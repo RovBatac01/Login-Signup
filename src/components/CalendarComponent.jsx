@@ -4,7 +4,7 @@ import '../styles/Components Css/CalendarComponent.css'; // Import the CSS file
 import { useTheme } from '../context/ThemeContext'; // Import the custom hook to use theme context (Adjust path if necessary)
 
 // Define your backend API base URL
-const API_BASE_URL = 'https://login-signup-3470.onrender.com'; // Make sure this matches your backend port
+const API_BASE_URL = 'https://login-signup-3470.onrender.com'; // Make sure this matches your backend
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -58,7 +58,8 @@ export default function Calendar() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/events-all`);
+      // Changed from /events-all to /api/events-all to match your backend route
+      const response = await fetch(`${API_BASE_URL}/api/events-all`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -110,7 +111,8 @@ export default function Calendar() {
         event_date: formatDateToYYYYMMDD(newEvent.date), // Format for backend
       };
 
-      const response = await fetch(`${API_BASE_URL}/events`, {
+      // Changed from /events to /api/events to match your backend route
+      const response = await fetch(`${API_BASE_URL}/api/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +140,8 @@ export default function Calendar() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/events/${eventId}`, {
+      // Changed from /events/${eventId} to /api/events/${eventId} to match your backend route
+      const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         method: 'DELETE',
       });
 

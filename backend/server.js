@@ -1668,13 +1668,18 @@ app.post('/save-user', async (req, res) => {
   }
 });
 
-app.get('/api/events-all', async (req, res) => {
+app.get('/api/events', async (req, res) => {
+  const { date } = req.query;
   try {
-    // Select all events, ordered by event_date and time
-    const [rows] = await pool.execute('SELECT * FROM events ORDER BY event_date, time');
-    res.json(rows);
+    if (date) {
+      const [rows] = await pool.execute('SELECT * FROM events WHERE event_date = ? ORDER BY time, id', [date]);
+      res.json(rows);
+    } else {
+      const [rows] = await pool.execute('SELECT * FROM events ORDER BY event_date, time');
+      res.json(rows);
+    }
   } catch (err) {
-    console.error('Error fetching all events:', err);
+    console.error('Error fetching events:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
