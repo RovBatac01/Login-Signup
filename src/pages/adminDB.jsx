@@ -1,12 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import styles from "../styles/Pages Css/adminDB.module.css";
 import { ThemeContext } from "../context/ThemeContext";
 import { AuthContext } from "../context/AuthContext";
 import AdminDashboardPage from "../components/AdminDashboardPage";
-import EstablishmentSensors from "../components/DashboardEstablishment-UI";
+import EstablishmentSensors, { sensorComponentMap } from "../components/DashboardEstablishment-UI";
 import Calendar from "../components/CalendarComponent";
+import InfoButton from "../components/InfoButton";
+import WaterQualityInfoModal from "../components/WaterQualityInfoModal";
+import '@fortawesome/fontawesome-free/css/all.min.css';  // For the icons
 // Import socket.io-client and your socket instance
 import io from 'socket.io-client';
 import socket from '../DashboardMeters/socket'; // Assuming 'socket.js' is in '../Dashboard Meters'
@@ -18,11 +20,19 @@ const AdminDb = () => {
   const [establishments, setEstablishments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedEstablishmentModal, setSelectedEstablishmentModal] = useState(null);
 
   // --- States for the Global Warning Pop-up ---
   const [showWarningPopup, setShowWarningPopup] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
   const [warningTitle, setWarningTitle] = useState('⚠️ Water Quality Alert!');
+  
+  // --- State for Water Quality Info Modal ---
+  const [showWaterQualityInfo, setShowWaterQualityInfo] = useState(false);
+  const [activeParameter, setActiveParameter] = useState('overview');  // --- Helper Function to Generate Device ID ---
+  const generateDeviceId = () => {
+    return Math.floor(10000 + Math.random() * 90000).toString();
+  };
 
   const fetchEstablishments = async () => {
     setLoading(true);
@@ -84,7 +94,6 @@ const AdminDb = () => {
       socket.on('newNotification', handleNewNotification);
     }
 
-
     return () => {
       // Clean up the event listener when the component unmounts
       if (socket) {
@@ -127,13 +136,26 @@ const AdminDb = () => {
     }
   };
 
+  // Handler for showing establishment details in full screen modal
+  const handleShowEstablishmentModal = (establishment) => {
+    setSelectedEstablishmentModal(establishment);
+  };
+
+  // Handler for closing the full screen modal
+  const handleCloseEstablishmentModal = () => {
+    setSelectedEstablishmentModal(null);
+  };
+
   return (
     <div className={`${styles.admindb} ${theme}`}>
       <div className={styles.admindbContainer}>
         <Sidebar theme={theme} toggleTheme={toggleTheme} />
         <div className={styles.admindbContents}>
-          <div className={styles.mainMetrics}>
+          <div className={styles.meterRowFlex}>
             <AdminDashboardPage />
+            <div className={styles.infoButtonContainer}>
+              <InfoButton onClick={() => setShowWaterQualityInfo(true)} text="Water Quality Information" />
+            </div>
           </div>
 
           <div className={styles.mainContentGrid}>
@@ -151,6 +173,7 @@ const AdminDb = () => {
                       key={establishment.id}
                       establishment={establishment}
                       onDelete={handleDeleteEstablishment}
+                      onShowModal={() => handleShowEstablishmentModal(establishment)}
                     />
                   );
                 })}
@@ -166,13 +189,93 @@ const AdminDb = () => {
 
       {/* Global Pop-up Warning Notification (Centered on Screen) */}
       {showWarningPopup && (
-        <div className="warning-popup"> {/* Ensure you have this class in your CSS */}
-          <div className="popup-content"> {/* Ensure you have this class in your CSS */}
+        <div className="warning-popup">
+          <div className="popup-content">
             <h3>{warningTitle}</h3>
             <p>{warningMessage}</p>
             <button onClick={() => setShowWarningPopup(false)} className="close-popup">
               Close
             </button>
+          </div>
+        </div>
+      )}
+      
+      {/* Water Quality Information Modal */}
+      <WaterQualityInfoModal 
+        isOpen={showWaterQualityInfo} 
+        onClose={() => setShowWaterQualityInfo(false)}
+        activeParameter={activeParameter}
+      />
+
+      {/* Full Screen Establishment Modal */}
+      {selectedEstablishmentModal && (
+        <div className="estab-modal">
+          <div className="estab-modal-content">
+            <div className="estab-modal-header">
+              <button onClick={handleCloseEstablishmentModal} className="estab-modal-close-button">
+                <i className="fas fa-times"></i>
+              </button>
+              <h2 className="estab-modal-title">{selectedEstablishmentModal.name}</h2>
+              <div className="estab-modal-meta">
+                <span className="badge sensor-count-badge">
+                  <i className="fas fa-microchip"></i> {
+                    Array.isArray(selectedEstablishmentModal.sensors) 
+                      ? selectedEstablishmentModal.sensors.length 
+                      : 0
+                  } Sensors
+                </span>
+                {selectedEstablishmentModal.device_id && (
+                  <span className="badge device-id-badge">
+                    <i className="fas fa-tablet-alt"></i> Device ID: {selectedEstablishmentModal.device_id}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="estab-sensor-list">
+              {Array.isArray(selectedEstablishmentModal.sensors) && selectedEstablishmentModal.sensors.length > 0 ? (
+                selectedEstablishmentModal.sensors.map((sensor) => {
+                  const SensorComponent = sensorComponentMap[sensor.name];
+                  if (SensorComponent) {
+                    return (
+                      <div key={sensor.id} className="estab-sensor-card">
+                        <div className="estab-sensor-header">
+                          <h3 className="estab-sensor-name">{sensor.name}</h3>
+                        </div>
+                        <div className="estab-sensor-body">
+                          <SensorComponent />
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={sensor.id} className="estab-sensor-card missing-component">
+                        <div className="estab-sensor-header">
+                          <h3 className="estab-sensor-name">{sensor.name}</h3>
+                        </div>
+                        <div className="estab-sensor-body">
+                          <div className="missing-sensor-placeholder">
+                            <i className="fas fa-exclamation-triangle"></i>
+                            <p>No dedicated display component available</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                })
+              ) : (
+                <div className="no-sensors-container">
+                  <i className="fas fa-exclamation-circle no-sensors-icon"></i>
+                  <p className="no-sensors-message">No sensors currently assigned to this establishment</p>
+                </div>
+              )}
+            </div>
+
+            <div className="estab-modal-footer">
+              <button onClick={handleCloseEstablishmentModal} className="estab-modal-close-button-bottom">
+                <i className="fas fa-times-circle"></i> Close
+              </button>
+            </div>
           </div>
         </div>
       )}

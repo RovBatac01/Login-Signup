@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
-import Navbar from "../components/Navbar"; // Assuming you have this
+import Navbar from "../components/Navbar"; 
 import Sidebar from "../components/Sidebar";
-import "../styles/Pages Css/AdminHistory.css"; // Still referencing your main CSS file
+import "../styles/Pages Css/AdminHistory.css"; 
 import Temp from "../sensors/temp";
 import PhLevel from "../sensors/phlevel";
 import Turbidity from "../sensors/turbudity";
@@ -13,13 +13,13 @@ import "../styles/theme.css";
 import { ThemeContext } from "../context/ThemeContext";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-// Assuming AuthContext provides user information including establishmentId
 import { AuthContext } from '../context/AuthContext';
+import PageTitle from "../components/PageTitle";
+import { exportToPdf, savePdf } from "../utils/pdfExport";
 
 
 const AdminHistory = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
-    // Destructure currentUser from AuthContext (assuming it's provided here)
     const { currentUser } = useContext(AuthContext);
 
     // State to hold the dynamically fetched establishment ID
@@ -29,6 +29,7 @@ const AdminHistory = () => {
     const [exporting, setExporting] = useState(false);
     const [selectedSensorForModal, setSelectedSensorForModal] = useState(null);
     const [message, setMessage] = useState('');
+    const [exportingPdf, setExportingPdf] = useState(false);
     const [messageType, setMessageType] = useState(''); // 'success' or 'error'
 
     // State to hold the dynamically fetched list of available sensors for the establishment
@@ -231,7 +232,7 @@ const AdminHistory = () => {
                 <div className="aqua-history-container">
                     <Sidebar theme={theme} toggleTheme={toggleTheme} />
                     <div className="aqua-history-content-wrapper">
-                        <h1 className={`aqua-history-title ${theme}-text`}>Sensor History</h1>
+                        <PageTitle title="SENSOR HISTORY" />
                         <div className="aqua-history-loading">
                             <p>Loading sensors for establishment...</p>
                         </div>
@@ -241,13 +242,41 @@ const AdminHistory = () => {
         );
     }
 
+        // Export to PDF function
+        const exportToPDF = async () => {
+            setExportingPdf(true);
+            
+            try {
+                const dataToExport = await fetchSensorData();
+                if (!dataToExport) {
+                    setExportingPdf(false);
+                    return;
+                }
+    
+                // Generate PDF using our utility function
+                const establishmentName = user?.establishmentName || "All Establishments";
+                const pdfBlob = exportToPdf(dataToExport, filter, establishmentName);
+                
+                // Save the PDF
+                savePdf(pdfBlob, filter, establishmentName);
+                console.log("PDF file exported successfully.");
+    
+            } catch (error) {
+                console.error("Error exporting PDF:", error);
+                alert(`Error exporting PDF: ${error.message}. Check browser console for details.`);
+            } finally {
+                setExportingPdf(false);
+            }
+        };
+
     return (
         <div className={`aqua-history-page ${theme}`}>
             <div className="aqua-history-container">
                 <Sidebar theme={theme} toggleTheme={toggleTheme} />
 
                 <div className="aqua-history-content-wrapper">
-                    <h1 className={`aqua-history-title ${theme}-text`}>Sensor History</h1>
+                    {/* Replace h1 with PageTitle component */}
+                    <PageTitle title="SENSOR HISTORY" />
                     
                     {message && (
                         <div className={`settings-page-message-box ${messageType === 'success' ? 'settings-page-message-success' : 'settings-page-message-error'}`}>
@@ -273,8 +302,11 @@ const AdminHistory = () => {
                         </div>
 
                         <div className="aqua-export-buttons">
-                            <button onClick={exportToExcel} className="aqua-export-btn" disabled={exporting}>
+                            <button onClick={exportToExcel} className="aqua-export-btn excel-btn" disabled={exporting || exportingPdf}>
                                 {exporting ? "Exporting..." : "Export Excel"}
+                            </button>
+                            <button onClick={exportToPDF} className="aqua-export-btn pdf-btn" disabled={exporting || exportingPdf}>
+                                {exportingPdf ? "Exporting..." : "Export PDF"}
                             </button>
                         </div>
                     </div>

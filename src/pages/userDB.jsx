@@ -14,6 +14,9 @@ import Turbidity from "../DashboardMeters/Turbidity";
 import ElectricalCon from "../DashboardMeters/ElectricalCon";
 import AccessRestrictedModal from "../components/AccessRestrictedModal";
 import { useNavigate, Link } from "react-router-dom";
+import PageTitle from "../components/PageTitle";
+import InfoButton from "../components/InfoButton";
+import WaterQualityInfoModal from "../components/WaterQualityInfoModal";
 import axios from 'axios'; // Import axios for API calls
 // Import socket.io-client and your socket instance
 import io from 'socket.io-client';
@@ -46,7 +49,9 @@ const Userdb = () => {
     const { currentUser, login, logout, getToken, deviceId, establishmentId } = useContext(AuthContext);
     const [showAccessModal, setShowAccessModal] = useState(false);
     const navigate = useNavigate();
-
+    const [showWaterQualityInfo, setShowWaterQualityInfo] = useState(false);
+    const [activeParameter, setActiveParameter] = useState('overview'); 
+    
     // State for AlertDialog
     const [alertMessage, setAlertMessage] = useState("");
     const [showAlert, setShowAlert] = useState(false);
@@ -358,11 +363,22 @@ const Userdb = () => {
         );
     }
 
+          {/* Water Quality Information Modal */}
+      <WaterQualityInfoModal 
+        isOpen={showWaterQualityInfo} 
+        onClose={() => setShowWaterQualityInfo(false)}
+        activeParameter={activeParameter}
+      />
+
     return (
         <div className={`${styles.userDb} ${theme}`}>
             <div className={styles.userDbContainer}>
                 <Sidebar theme={theme} toggleTheme={toggleTheme} />
                 <div className={styles.userDbContents}>
+                    <PageTitle title="DASHBOARD" />
+                                <div className={styles.infoButtonContainer}>
+              <InfoButton onClick={() => setShowWaterQualityInfo(true)} text="Water Quality Information" />
+            </div>
                     <div className={styles.meterRowFlex}>
                         {associatedSensors.length > 0 ? (
                             associatedSensors.map((sensor) => {
@@ -419,6 +435,14 @@ const Userdb = () => {
                     </div>
                 </div>
             )}
+
+                      {/* Water Quality Information Modal */}
+      <WaterQualityInfoModal 
+        isOpen={showWaterQualityInfo} 
+        onClose={() => setShowWaterQualityInfo(false)}
+        activeParameter={activeParameter}
+      />
+      
         </div>
     );
 };

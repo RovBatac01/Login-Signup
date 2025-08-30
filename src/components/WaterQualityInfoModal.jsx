@@ -88,6 +88,46 @@ const WaterQualityInfoModal = ({ isOpen, onClose, activeParameter = 'overview' }
           <div className="wq-tab-content">
             {currentTab === 'overview' && (
               <div className="wq-overview">
+                {/* NEW: Color Legend Section */}
+                <div className="wq-color-legend">
+                  <h3>Water Quality Color Indicators</h3>
+                  <p>Our system uses color coding to quickly communicate water quality status:</p>
+                  
+                  <div className="wq-quality-indicators">
+                    <div className="wq-quality-indicator excellent">
+                      <div className="indicator-color"></div>
+                      <div className="indicator-details">
+                        <h4>Green - Excellent/Safe</h4>
+                        <p>Parameters are within optimal range. Water is safe for intended use.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="wq-quality-indicator good">
+                      <div className="indicator-color"></div>
+                      <div className="indicator-details">
+                        <h4>Light Green - Good</h4>
+                        <p>Parameters in acceptable range. Minor treatment may be required.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="wq-quality-indicator moderate">
+                      <div className="indicator-color"></div>
+                      <div className="indicator-details">
+                        <h4>Yellow - Moderate/Caution</h4>
+                        <p>Parameters approaching critical levels. Treatment recommended.</p>
+                      </div>
+                    </div>
+                    
+                    <div className="wq-quality-indicator poor">
+                      <div className="indicator-color"></div>
+                      <div className="indicator-details">
+                        <h4>Red - Critical/Poor</h4>
+                        <p>Parameters outside safe ranges. Immediate action required.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="wq-intro">
                   <h3>Water Quality Monitoring System</h3>
                   <p>Our comprehensive water quality monitoring system measures key parameters that indicate the health and safety of water sources. These measurements help ensure water is suitable for its intended use, whether for drinking, agriculture, or environmental conservation.</p>

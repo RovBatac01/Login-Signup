@@ -14,6 +14,8 @@ import { ThemeContext } from "../context/ThemeContext";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+import { exportToPdf, savePdf } from "../utils/pdfExport";
+import PageTitle from "../components/PageTitle";
 
 // Renamed the component from History to UserHistory
 const UserHistory = () => {
@@ -27,6 +29,7 @@ const UserHistory = () => {
     const [selectedSensorForModal, setSelectedSensorForModal] = useState(null);
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
+    const [exportingPdf, setExportingPdf] = useState(false);
 
     // State to hold the dynamically fetched list of available sensors for the user's device
     const [userAssociatedSensors, setUserAssociatedSensors] = useState([]);
@@ -241,6 +244,33 @@ const UserHistory = () => {
         }
     };
 
+        // Export to PDF function
+        const exportToPDF = async () => {
+            setExportingPdf(true);
+            
+            try {
+                const dataToExport = await fetchSensorData();
+                if (!dataToExport) {
+                    setExportingPdf(false);
+                    return;
+                }
+    
+                // Generate PDF using our utility function
+                const establishmentName = user?.establishmentName || "All Establishments";
+                const pdfBlob = exportToPdf(dataToExport, filter, establishmentName);
+                
+                // Save the PDF
+                savePdf(pdfBlob, filter, establishmentName);
+                console.log("PDF file exported successfully.");
+    
+            } catch (error) {
+                console.error("Error exporting PDF:", error);
+                alert(`Error exporting PDF: ${error.message}. Check browser console for details.`);
+            } finally {
+                setExportingPdf(false);
+            }
+        };
+
     const getSensorUnit = (sensorName) => {
         switch (sensorName) {
             case "Turbidity": return "NTU";
@@ -260,7 +290,7 @@ const UserHistory = () => {
             <div className={`aqua-history-page ${theme}`}>
                 <Sidebar theme={theme} toggleTheme={toggleTheme} />
                 <div className="aqua-history-content-wrapper">
-                    <h1 className={`aqua-history-title ${theme}-text`}>Sensor History </h1>
+                    <PageTitle title="SENSOR HISTORY" />
                     <div className="aqua-history-sensors-grid">
                         <p>Loading your device's sensors...</p>
                     </div>
@@ -279,7 +309,7 @@ const UserHistory = () => {
                 <Sidebar theme={theme} toggleTheme={toggleTheme} />
 
                 <div className="aqua-history-content-wrapper">
-                    <h1 className={`aqua-history-title ${theme}-text`}>Sensor History </h1>
+                    <PageTitle title="SENSOR HISTORY" />
                     {message && (
                         <div className={`settings-page-message-box ${messageType === 'success' ? 'settings-page-message-success' : 'settings-page-message-error'}`}>
                             {message}
@@ -304,8 +334,11 @@ const UserHistory = () => {
                         </div>
 
                         <div className="aqua-export-buttons">
-                            <button onClick={exportToExcel} className="aqua-export-btn" disabled={exporting}>
+                            <button onClick={exportToExcel} className="aqua-export-btn excel-btn" disabled={exporting || exportingPdf}>
                                 {exporting ? "Exporting..." : "Export Excel"}
+                            </button>
+                            <button onClick={exportToPDF} className="aqua-export-btn pdf-btn" disabled={exporting || exportingPdf}>
+                                {exportingPdf ? "Exporting..." : "Export PDF"}
                             </button>
                         </div>
                     </div>

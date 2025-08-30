@@ -70,7 +70,7 @@
   gap: 10px; /* Further reduced gap for a tighter layout */
   overflow-y: scroll; 
   max-height: 100vh;
-  padding-top: 10px; /* Added a small padding at the top */ 
+  padding-top: 10px;
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -189,7 +189,7 @@
     flex-direction: column;
     position: relative;
     overflow-y: auto; 
-    height: fit-content;
+    height: 665px;
     width: 100%;
 }
 

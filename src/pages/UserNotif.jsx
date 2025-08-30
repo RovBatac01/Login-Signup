@@ -5,6 +5,7 @@ import axios from 'axios';
 import '../styles/Pages Css/Notifications.css';
 import Sidebar from '../components/Sidebar';
 import { ThemeContext } from '../context/ThemeContext';
+import PageTitle from "../components/PageTitle";
 
 // --- Helper Functions for User Notifications in localStorage ---
 const getUserNotificationsKey = (userId) => `userNotifications_${userId}`;
@@ -284,9 +285,7 @@ const UserNotificationsPage = () => {
         <div className={`notifications-container bg-${theme}-background text-${theme}-text`}>
             <div className="notifications-wrapper">
                 <div className="notifications-header">
-                    <h1 className={`notifications-title ${theme}-text`}>
-                        Your Notifications
-                    </h1>
+                    <PageTitle title="Notifications" />
                     <div className="notifications-actions">
                         <button
                             onClick={markAllAsRead}

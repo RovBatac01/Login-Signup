@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Search, Building, Wifi, Users } from 'lucide-react';
 import '../styles/Components Css/DashboardPage.css';
 import { ThemeContext } from '../context/ThemeContext'; // adjust path as needed
+import PageTitle from "../components/PageTitle";
 
 // DashboardSearch Component
 const AdminDashboardSearch = () => {
@@ -126,8 +127,8 @@ const AdminDashboardPage = () => {
   }, []);
 
   return (
-    <div className="dashboard-page">
-      <h1 className="dashboard-page-title">Dashboard</h1>
+    <div className="dashboard-page" style={{ width: '100%' }}>
+      <PageTitle title="DASHBOARD" />
       <AdminDashboardSearch />
       <AdminDashboardSummary
         totalSensors={dashboardSummaryData.totalSensors}

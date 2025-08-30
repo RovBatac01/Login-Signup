@@ -647,3 +647,117 @@
     margin-top: 1rem;
   }
 }
+
+/* Add this to c:\xampp\htdocs\Login-Signup\src\styles\Components Css\WaterQualityInfo.css */
+
+/* Color Legend Styles */
+.wq-color-legend {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.wq-quality-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.wq-quality-indicator {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.wq-quality-indicator:hover {
+  transform: translateX(5px);
+}
+
+.wq-quality-indicator.excellent {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-left: 4px solid #4CAF50;
+}
+
+.wq-quality-indicator.good {
+  background-color: rgba(139, 195, 74, 0.1);
+  border-left: 4px solid #8BC34A;
+}
+
+.wq-quality-indicator.moderate {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-left: 4px solid #FFC107;
+}
+
+.wq-quality-indicator.poor {
+  background-color: rgba(244, 67, 54, 0.1);
+  border-left: 4px solid #F44336;
+}
+
+.indicator-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.excellent .indicator-color {
+  background-color: #4CAF50;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+}
+
+.good .indicator-color {
+  background-color: #8BC34A;
+  box-shadow: 0 0 8px rgba(139, 195, 74, 0.6);
+}
+
+.moderate .indicator-color {
+  background-color: #FFC107;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.6);
+}
+
+.poor .indicator-color {
+  background-color: #F44336;
+  box-shadow: 0 0 8px rgba(244, 67, 54, 0.6);
+}
+
+.indicator-details h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+}
+
+.indicator-details p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* Dark theme adjustments */
+.dark .wq-color-legend {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 768px) {
+  .wq-quality-indicator {
+    padding: 8px;
+  }
+  
+  .indicator-color {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+  }
+  
+  .indicator-details h4 {
+    font-size: 14px;
+  }
+  
+  .indicator-details p {
+    font-size: 12px;
+  }
+}

@@ -1,13 +1,22 @@
 /* Light & Dark Mode Styles */
-.app-container {
-    min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+body, 
+.app-container, 
+.login-page, 
+.auth-container,
+.auth-page {
+  background-color: #d6ebff !important; /* Light blue color from image */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  
 }
 
 
 /* Light Mode - Ensure Consistent UI Elements */
 .app-container.light a {
     color: #007bff;
+
+    
 }
 
 .app-container.dark a {

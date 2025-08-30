@@ -5,6 +5,7 @@ import axios from 'axios';
 import '../styles/Pages Css/Notifications.css';
 import Sidebar from '../components/Sidebar';
 import { ThemeContext } from '../context/ThemeContext';
+import PageTitle from "../components/PageTitle";
 
 // --- NotificationIcon component (updated for 'schedule' and 'request' type) ---
 const NotificationIcon = ({ type }) => {
@@ -345,9 +346,7 @@ const markAllAsRead = async () => {
             <div className="notifications-wrapper">
                 <div className="notifications-header">
                     {/* CHANGE 3: Generalize the title */}
-                    <h1 className={`notifications-title ${theme}-text`}>
-                        Admin Panel Notifications
-                    </h1>
+    <PageTitle title="NOTIFICATIONS" />
                     <div className="notifications-actions">
                         <button
                             onClick={markAllAsRead}
