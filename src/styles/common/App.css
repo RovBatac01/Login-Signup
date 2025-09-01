@@ -1,0 +1,147 @@
+/* Light & Dark Mode Styles */
+body, 
+.app-container, 
+.login-page, 
+.auth-container,
+.auth-page {
+  background-color: #d6ebff !important; /* Light blue color from image */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  
+}
+
+
+/* Light Mode - Ensure Consistent UI Elements */
+.app-container.light a {
+    color: #007bff;
+
+    
+}
+
+.app-container.dark a {
+    color: #4da8da;
+}
+
+
+/* Light Mode - Input Fields */
+
+
+
+/* Add these to a global CSS file (e.g., App.css or theme.css) */
+
+.app-blurred-content { /* Renamed from .blurred-content */
+    filter: blur(5px); /* Adjust blur amount as needed */
+    pointer-events: none; /* Prevents interaction with blurred content */
+    user-select: none; /* Prevents selecting text */
+    transition: filter 0.3s ease-in-out; /* Smooth transition for blur */
+    height: 100vh; /* Ensure it covers the full viewport */
+    overflow: hidden; /* Prevent scrolling when blurred */
+}
+
+/* Modal Overlay */
+.app-modal-overlay { /* Renamed from .modal-overlay */
+    position: fixed; /* Changed to fixed to cover the entire viewport */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Slightly less opaque to let blur show */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Ensure it's on top of everything */
+    backdrop-filter: blur(8px); /* Apply blur directly to the overlay's background */
+    -webkit-backdrop-filter: blur(8px); /* For Safari support */
+}
+
+/* Modal Content */
+.app-modal-content { /* Renamed from .modal-content */
+    background-color: var(--background-color-light); /* Use theme variable for background */
+    color: var(--text-color); /* Use theme variable for text color */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    animation: fadeInScale 0.3s ease-out; /* Simple animation for modal appearance */
+}
+
+.app-modal-content h3 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    color: var(--primary-color); /* Use a primary color for the heading */
+    margin-bottom: 15px;
+}
+
+.app-modal-content p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+/* Modal Actions (Buttons) */
+.app-modal-actions { /* Renamed from .modal-actions */
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 20px; /* Space between buttons */
+}
+
+.app-modal-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.app-modal-actions button:first-child { /* Send Request button */
+    background-color: #28a745; /* Green for action */
+    color: white;
+}
+
+.app-modal-actions button:first-child:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+.app-modal-actions button:last-child { /* Cancel button */
+    background-color: #dc3545; /* Red for cancel */
+    color: white;
+}
+
+.app-modal-actions button:last-child:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+
+/* Keyframe animation for modal */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('/fonts/Montserrat-Medium.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('/fonts/Lato-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+}

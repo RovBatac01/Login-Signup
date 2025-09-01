@@ -1,0 +1,140 @@
+.meter-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.meter-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meter-connection-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 4px;
+  margin-left: 24px; /* Align with the meter name for better visual hierarchy */
+}
+
+.status-connected {
+  background-color: rgba(32, 164, 76, 0.1);
+  color: #20a44c;
+}
+
+.status-disconnected {
+  background-color: rgba(217, 83, 79, 0.1);
+  color: #d9534f;
+}
+
+[data-theme="dark"] .status-connected {
+  background-color: rgba(32, 164, 76, 0.2);
+}
+
+[data-theme="dark"] .status-disconnected {
+  background-color: rgba(217, 83, 79, 0.2);
+}
+
+/* Custom toggle styles - modified to be more compact */
+.toggle-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.custom-toggle {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Connection status text below meter title */
+.meter-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.connection-status-text {
+  font-size: 0.7rem;
+  margin-top: 4px;
+  margin-left: 24px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.widget-container .meter-name-wrapper {
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.widget-container {
+  position: relative;
+  background-color: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid var(--card-border, #e5e7eb);
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.temperature-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.temperature-text .label {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #777);
+  margin-bottom: 0.2rem;
+}
+
+.temperature-text .value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
+  transition: color 0.3s ease;
+}
+
+.temperature-text .unit {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #777);
+}
+
+.water-quality-text {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--card-border, #e5e7eb);
+  width: 100%;
+}

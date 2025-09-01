@@ -1,0 +1,183 @@
+/* Sidebar Styles */
+.sidebar {
+  height: 100vh;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.User {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #444;
+  width: 100%;
+  padding-top: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1rem;
+}
+
+.User h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--sidebar-text);
+  margin-bottom: 0.2rem;
+  margin-left: 0;
+  font-family: 'Montserrat';
+}
+
+.User h4 {
+  font-size: 1.1rem;
+  color: var(--sidebar-text);
+  margin-top: 0;
+  margin-left: 0;
+  font-family: 'Poppins';
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px; /* Increased horizontal padding slightly */
+  cursor: pointer;
+  color: var(--sidebar-text-light);
+  font-size: 14px;
+  position: relative;
+  width: 100%;
+  font-family: 'Poppins';
+  transition: color 0.3s ease, font-weight 0.3s ease, background-color 0.3s ease, border-radius 0.3s ease;
+  box-sizing: border-box; /* Ensures padding doesn't push element out */
+}
+
+/* Style for the selected/active menu item - MORE ROUND & VISIBLE */
+.menu-item.active {
+  color: var(--sidebar-active, #ffffff); /* Ensure active text is visible, e.g., white */
+  font-weight: bold;
+  background-color: var(--sidebar-active-bg, #007bff); /* Stronger background color for active state */
+  border-radius: 8px; /* More rounded corners for the entire item */
+  padding-left: 20px; /* Adjust padding for the indicator, if using it inside */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for depth */
+}
+
+/* Indicator for the active menu item - MORE ROUND & VISIBLE */
+/* I've removed the absolute indicator if you're using a full background for the active item.
+   If you still want a bar, this is how you'd make it more visible: */
+.menu-item.active .active-indicator {
+  /* Consider if you still need this if the whole item is highlighted.
+     If you do, you might want to make it an overlay or a more distinct element. */
+  display: none; /* Hiding it if the whole background is the indicator */
+
+  /* If you still want an indicator bar alongside the highlighted background: */
+  /*
+  position: absolute;
+  left: 0;
+  height: 80%; /* Shorter than 100% to allow for more rounded appearance */
+  /* width: 6px; /* Thicker bar */
+  /* background: var(--sidebar-indicator-bar, #ffc107); /* A contrasting color for the bar */
+  /* border-radius: 3px; /* More rounded end for the bar itself */
+  /* top: 10%; /* Center vertically if height is less than 100% */
+  /*
+  */
+}
+
+
+/* Hover effect for menu items */
+.menu-item:hover {
+  background-color: var(--sidebar-hover-bg, rgba(255, 255, 255, 0.1)); 
+  color: var(--sidebar-hover-text, var(--sidebar-active)); /* Change text color on hover, perhaps to the active color */
+  border-radius: 8px; /* Apply similar rounding on hover for consistency */
+}
+
+/* Ensure the icon color also changes with the active state */
+.menu-item.active .icon {
+  color: var(--sidebar-active-icon, #ffffff); /* Icon color matches active text */
+}
+
+.icon {
+  font-size: 16px;
+  color: var(--sidebar-text-light);
+  transition: color 0.3s ease; /* Smooth transition for icon color */
+}
+
+.section-title {
+  font-size: 12px;
+  color: var(--sidebar-text-muted);
+  margin-top: 20px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.logout {
+  margin-top: auto;
+}
+
+.logout .menu-item {
+  color: var(--sidebar-text-light);
+  font-family: 'Poppins';
+}
+
+/* The standalone .active-indicator is likely redundant if it's nested within .menu-item.active */
+/* .active-indicator {
+  width: 5px;
+  height: 100%;
+  background-color: var(--sidebar-indicator);
+  position: absolute;
+  left: 0;
+} */
+
+
+/* In your CSS file (e.g., Sidebar.css or a new Modal.css) */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+  gap: 10px; /* Space between buttons */
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.modal-actions button:first-child { /* Send Request button */
+  background-color: #007bff; /* Example blue */
+  color: white;
+}
+
+.modal-actions button:first-child:hover {
+  background-color: #0056b3;
+}
+
+.modal-actions button:last-child { 
+  background-color: #6c757d; 
+  color: white;
+}
+
+.modal-actions button:last-child:hover {
+  background-color: #5a6268;
+}
+

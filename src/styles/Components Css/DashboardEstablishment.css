@@ -1,0 +1,94 @@
+/* Variables will be inherited from :root in Dashboard.module.css or global styles */
+
+.establishment-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px; /* Reduced from 10px to 8px */
+  padding: 12px 16px; /* Reduced from 15px 20px to 12px 16px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03); /* Slightly reduced shadow */
+}
+
+.establishment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  background-color: var(--input-bg); /* Slight background change on hover */
+}
+
+.establishment-card-content {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Space between icon and name */
+}
+
+.establishment-icon {
+  color: #60a5fa; /* A friendly blue for establishment icons */
+  min-width: 24px; /* Ensure icon doesn't shrink */
+  min-height: 24px;
+}
+
+/* Dark theme icon color */
+:root[data-theme='dark'] .establishment-icon {
+  color: #93c5fd;
+}
+
+.establishment-name {
+  font-size: 1.05rem; /* Reduced from 1.15rem to 1.05rem */
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0; /* Remove default margin from h3 */
+}
+
+.establishment-arrow {
+  color: var(--text-color); /* Arrow color matches text */
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.establishment-card:hover .establishment-arrow {
+  opacity: 1; /* Arrow becomes more visible on hover */
+}
+
+/* styles/Components Css/Establishment.css */
+
+.estab-actions {
+    display: flex;
+    gap: 10px; /* Space between buttons/icons */
+    align-items: center;
+}
+
+.estab-details-button,
+.estab-delete-icon-button { /* Apply common button styles */
+    padding: 6px 12px; /* Reduced padding from 8px 15px to 6px 12px */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease; /* Add color transition */
+}
+
+.estab-details-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.estab-details-button:hover {
+    background-color: #0056b3;
+}
+
+.estab-delete-icon-button {
+    background-color: transparent; /* Make background transparent */
+    color: #dc3545; /* Red color for the icon */
+    padding: 8px; /* Adjust padding for icon-only button */
+    font-size: 1.2rem; /* Make icon larger */
+}
+
+.estab-delete-icon-button:hover {
+    color: #c82333; /* Darker red on hover */
+    background-color: rgba(220, 53, 69, 0.1); /* Slight background on hover */
+}
+

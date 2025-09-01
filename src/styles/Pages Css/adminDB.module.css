@@ -1,0 +1,503 @@
+/* Userdb.module.css */
+
+.admindb {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.admindbContainer {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.admindbContents {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Further reduced gap for a tighter layout */
+  overflow-y: scroll; 
+  max-height: 100vh;
+  padding-top: 10px;
+}
+
+.admindbContents::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admindbContents::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  border-radius: 10px;
+}
+
+.admindbContents::-webkit-scrollbar-thumb {
+  background: var(--accent-color); /* Use a theme variable for scrollbar */
+  border-radius: 10px;
+}
+
+/* Calendar Widget Styles */
+.calendarWidget {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px var(--shadow-color);
+  margin-bottom: 20px; /* Space below the calendar */
+  /* This ensures the calendar takes available width but doesn't stretch excessively */
+  width: 100%;
+  max-width: 900px; /* Limit max width for better aesthetics on large screens */
+  align-self: center; /* Center the calendar widget */
+}
+
+.meterWidget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px var(--shadow-color);
+  text-align: center;
+  font-weight: bold;
+  transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out;
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.meterWidget:hover {
+  transform: scale(1.03); /* Slightly less aggressive hover */
+  box-shadow: 0px 6px 15px var(--shadow-color);
+}
+
+.meterLabel {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--text-color);
+  width: 100%;
+  text-align: left;
+  padding-left: 10px;
+}
+
+/* Admin Establishment Container */
+.adminEstablishmentContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Center items within the container */
+  gap: 20px;
+  width: 100%;
+}
+
+.adminEstablishmentContainer > div {
+  flex: 1 1 calc(33% - 20px);
+  min-width: 280px; /* Slightly reduced min-width for better wrapping */
+  max-width: 350px; /* Add a max-width to prevent stretching too wide */
+  background: var(--card-bg); /* Apply consistent styling */
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px var(--shadow-color);
+}
+
+
+/* Media queries for responsiveness */
+@media (max-width: 1200px) {
+  .adminEstablishmentContainer > div {
+    flex: 1 1 calc(50% - 20px); /* Two columns on larger tablets */
+  }
+}
+
+@media (max-width: 768px) {
+  .admindbContents {
+    padding: 15px; /* Slightly less padding on smaller screens */
+  }
+
+  .calendarWidget {
+    padding: 15px;
+  }
+
+  .meterRowFlex {
+    gap: 15px;
+  }
+  .meterWidget {
+    width: 100%; /* Full width on medium screens to stack */
+    max-width: 350px; /* Keep a max-width */
+  }
+  .adminEstablishmentContainer > div {
+    flex: 1 1 100%; /* Stack on small tablets and mobile */
+    max-width: 400px; /* Limit width */
+  }
+}
+
+@media (max-width: 600px) {
+  .admindbContents {
+    padding: 10px;
+    gap: 15px;
+  }
+  .calendarWidget {
+    padding: 10px;
+  }
+  .meterRowFlex {
+    flex-direction: column; /* Stack all items vertically */
+    align-items: center; /* Center items when stacked */
+  }
+  .meterWidget {
+    width: 95%; /* Almost full width for better mobile experience */
+    margin-bottom: 15px; /* Add vertical spacing */
+  }
+}
+
+.mainContentGrid{
+  display: flex;
+  gap: 10px; /* Further reduced from 15px to 10px */
+  flex-grow: 1; /* Allow this section to grow */
+  width: 100%;
+  padding: 0 15px; /* Reduced from 0 20px to 0 15px */
+  margin-top: 0; /* Ensure no extra margin at the top */
+}
+
+.mainContentGrid .establishmentSection {
+  flex: 2; /* Takes 2 parts of the available space */
+}
+
+.calendarSection {
+  background-color: var(--card-bg);
+  border-radius: 10px; /* Reduced from 12px to 10px */
+  padding: 3px; /* Reduced from 5px to 3px */
+  box-sizing: border-box; 
+  box-shadow: 0px 3px 10px var(--shadow-color); /* Reduced shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center calendar within its section */
+  height: fit-content;
+  overflow-y: scroll;
+  width:33%;
+}
+
+.calendarSection::-webkit-scrollbar {
+  display: none;
+}
+
+.establishmentSection {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px; /* Reduced from 20px to 15px */
+    padding: 15px; /* Further reduced from 20px to 15px */
+    box-shadow: 0 10px 20px var(--shadow-color); /* Reduced shadow intensity */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto; 
+    height: 625px;
+    width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .mainContentGrid {
+    grid-template-columns: 1fr; /* Stack on smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .dbContainer {
+    flex-direction: column; /* Stack sidebar and content vertically */
+  }
+
+  .dbContents {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .meterRowFlex {
+    grid-template-columns: 1fr; /* Single column for meters */
+  }
+
+  .meterWidget {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .mainContentGrid {
+    gap: 20px;
+  }
+
+  .establishmentSection, .calendarSection {
+    padding: 20px;
+    min-height: unset; /* Allow height to adjust */
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .addEstablishmentButton {
+    width: 100%;
+  }
+  .addEstablishmentForm .formButtons {
+    flex-direction: column;
+  }
+  .addEstablishmentForm .formButtons button {
+    width: 100%;
+  }
+}
+
+/* For the container of your establishment cards */
+.establishmentCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Reduced from 15px to 10px */
+    flex-grow: 1;
+    padding-right: 5px;
+    align-items: flex-start; /* Align items to the start */
+    max-height: 450px; /* Allow space for the header and search bar */
+    overflow-y: auto; /* This will be scrollable within the parent */
+}
+
+/* Optional: Adjustments for smaller screens if needed */
+@media (max-width: 900px) {
+  .establishmentCards {
+    grid-template-columns: 1fr; /* On smaller screens, stack them in a single column */
+  }
+}
+
+/* Adjust the width of individual establishment sensor cards if necessary */
+/* This ensures they don't grow too wide on larger screens if there's only one or two */
+.establishmentCards > * {
+  max-width: 100%; /* Ensure individual cards don't overflow their grid area */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.infoButtonContainer {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.meterRowFlex {
+  display: flex !important; /* Force flex display */
+  flex-wrap: wrap !important;
+  gap: 10px; /* Further reduced from 15px to 10px */
+  justify-content: center; /* Center items if they don't fill the row */
+  width: 100%; /* Ensure it takes full width */
+  position: relative; /* For absolute positioning of the info button */
+  margin-bottom: 5px; /* Small margin before next section */
+}
+
+/* ============ MODAL STYLES ============ */
+/* Modal overlay - covers the entire viewport */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it appears above everything else */
+}
+
+/* Modal container */
+.modalContainer {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 5px 20px var(--shadow-color);
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  color: var(--text-color);
+}
+
+/* Close button */
+.closeButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: var(--text-color);
+}
+
+/* Establishment name in modal header */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.sensorInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.badge {
+  background-color: #e6f7e9;
+  color: #4cd964;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.deviceId {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+/* Sensor grid layout */
+.sensorGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Responsive adjustments for the sensor grid */
+@media (max-width: 768px) {
+  .sensorGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .sensorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Individual sensor card */
+.sensorCard {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.sensorCard h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+/* Sensor reading visualization */
+.sensorReading {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 10px solid #eee;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.sensorValue {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.sensorUnit {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+/* Status indicator */
+.statusIndicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.statusLabel {
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.statusToggle {
+  width: 50px;
+  height: 24px;
+  background-color: #4cd964;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+}
+
+.statusToggle:after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+/* Connected indicator */
+.connectedBadge {
+  background-color: #e6f7e9;
+  color: #4cd964;
+  font-size: 0.8rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Style for the details button */
+.detailsButton {
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.detailsButton:hover {
+  background-color: #0069d9;
+}
+
+.infoButtonContainer {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}

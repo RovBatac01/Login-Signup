@@ -1,0 +1,468 @@
+:root {
+  --notif-card-bg: #2f2f31;
+  --actions-button-bg-mark-read: green;
+  --actions-button-text-mark-read: #fff;
+  --actions-button-bg-delete-all: #e53e3e;
+  --actions-button-text-delete-all: #fff;
+  --approve-button-bg: #28a745;
+  --approve-button-text: #fff;
+  --decline-button-bg: #dc3545;
+  --decline-button-text: #fff;
+  --notif-text-color:white;
+  --notif-timestamp:white;
+}
+
+.light {
+  --notif-card-bg: #ffffff;
+  --actions-button-bg-mark-read: #28a745;
+  --actions-button-text-mark-read: #fff;
+  --actions-button-bg-delete-all: #dc3545;
+  --actions-button-text-delete-all: #fff;
+  --approve-button-bg: #28a745;
+  --approve-button-text: #fff;
+  --decline-button-bg: #dc3545;
+  --decline-button-text: #fff;
+  --notif-text-color:black;
+   --notif-timestamp:#718096;
+}
+
+.notifications-container {
+  min-height: 100vh;
+  padding: 0.5px;
+  background: var(--bg-color);
+  transition: background-color 0.3s ease;
+}
+
+.notifications-container.light {
+  background-color: #f0f2f5;
+}
+
+.notifications-wrapper {
+  max-width: 100%;
+  margin: 1rem 0;
+  padding: 0 20px;
+}
+
+.notifications-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.notifications-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'montserrat', sans-serif;
+}
+
+
+.notifications-container.light .notifications-title {
+  color: #333;
+}
+
+.light-text {
+  color: #333;
+}
+
+.dark-text {
+  color: #eee;
+}
+
+.notifications-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: 'montserrat', sans-serif;
+  width: 100%;
+  justify-content: end;
+}
+
+.notifications-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  transition: background-color 0.15s ease-in-out;
+  border: none;
+  cursor: pointer;
+}
+
+.mark-as-read-button {
+  background-color: var(--actions-button-bg-mark-read);
+  color: var(--actions-button-text-mark-read);
+  border: 1px solid var(--actions-button-bg-mark-read);
+}
+
+.mark-as-read-button:hover {
+  background-color: #2d3748;
+  border-color: #2d3748;
+}
+
+.notifications-container.light .mark-as-read-button:hover {
+  background-color: #218838;
+  border-color: #218838;
+}
+
+/* Specific styles for 'Delete all' button */
+.delete-all-button {
+  background-color: var(--actions-button-bg-delete-all);
+  color: var(--actions-button-text-delete-all);
+  border: 1px solid var(--actions-button-bg-delete-all);
+  /* Border matches background */
+}
+
+.delete-all-button:hover {
+  background-color: #c82333;
+  /* Slightly darker red for hover */
+  border-color: #c82333;
+}
+
+
+.loading-text {
+  color: #a0aec0;
+  text-align: center;
+}
+
+/* Light mode for loading text */
+.notifications-container.light .loading-text {
+  color: #718096;
+  /* Darker grey for readability */
+}
+
+.no-notifications-text {
+  color: #718096;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Light mode for no notifications text */
+.notifications-container.light .no-notifications-text {
+  color: #555;
+  /* Darker grey for readability */
+}
+
+.notification-action-button {
+  background-color: transparent;
+  /* Always transparent for this button */
+  border: none;
+  /* Ensure no border */
+  color: #fff;
+  /* Default dark mode icon color (like the trash icon) */
+}
+
+/* Light mode for individual notification action buttons (like delete icon) */
+.notifications-container.light .notification-action-button {
+  color: #666;
+  /* Darker color for the icon in light mode */
+}
+
+/* --- NEW / MODIFIED: Approve & Decline Buttons within Notification Card --- */
+
+/* Assuming these buttons are also within .notification-actions but specifically in the card */
+.approve-button {
+  background-color: var(--approve-button-bg);
+  color: var(--approve-button-text);
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex; /* Ensures icon is centered if alone */
+  align-items: center;
+  justify-content: center;
+  gap: 4px; /* Space between icon and text if you add text later */
+}
+
+.approve-button:hover {
+  background-color: #218838; /* Slightly darker green on hover */
+}
+
+.decline-button {
+  background-color: var(--decline-button-bg);
+  color: var(--decline-button-text);
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex; /* Ensures icon is centered if alone */
+  align-items: center;
+  justify-content: center;
+  gap: 4px; /* Space between icon and text if you add text later */
+}
+
+.decline-button:hover {
+  background-color: #c82333; /* Slightly darker red on hover */
+}
+
+
+/* Light mode adjustments for Approve & Decline buttons - these variables are already defined in .light */
+.notifications-container.light .notification-card .notification-actions .approve-request-button {
+  background-color: var(--approve-button-bg);
+  /* Uses #28a745 from .light variable */
+  color: var(--approve-button-text);
+  /* Uses #fff from .light variable */
+}
+
+.approve-request-icon,
+.decline-request-icon {
+  width: 20px;
+  height: 20px;
+  color: inherit; /* Inherit color from the button's text color (var(--approve-button-text) or var(--decline-button-text)) */
+  stroke-width: 3; /* Increase stroke-width for bolder icon appearance */
+}
+
+/* --- END NEW / MODIFIED --- */
+
+/* --- ADDED / MODIFIED CODE FOR CHECK AND CROSS ICONS --- */
+
+/* Styles for the Check icon inside the Approve button */
+.notification-card .notification-actions .approve-request-button .approve-request-icon {
+  width: 20px;
+  /* Set a consistent size for the icon */
+  height: 20px;
+  /* Set a consistent size for the icon */
+  color: #fff;
+  /* Make the icon white to contrast with the green button */
+  stroke-width: 3;
+  /* Increase stroke-width for bolder icon appearance if it's an SVG icon */
+}
+
+/* Styles for the Cross icon inside the Decline button */
+.notification-card .notification-actions .decline-request-button .decline-request-icon {
+  width: 20px;
+  /* Set a consistent size for the icon */
+  height: 20px;
+  /* Set a consistent size for the icon */
+  color: #fff;
+  /* Make the icon white to contrast with the red button */
+  stroke-width: 3;
+  /* Increase stroke-width for bolder icon appearance if it's an SVG icon */
+}
+
+/* --- END ADDED / MODIFIED CODE --- */
+
+
+.notification-card {
+  margin-bottom: 16px;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* Default dark mode shadow */
+  border: 1px solid #4a5568;
+  /* Default dark mode border */
+  transition: all 0.15s ease-in-out;
+  background-color: var(--notif-card-bg);
+  /* Uses the theme variable */
+  width: 100%;
+}
+
+/* Light mode for notification cards */
+.notifications-container.light .notification-card {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* Lighter shadow for light mode */
+  border: 1px solid #e0e0e0;
+  /* Lighter border for light mode */
+}
+
+.notification-card-read {
+  background-color: rgba(47, 47, 47, 0.5);
+  /* Dark mode read card background */
+}
+
+/* Light mode for read notification cards */
+.notifications-container.light .notification-card-read {
+  background-color: #f8f8f8;
+  /* Slightly off-white for read cards in light mode */
+  border: 1px solid #f0f0f0;
+  /* Lighter border for read cards */
+}
+
+.notification-card-unread {
+  background-color: #2f2f2f;
+  /* Dark mode unread card background */
+}
+
+/* Light mode for unread notification cards */
+.notifications-container.light .notification-card-unread {
+  background-color: var(--notif-card-bg);
+  /* Will be #ffffff via :root .light */
+  border: 1px solid #e0e0e0;
+  /* Matches main card border */
+}
+
+.notification-content {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.notification-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.notification-icon-wrapper {
+  padding: 8px;
+  border-radius: 50%;
+  color: var(--notif-text-color);
+  /* You might want to add theme-based background for the icon wrapper if it has one */
+}
+
+.notification-type {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'montserrat', sans-serif;
+  color: var(--notif-text-color);
+}
+
+.notification-type-read {
+  color: #a0aec0;
+  /* Default dark mode read type color */
+}
+
+/* Light mode for read notification type text */
+.notifications-container.light .notification-type-read {
+  color: #718096;
+  /* Darker grey for readability */
+}
+
+.notification-type-unread {
+  color: #fff;
+  /* Default dark mode unread type color */
+}
+
+/* Light mode for unread notification type text */
+.notifications-container.light .notification-type-unread {
+  color: #333;
+  /* Dark text for unread in light mode */
+}
+
+.notification-message {
+  font-size: 0.875rem;
+  font-family: 'poppins', sans-serif;
+    color: var(--notif-text-color);
+}
+
+.notification-message-read {
+  color: #718096;
+  /* Default dark mode read message color */
+}
+
+.notification-status{
+    color: var(--notif-text-color);
+    font-family: 'poppins';
+}
+
+/* Light mode for read notification message text */
+.notifications-container.light .notification-message-read {
+  color: #555;
+  /* Darker grey for readability */
+}
+
+.notification-message-unread {
+  color: #d1d5db;
+  /* Default dark mode unread message color */
+}
+
+/* Light mode for unread notification message text */
+.notifications-container.light .notification-message-unread {
+  color: #333;
+  /* Dark text for unread message in light mode */
+}
+
+.nitification-status {
+  font-family: 'poppins', sans-serif;
+  /* This rule applies to Status: Approved/Invalid Date */
+}
+
+/* Light mode for status text */
+.notifications-container.light .nitification-status {
+  color: #555;
+  /* Ensure readability */
+}
+
+.notification-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-actions button {
+  transition: color 0.15s ease-in-out;
+}
+
+.notification-actions button:hover {
+  cursor: pointer;
+}
+
+.mark-read-icon {
+  width: 20px;
+  height: 20px;
+  color: #63b3ed;
+  /* Default dark mode icon color */
+}
+
+/* Light mode for mark read icon */
+.notifications-container.light .mark-read-icon {
+  color: #007bff;
+  /* A standard blue that fits light mode */
+}
+
+.delete-icon {
+  width: 20px;
+  height: 20px;
+  color: #e53e3e;
+  /* Default dark mode icon color */
+}
+
+/* Light mode for delete icon */
+.notifications-container.light .delete-icon {
+  color: #dc3545;
+  /* A standard red that fits light mode */
+}
+
+.notification-timestamp {
+  font-size: 0.75rem;
+  color: var(--notif-timestamp);
+  margin-top: 8px;
+  margin-left: 66px;
+  font-family: 'poppins', sans-serif;
+}
+
+
+.notifications-container.light .notification-timestamp {
+  color: #555;
+}
+
+.Notifpage {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.Notifpage-content {
+  width: 100%;
+  overflow: auto;
+  padding: 0;
+}
+
+.Notifpage-content::-webkit-scrollbar {
+  display: none;
+}

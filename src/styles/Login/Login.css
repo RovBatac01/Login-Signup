@@ -1,8 +1,6 @@
-
 .login-container {
     width: 100%;
     max-width: 500px;
-    background: transparent;
     border-radius: 12px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -25,11 +23,13 @@
 .login-title {
     color: white;
     text-align: left;
+    font-family: 'montserrat';
 }
 
 .login-subtitle {
     color: white;
     text-align: left;
+    font-family: 'poppins';
 }
 
 .login-divider {
@@ -58,8 +58,7 @@
 }
 
 .login-signup-link-text {
-    color: white;
-    text-decoration: none;
+    color: blue;
 }
 
 .login-signup-link-text:hover {
@@ -68,8 +67,8 @@
 
 .login-footer {
     text-align: center;
-    font-size: 0.875rem;
     color: #ddd;
+    font-family: 'poppins';
 }
 
 .login-footer-link {
@@ -90,4 +89,89 @@
 
 .social-icon:hover {
     color: #8e2de2;
+}
+
+
+/* Targeting the Modal container itself */
+.login-terms-modal .modal{
+    width: 100%;
+}
+
+.login-terms-modal .modal-content {
+  border-radius: 10px; 
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); 
+}
+
+/* Specific styling for the modal header */
+.login-terms-modal .modal-header {
+  border-bottom: 1px solid #dee2e6; /* Default Bootstrap border color */
+  padding: 15px 20px;
+  font-family: 'montserrat';
+  text-align: center;
+}
+
+/* Specific styling for the modal title */
+.login-terms-modal .modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Specific styling for the modal body */
+.login-terms-modal .modal-body {
+  padding: 20px;
+  line-height: 1.6; 
+  text-align: justify;
+  font-family: 'poppins';
+}
+
+
+.login-terms-modal .modal-body p {
+  margin-bottom: 1rem;
+}
+
+
+.login-terms-modal .modal-body strong {
+  color: #333; 
+}
+
+/* Styling for lists within the modal body */
+.login-terms-modal .modal-body ul {
+  list-style-type: disc; /* Use disc bullets for lists */
+  padding-left: 20px; /* Indent list items */
+  margin-bottom: 1rem;
+}
+
+/* Specific styling for the modal footer */
+.login-terms-modal .modal-footer {
+  border-top: 1px solid #dee2e6; /* Default Bootstrap border color */
+  padding: 15px 20px;
+}
+
+/* Dark theme adjustments for the modal content */
+.login-terms-modal.dark .modal-content {
+  background-color: #343a40; /* Dark background for dark theme */
+  color: #f8f9fa; /* Light text for dark theme */
+  border-color: #495057; /* Darker border for dark theme */
+}
+
+.login-terms-modal.dark .modal-header {
+
+}
+
+.login-terms-modal.dark .modal-body strong {
+  color: #e0e0e0; /* Lighter color for bold text in dark mode */
+}
+
+.login-terms-modal.dark .modal-footer {
+  border-top-color: #495057; /* Darker border for dark theme footer */
+}
+
+/* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+.login-terms-modal .modal-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.login-terms-modal .modal-body {
+  scrollbar-width: none; /* Firefox */
 }

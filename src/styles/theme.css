@@ -1,0 +1,57 @@
+:root {
+  --background-color: #ffffff;
+  --text-color: #000000;
+  --button-bg: #e0e0e0;
+  --sidebar-bg: #FFFDF6;
+  --navbar-bg: #0a782f; 
+  --sidebar-text: #333;
+  --hover-bg: #dcdcdc;
+  --active-indicator: #007bff;
+  --gauge-bg: #ffffff;
+  --gauge-text: #0d1b2a;
+  --gauge-fill: #6FCF97;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --background-color: #121212;
+  --text-color: #ffffff;
+  --button-bg: #333;
+  --navbar-bg: rgba(7, 11, 23, 1);
+  --sidebar-bg: #2f2f31;
+  --sidebar-text: #ffffff;
+  --hover-bg: #292929;
+  --active-indicator: #ffcc00;
+  --gauge-bg: #131b42;
+  --gauge-text: #ffffff;
+  --gauge-fill: #FF8C42;
+}
+
+/* another universal cs */
+
+.light {
+  --bg-color: #DDDDDD;
+  --text-color: #333;
+}
+
+/* Dark mode */
+.dark {
+  --bg-color: #1e1f21;
+  --text-color: #fff;
+}
+
+
+:root {
+  --btn-bg: #007bff;
+  --btn-hover: #0056b3;
+  --btn-text: white;
+
+  --btn-bg-light: #007bff;
+  --btn-text-light: white;
+
+  --btn-bg-dark: #222;
+  --btn-text-dark: #fff;
+}
+
+
+

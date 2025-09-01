@@ -1,0 +1,62 @@
+.standby-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+    /* Background styles will be handled by theme.css body or app-container */
+}
+
+.standby-card {
+    background-color: var(--card-background-color); /* From theme.css */
+    color: var(--text-color); /* From theme.css */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    border: 1px solid var(--border-color); /* From theme.css */
+}
+
+.standby-card h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: var(--primary-color); /* From theme.css */
+}
+
+.standby-card p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* Optional: Basic Loading Spinner */
+.loading-spinner {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 30px auto 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .standby-card {
+        padding: 30px;
+    }
+    .standby-card h1 {
+        font-size: 2em;
+    }
+    .standby-card p {
+        font-size: 1em;
+    }
+}

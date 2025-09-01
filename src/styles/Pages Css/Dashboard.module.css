@@ -1,0 +1,645 @@
+/* General Variables (Assuming these are defined globally or in a theme file) */
+
+:root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --card-bg: #2f2f31;
+    --card-border: #3a3a3a;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --primary-blue: #1B56FD;
+    --primary-blue-hover: #1230AE;
+    --danger-red: #dc3545;
+    --danger-red-hover: #c82333;
+    --success-green: #28a745;
+    --success-green-hover: #218838;
+    --input-bg: #343a40;
+    --input-border: #495057;
+    --addEstablishmentForm:#FFFDF6;
+    --input-background-color: #ffffff;
+    --input-text-color: #333333;
+    --input-border-color: #cccccc; 
+
+
+}
+
+:root[data-theme='dark']{
+    --bg-color: #121212;
+    --text-color: #ffffff;
+    --card-bg: #1e1f21;
+    --card-border: #2a2a2a;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --primary-blue: #222;
+    --primary-blue-hover: #5a6268;
+    --danger-red: #dc3545;
+    --danger-red-hover: #c82333;
+    --success-green: #28a745;
+    --success-green-hover: #218838;
+    --input-bg: #343a40;
+    --input-border: #495057;
+    --addEstablishmentForm:#3a3a3a;
+    --input-background-color: #2a2a2a; 
+    --input-text-color: #eeeeee; 
+    --input-border-color: #444444; 
+}
+
+
+.db {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+  font-family: 'Inter', sans-serif; /* Recommended a modern font */
+}
+
+.dbContainer {
+  display: flex;
+  flex: 1;
+  overflow-y: scroll; /* Ensures no extra scrollbars from content outside */
+}
+
+.dbContainer::-webkit-scrollbar{
+  display: none;
+}
+
+.dbContents {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Further reduced gap for a tighter layout */
+  overflow-y: scroll; 
+  max-height: 100vh;
+  padding-top: 10px;
+}
+
+/* Custom scrollbar for webkit browsers */
+.dbContents::-webkit-scrollbar {
+  display: none;
+}
+
+.dbContents::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+.dbContents::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+.dbContents::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* Dashboard Metrics Row */
+.meterRowFlex {
+  display: flex !important; /* Force flex display */
+  flex-wrap: wrap !important;
+  gap: 10px; /* Further reduced from 15px to 10px */
+  justify-content: center; /* Center items if they don't fill the row */
+  width: 100%; /* Ensure it takes full width */
+  position: relative; /* For absolute positioning of the info button */
+  margin-bottom: 5px; /* Small margin before next section */
+}
+
+/* Info Button Container */
+.infoButtonContainer {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+
+.meterWidget {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align text to the start */
+  background: var(--card-bg);
+  padding: 15px; /* Reduced from 20px to 15px */
+  border-radius: 10px; /* Reduced from 12px to 10px */
+  box-shadow: 0px 2px 10px var(--shadow-color); /* Reduced shadow */
+  text-align: left; /* Align text left within the widget */
+  transition: transform 0.2s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease;
+  min-width: 220px; /* Reduced from 250px to 220px */
+}
+
+.meterWidget:hover {
+  transform: translateY(-5px); /* Subtle lift effect */
+  box-shadow: 0px 8px 20px var(--shadow-color);
+  background-color: #333; /* Slightly lighter on hover */
+}
+
+.meterLabel {
+  font-size: 1.1em; /* Slightly larger for clarity */
+  font-weight: 500; /* Regular font weight */
+  margin-bottom: 8px; /* Adjusted margin */
+  color: var(--text-color);
+  opacity: 0.8; /* Subtle text */
+}
+
+.meterValue {
+  font-size: 2.5em; /* Make the number stand out */
+  font-weight: bold;
+  color: var(--primary-blue); /* Use a primary color for values */
+  line-height: 1; /* Tighten line height */
+}
+
+
+/* Main Content Grid (Establishments + Calendar) */
+.mainContentGrid {
+  display: flex;
+  gap: 10px; /* Further reduced from 15px to 10px */
+  flex-grow: 1; /* Allow this section to grow */
+  width: 100%;
+  padding: 0 15px; /* Reduced from 0 20px to 0 15px */
+  margin-top: 0; /* Ensure no extra margin at the top */
+}
+
+/* Set width for establishment section (2/3) */
+.mainContentGrid .establishmentSection {
+  flex: 2; /* Takes 2 parts of the available space */
+}
+
+/* Set width for calendar section (1/3) */
+.mainContentGrid .calendarSection {
+  flex: 1; /* Takes 1 part of the available space */
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px; /* Reduced from 30px to 15px */
+  font-family: 'poppins';
+}
+
+.sectionHeader h3{
+  font-weight: bold;
+}
+
+/* Establishment Section */
+.establishmentSection {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px; /* Reduced from 20px to 15px */
+    padding: 15px; /* Further reduced from 20px to 15px */
+    box-shadow: 0 10px 20px var(--shadow-color); /* Reduced shadow intensity */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: auto; 
+    height: 665px;
+    width: 100%;
+}
+
+
+.establishmentSection::-webkit-scrollbar {
+    width: 6px; /* Width of the scrollbar */
+}
+
+.establishmentSection::-webkit-scrollbar-track {
+    background: var(--card-bg); /* Track color */
+    border-radius: 10px;
+}
+
+.establishmentSection::-webkit-scrollbar-thumb {
+    background: #888; /* Scrollbar handle color */
+    border-radius: 10px;
+}
+
+.establishmentSection::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Scrollbar handle color on hover */
+}
+
+.addEstablishmentButton {
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.addEstablishmentButton:hover {
+  background-color: var(--primary-blue-hover);
+  transform: translateY(-2px);
+}
+
+.addEstablishmentForm {
+  background-color: var(--addEstablishmentForm); /* Slightly different background for the form */
+  border-radius: 8px;
+  padding: 12px; /* Reduced from 15px to 12px */
+  margin-bottom: 15px; /* Reduced from 20px to 15px */
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Reduced from 15px to 12px */
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); /* Inner shadow for depth */
+  font-family: 'poppins';
+}
+
+.addEstablishmentForm input {
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  padding: 10px; /* Reduced from 12px to 10px */
+  border-radius: 6px;
+  font-size: 0.95em; /* Reduced from 1em to 0.95em */
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.addEstablishmentForm input::placeholder {
+  color: #888;
+}
+
+.addEstablishmentForm input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.3); /* Focus ring */
+}
+
+.addEstablishmentForm .formButtons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.addEstablishmentForm .formButtons button {
+  padding: 8px 15px; /* Reduced from 10px 18px to 8px 15px */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.addEstablishmentForm .formButtons .addButton {
+  background-color: var(--success-green);
+  color: white;
+}
+
+.addEstablishmentForm .formButtons .addButton:hover {
+  background-color: var(--success-green-hover);
+}
+
+.addEstablishmentForm .formButtons .cancelButton {
+  background-color: var(--danger-red);
+  color: white;
+}
+
+.addEstablishmentForm .formButtons .cancelButton:hover {
+  background-color: var(--danger-red-hover);
+}
+
+.establishmentsList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* Reduced from 15px to 10px */
+    flex-grow: 1;
+    padding-right: 5px;
+    align-items: flex-start; /* Align items to the start */
+    max-height: 450px; /* Allow space for the header and search bar */
+    overflow-y: auto; /* This will be scrollable within the parent */
+}
+
+/* Each establishment card takes up 50% of space minus the gap */
+.establishmentsList > * {
+    flex: 0 0 calc(50% - 10px); /* Updated from 15px to 10px to match the new gap */
+    max-width: calc(50% - 10px); /* Also updated to match new gap */
+}
+
+/* Optional: Add media query for smaller screens if 2 columns become too cramped */
+@media (max-width: 768px) { /* Adjust breakpoint as needed */
+    .establishmentsList > * {
+        flex: 0 0 100%; /* Take full width on smaller screens */
+        max-width: 100%;
+    }
+}
+
+/* Custom scrollbar for the establishment list */
+.establishmentsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.establishmentsList::-webkit-scrollbar-track {
+  background: var(--card-bg);
+}
+
+.establishmentsList::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 3px;
+}
+
+.establishmentsList::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+.loadingMessage, .noEstablishmentsMessage {
+  text-align: center;
+  color: #aaa;
+  padding: 20px;
+  font-style: italic;
+  width: 100%; /* Take full width in flexbox */
+}
+
+/* Establishment Sensors Container (assuming EstablishmentSensors component has this class) */
+.establishmentSensors {
+  background-color: #212121; /* Slightly darker than card-bg for contrast */
+  border-radius: 10px;
+  padding: 18px;
+  border: 1px solid var(--card-border);
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease;
+}
+
+.establishmentSensors:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+.establishmentSensors h4 {
+  font-size: 1.1em;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--primary-blue); /* Highlight establishment names */
+}
+
+.establishmentSensors p { /* Assuming sensor info is in paragraphs */
+  font-size: 0.9em;
+  color: #ccc;
+  margin-bottom: 5px;
+}
+
+.establishmentSensors .detailsButton { /* Assuming there's a details button */
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85em;
+  margin-top: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.establishmentSensors .detailsButton:hover {
+  background-color: #666;
+}
+
+
+/* Calendar Section */
+.calendarSection {
+  background-color: var(--card-bg);
+  border-radius: 10px; /* Reduced from 12px to 10px */
+  padding: 3px; /* Reduced from 5px to 3px */
+  box-sizing: border-box; 
+  box-shadow: 0px 3px 10px var(--shadow-color); /* Reduced shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center calendar within its section */
+  height: fit-content;
+  overflow-y: scroll;
+}
+
+.calendarSection::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* Establishment Details Section */
+.establishmentDetailsSection {
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0px 3px 10px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  width: 100%;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.establishmentDetailsSection::-webkit-scrollbar {
+  width: 6px;
+}
+
+.establishmentDetailsSection::-webkit-scrollbar-track {
+  background: var(--card-bg);
+  border-radius: 10px;
+}
+
+.establishmentDetailsSection::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.establishmentDetailsSection::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.establishmentMeta {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  background-color: rgba(50, 50, 50, 0.1);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(100, 100, 100, 0.2);
+}
+
+.detailBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: rgba(76, 175, 80, 0.25);
+  color: var(--success-green);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.detailBadge i {
+  margin-right: 8px;
+}
+
+.closeDetailsButton {
+  background-color: var(--danger-red);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.closeDetailsButton:hover {
+  background-color: var(--danger-red-hover);
+}
+
+.sensorsDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.sensorDetailCard {
+  background-color: var(--background-main, #2f2f31);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--card-border, #363636);
+}
+
+.sensorDetailHeader {
+  padding: 10px 15px;
+  border-bottom: 1px solid var(--card-border, #363636);
+}
+
+.sensorDetailHeader h4 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary, #ffffff);
+}
+
+.sensorDetailBody {
+  padding: 10px;
+}
+
+.missingSensorPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+  color: var(--danger-red);
+  background-color: rgba(220, 53, 69, 0.1);
+  border-radius: 8px;
+}
+
+.missingSensorPlaceholder i {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.missingSensorPlaceholder p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.noSensorsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-secondary, #cccccc);
+}
+
+.noSensorsContainer i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  opacity: 0.6;
+}
+
+.noSensorsContainer p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.establishmentDetailContent {
+  padding: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .mainContentGrid {
+    flex-direction: column; /* Stack on smaller screens */
+  }
+  
+  /* Reset flex values for stacked layout */
+  .mainContentGrid .establishmentSection,
+  .mainContentGrid .calendarSection,
+  .mainContentGrid .establishmentDetailsSection {
+    flex: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .dbContainer {
+    flex-direction: column; /* Stack sidebar and content vertically */
+  }
+
+  .dbContents {
+    padding: 15px;
+    gap: 15px;
+  }
+
+
+
+  .meterWidget {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .mainContentGrid {
+    gap: 20px;
+  }
+
+  .establishmentSection, .calendarSection {
+    padding: 20px;
+    min-height: unset; /* Allow height to adjust */
+  }
+}
+
+@media (max-width: 480px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .addEstablishmentButton {
+    width: 100%;
+  }
+  .addEstablishmentForm .formButtons {
+    flex-direction: column;
+  }
+  .addEstablishmentForm .formButtons button {
+    width: 100%;
+  }
+}
+
+.searchBar {
+  width: 100%;
+  padding: 8px; /* Reduced padding from 10px to 8px */
+  border: 1px solid var(--input-border-color); /* Uses variable */
+  border-radius: 5px;
+  background-color: var(--input-background-color); /* Uses variable */
+  color: var(--input-text-color); /* Uses variable */
+  font-size: 1rem;
+  /* Add transition for smooth theme changes */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  font-family: 'poppins';
+  margin-bottom: 10px; /* Added margin to separate from establishments list */
+}
+
+.searchBar::placeholder {
+  color: var(--text-color-secondary); /* Placeholder text color, also themed */
+}
+

@@ -1,0 +1,285 @@
+/* Light Mode */
+.admin-form-container.light {
+  --admin-bg-color: #f5f5f5;
+  --admin-card-bg: #fff;
+  --admin-text-color: #000;
+  --admin-input-bg: #fff;
+  --admin-input-border: #ccc;
+  --admin-button-bg: #007bff;
+  --admin-button-hover: #0056b3;
+  --select-bg: #fff;
+  --select-border: #ccc;
+  --select-focus-border: #007bff;
+  --select-arrow-color: #000;
+  --option-hover-bg: #f0f0f0;
+}
+
+/* Dark Mode */
+.admin-form-container.dark {
+  --admin-bg-color: transparent;
+  --admin-card-bg: #222;
+  --admin-text-color: #fff;
+  --admin-input-border: rgba(255, 255, 255, 0.2);
+  --admin-button-bg: #444;
+  --admin-button-hover: #666;
+  --admin-input-bg: transparent;
+  --select-bg: #333;
+  --select-border: rgba(255, 255, 255, 0.2);
+  --select-focus-border: #666;
+  --select-arrow-color: #fff;
+  --option-hover-bg: #3f3f3f;
+  --option-text-color: #fff;
+}
+
+/* Base styles */
+
+.admin-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: var(--admin-bg-color);
+  transition: background 0.3s ease;
+}
+
+/* Styling for the card container that wraps the form */
+.admin-form-card {
+  background-color: var(--admin-card-bg);
+  color: var(--admin-text-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  /* Increased padding for better appearance */
+  width: 100%;
+  max-width: 450px;
+  /* Max width for the card */
+}
+
+.admin-form-body {
+  /* No specific styles needed here, just a wrapper for the form content */
+}
+
+.admin-form-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.admin-form-label {
+  font-size: 14px;
+  display: flex;
+  justify-content: start;
+  align-items: start;
+  font-size: 1rem;
+  padding-top: 10px;
+  font-family: 'montserrat', sans-serif;
+}
+
+.admin-form-input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 3px;
+  background: var(--admin-input-bg);
+  border: 1px solid var(--admin-input-border);
+  border-radius: 5px;
+  color: var(--admin-text-color);
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.admin-form-input::placeholder {
+  color: #b0b3b8;
+}
+
+.admin-form-input:focus {
+  border-color: var(--admin-button-bg);
+  outline: none;
+}
+
+/* Messages (error and success) */
+.text-danger {
+  color: #dc3545;
+  /* Bootstrap's danger color */
+  margin-top: 1rem;
+}
+
+.text-success {
+  color: #28a745;
+  /* Bootstrap's success color */
+  margin-top: 1rem;
+}
+
+/* Buttons */
+.admin-form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  /* Changed to flex-end to align buttons to the right */
+  margin-top: 15px;
+  gap: 10px;
+  font-family: 'poppins', sans-serif;
+  font-size: fit-content;
+}
+
+.admin-form-submit {
+  padding: 8px 15px;
+  /* Added horizontal padding */
+  background: var(--admin-button-bg);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.admin-form-submit:hover {
+  background: var(--admin-button-hover);
+  transform: scale(1.05);
+}
+
+.admin-form-reset {
+  padding: 8px 15px;
+  /* Added horizontal padding */
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.admin-form-reset:hover {
+  background: #5a6268;
+  transform: scale(1.05);
+}
+
+
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .admin-form-card {
+    padding: 15px;
+  }
+
+  .admin-form-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-form-submit,
+  .admin-form-reset {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* AdminAccountForm.css */
+
+/* Styles for the container of the buttons */
+.admin-form-buttons {
+  display: flex;
+  /* Arranges buttons in a row */
+  justify-content: flex-end;
+  /* Aligns buttons to the right */
+  gap: 10px;
+  /* Adds space between buttons */
+  margin-top: 20px;
+  /* Adds some space above the buttons */
+}
+
+/* Base style for all buttons within admin-form-buttons */
+.admin-form-buttons button {
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  border: 1px solid;
+  /* Default border */
+}
+
+/* Style for the "Create Admin" button */
+.admin-form-buttons button[type="submit"] {
+  background-color: #1B56FD;
+  color: white;
+  border: none;
+  margin: 0 5px;
+  padding: 6px 10px;
+  display: inline-flex;
+  justify-content: center;
+  box-shadow: var(--acctbl-shadow-dark);
+}
+
+.admin-form-buttons button[type="submit"]:hover {
+  background-color: #1230AE;
+  border-color: #1230AE;
+}
+
+/* Style for the "Cancel" button */
+.admin-form-buttons button:not([type="submit"]) {
+  /* Targets buttons that are not submit type */
+  background-color: #2f2f31;
+  /* Bootstrap secondary gray */
+  color: white;
+  border-color: #2f2f31;
+    box-shadow: var(--acctbl-shadow-dark);
+      border: none;
+  margin: 0 5px;
+  padding: 6px 10px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.admin-form-buttons button:not([type="submit"]):hover {
+  background-color: #5a6268;
+  /* Darker gray on hover */
+  border-color: #545b62;
+}
+
+/* You can add more specific styles or adjust these values as needed */
+/* For example, if you want a specific font, shadow, or different colors */
+
+.admin-username-input{
+  background-color: transparent !important;
+  color: var(--admin-text-color) !important;
+}
+
+/* Custom styles for dropdown selects */
+select.admin-username-input {
+  appearance: none;
+  background-color: var(--select-bg) !important;
+  border: 1px solid var(--select-border) !important;
+  padding: 8px 10px;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+  color: var(--admin-text-color) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8.825l4.975-4.975a.5.5 0 0 1 .707 0l.043.043a.5.5 0 0 1 0 .707L6.353 10.07a.5.5 0 0 1-.707 0L.275 4.6a.5.5 0 0 1 0-.707l.043-.043a.5.5 0 0 1 .707 0L6 8.825z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+select.admin-username-input:focus {
+  border-color: var(--select-focus-border) !important;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(27, 86, 253, 0.2);
+}
+
+/* Style for the placeholder option */
+select.admin-username-input option:first-child {
+  color: #888;
+}
+
+/* Style for the actual options */
+select.admin-username-input option {
+  background-color: var(--select-bg);
+  color: var(--option-text-color, var(--admin-text-color));
+  padding: 8px;
+}
+
+/* Dark mode adjustments */
+.admin-form-container.dark select.admin-username-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23fff' d='M6 8.825l4.975-4.975a.5.5 0 0 1 .707 0l.043.043a.5.5 0 0 1 0 .707L6.353 10.07a.5.5 0 0 1-.707 0L.275 4.6a.5.5 0 0 1 0-.707l.043-.043a.5.5 0 0 1 .707 0L6 8.825z'/%3E%3C/svg%3E");
+}
+

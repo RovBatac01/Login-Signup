@@ -1,83 +1,21 @@
+/* Base styles */
 .background-layout {
-    background: linear-gradient(to right, #000000, #0d0d3b);
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    transition: background 0.5s ease-in-out; /* Smooth transition for background change */
 }
 
-.background-layout.purple::before {
-    content: '';
-    position: absolute;
-    top: 10%; /* Changed from 10% to 20% */
-    left: 30%;
-    width: 300px;
-    height: 300px;
-    border-radius: 302px;
-    background: linear-gradient(180deg, #530061 0%, #0D0A30 100%);
-    z-index: 0;
+/* Dark Theme Background */
+.background-layout.dark {
+    background: linear-gradient(to right, #1e1f21, #323233); /* Your original dark gradient */
 }
 
-.background-layout.purple::after {
-    content: '';
-    position: absolute;
-    bottom: 10%; /* Changed from 10% to 20% */
-    right: 33%;
-    width: 200px;
-    height: 200px;
-    border-radius: 302px;
-    background: linear-gradient(180deg, #530061 0%, #0D0A30 100%);
-    z-index: 0;
+/* Light Theme Background */
+.background-layout.light {
+    background: linear-gradient(to right, #f8f9fa, #e9ecef); /* Light grey gradient */
+    /* Or a more vibrant light theme: */
+    /* background: linear-gradient(to right, #ffffff, #f0f2f5); */
 }
-
-.background-layout.blue::before {
-    content: '';
-    position: absolute;
-    top: 7%; /* Changed from 10% to 20% */
-    left: 30%;
-    width: 300px;
-    height: 300px;
-    border-radius: 302px;
-    background: linear-gradient(180deg, #190061 0%, #0A1B30 100%);
-    z-index: 0;
-}
-
-.background-layout.blue::after {
-    content: '';
-    position: absolute;
-    bottom: 8%; /* Changed from 10% to 20% */
-    right: 33%;
-    width: 200px;
-    height: 200px;
-    border-radius: 302px;
-    background: linear-gradient(180deg, #190061 0%, #0A1B30 100%);
-    z-index: 0;
-}
-
-
-.background-layout.pink::before {
-    content: '';
-    position: absolute;
-    top: 20%; /* Changed from 10% to 20% */
-    left: 30%;
-    width: 300px;
-    height: 300px;
-    border-radius: 302px;
-    background: linear-gradient(180deg, #61003A 0%, #2D0A30 100%);
-    z-index: 0;
-}
-
-.background-layout.pink::after {
-    content: '';
-    position: absolute;
-    bottom: 20%; /* Changed from 10% to 20% */
-    right: 33%;
-    width: 200px;
-    height: 200px;
-    border-radius: 302px;
-    background: linear-gradient(180deg, #61003A 0%, #2D0A30 100%);
-    z-index: 0;
-}
-
-
