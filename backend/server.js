@@ -21,7 +21,7 @@ const { SerialPort } = require("serialport");
 const { ReadlineParser } = require("@serialport/parser-readline");
 const cookieParser = require("cookie-parser");
 const authRoutes = require("./models/route");
-const sessionHistoryRoutes = require("./routes/sessionHistory");
+// const sessionHistoryRoutes = require("./routes/sessionHistory");
 const SessionHistory = require("./models/sessionHistory");
 const app = express();
 const port = 5000;
@@ -191,8 +191,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Add session history routes
-app.use("/api/session-history", sessionHistoryRoutes);
 
 // --- Test Root Endpoint ---
 app.get("/", (req, res) => {
@@ -487,6 +485,9 @@ async function sendVerificationEmail(to, code) {
 }
 
 // Login function
+// Find your login route around line 489 and replace the session recording part:
+// Replace your existing login route around line 489 with this:
+
 app.post("/login", async (req, res) => {
   console.log("Received Data:", req.body);
 
@@ -496,140 +497,178 @@ app.post("/login", async (req, res) => {
     return res.status(400).json({ error: "All fields are required" });
   }
 
-  const sql = "SELECT id, username, role, password_hash, is_verified, email_verified, device_id FROM users WHERE username = ?"; // IMPORTANT: Select device_id here
-
+  let connection;
   try {
-    const [results] = await db.query(sql, [username]);
+    connection = await db.getConnection();
+    
+    const [results] = await connection.execute(
+      "SELECT id, username, role, password_hash, is_verified, email_verified, device_id FROM users WHERE username = ?",
+      [username]
+    );
 
     if (results.length === 0) {
-      console.log("Login attempt: User not found.");
-      return res.status(400).json({ error: "User not found" });
+      return res.status(401).json({ error: "Invalid username or password" });
     }
 
     const user = results[0];
-    // --- NEW DEBUG LOG ---
-    console.log(`Backend Debug: User object directly from DB query for ${user.username}:`, user);
-    // --- END NEW DEBUG LOG ---
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
-
-    if (!isMatch) {
-      console.log("Login attempt: Incorrect password for user:", username);
-      return res.status(400).json({ error: "Incorrect password" });
+    // Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: "Invalid username or password" });
     }
 
-    if (user.email_verified === 0) {
-      return res.status(403).json({ error: "Please verify your email address first." });
+    // Check verification status
+    if (!user.is_verified || !user.email_verified) {
+      return res.status(403).json({ error: "Please verify your email before logging in." });
     }
 
-    // --- IMPORTANT: Fetch the establishment ID and DEVICE ID for the User/Admin ---
-    let associatedEstablishmentId = null;
-    let associatedDeviceId = null; 
-
-    if (user.role === "Admin") {
-      const [adminAssignments] = await db.query(
-        `SELECT ae.establishment_id, e.device_id
-         FROM admin_establishments ae
-         JOIN estab e ON ae.establishment_id = e.id
-         WHERE ae.user_id = ?`,
-        [user.id]
-      );
-
-      if (adminAssignments.length > 0) {
-        associatedEstablishmentId = adminAssignments[0].establishment_id;
-        associatedDeviceId = adminAssignments[0].device_id; 
-        console.log(`Backend Debug: Admin user ${user.username} (ID: ${user.id}) assigned establishmentId: ${associatedEstablishmentId}, deviceId: ${associatedDeviceId}`);
-      } else {
-        console.warn(`Backend Debug: Admin user ${user.username} (ID: ${user.id}) has no assigned establishments.`);
-      }
-    } else if (user.role === "User") { 
-        // For 'User' role, directly use the device_id from the 'users' table
-        associatedDeviceId = user.device_id; // Directly assign from the fetched user object
-        
-        // If a User is also linked to an establishment, you might still want to fetch that
-        // However, based on your schema, it's not directly in the 'users' table.
-        // If you intend for users to have an establishment, Option 1 (modifying schema) is better.
-        // For now, we'll keep establishmentId as null for regular users if it's not in the users table
-        // or fetched via a join.
-
-        console.log(`Backend Debug: User ${user.username} (ID: ${user.id}) directly using deviceId: ${associatedDeviceId}`);
-    }
-
-
+    // Generate JWT token
     const token = jwt.sign(
-      {
-        id: user.id,
-        role: user.role,
-        isVerified: user.is_verified,
-        emailVerified: user.email_verified,
-        establishmentId: associatedEstablishmentId,
-        deviceId: associatedDeviceId 
-      },
+      { id: user.id, username: user.username, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
 
-    console.log('🔐 Signing with JWT_SECRET:', process.env.JWT_SECRET);
-    console.log("Backend: Generated Auth Token for user:", token);
+    // IMPROVED: Record login session in session_history table with better error handling
+try {
+  const ipAddress = req.headers['x-forwarded-for'] || 
+                  req.connection.remoteAddress || 
+                  req.socket.remoteAddress || 
+                  'Unknown IP';
+  
+  const deviceInfo = req.headers['user-agent'] || 'Unknown Device';
 
-    let redirectUrl = "/dashboard";
-    if (user.role === "Admin") {
-      redirectUrl = "/adminDB";
-    } else if (user.role === "User") {
-      redirectUrl = "/userDB";
+  await connection.execute(
+    "INSERT INTO session_history (user_id, username, session_type, ip_address, device_info) VALUES (?, ?, ?, ?, ?)",
+    [user.id, user.username, 'login', ipAddress, deviceInfo]
+  );
+
+  console.log(`✅ Login session recorded for user: ${user.username}`);
+} catch (sessionError) {
+  console.error("⚠️ Error recording session history:", sessionError);
+}
+
+    console.log(`✅ User ${user.username} logged in successfully`);
+
+    res.status(200).json({
+      message: "Login successful",
+      token: token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        device_id: user.device_id
+      }
+    });
+
+  } catch (error) {
+    console.error("❌ Login error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+});
+
+// Add this route after your login route:
+
+// Get session history for the current user
+app.get('/api/session-history', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    let connection;
+    try {
+      connection = await db.getConnection();
+      
+      const [sessions] = await connection.execute(
+        `SELECT id, username, session_type as type, ip_address as ipAddress, 
+         device_info as device, DATE_FORMAT(timestamp, '%M %d, %Y at %h:%i %p') as timestamp
+         FROM session_history 
+         WHERE user_id = ? 
+         ORDER BY timestamp DESC 
+         LIMIT 20`,
+        [userId]
+      );
+
+      res.status(200).json({
+        success: true,
+        data: sessions,
+        message: 'Session history retrieved successfully'
+      });
+
+    } finally {
+      if (connection) {
+        connection.release();
+      }
     }
 
-    const userForFrontend = {
-      id: user.id,
-      username: user.username,
-      role: user.role,
-      isVerified: user.is_verified === 1,
-      emailVerified: user.email_verified === 1,
-      establishmentId: associatedEstablishmentId,
-      deviceId: associatedDeviceId 
-    };
+  } catch (error) {
+    console.error('Error fetching session history:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch session history',
+      error: error.message
+    });
+  }
+});
 
-    console.log("Backend Debug: userForFrontend object being sent:", userForFrontend);
+// Add this route after your existing /api/session-history route:
 
-    // Record the login in session history
+// Log a new session event (for manual logging from frontend)
+app.post('/api/session-history/log', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const username = req.user.username;
+    const { sessionType, deviceInfo } = req.body;
+
+    if (!sessionType || !['login', 'logout'].includes(sessionType)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid session type. Must be "login" or "logout".'
+      });
+    }
+
+    let connection;
     try {
+      connection = await db.getConnection();
+
       // Get IP address
       const ipAddress = req.headers['x-forwarded-for'] || 
                       req.connection.remoteAddress || 
                       req.socket.remoteAddress || 
-                      req.connection.socket.remoteAddress;
-      
-      // Get device info from user agent
-      const deviceInfo = req.headers['user-agent'];
+                      'Unknown IP';
 
-      await SessionHistory.recordSession(
-        user.id,
-        user.username,
-        'login',
-        ipAddress,
-        deviceInfo
+      // Insert session history record
+      await connection.execute(
+        "INSERT INTO session_history (user_id, username, session_type, ip_address, device_info) VALUES (?, ?, ?, ?, ?)",
+        [userId, username, sessionType, ipAddress, deviceInfo || 'Unknown Device']
       );
-      console.log(`Session history recorded for user ${user.username} (login)`);
-    } catch (error) {
-      console.error("Error recording session history:", error);
-      // Don't fail the login if session history recording fails
+
+      console.log(`✅ ${sessionType} session logged for user: ${username}`);
+
+      res.status(201).json({
+        success: true,
+        message: `${sessionType} session recorded successfully`
+      });
+
+    } finally {
+      if (connection) {
+        connection.release();
+      }
     }
 
-    res.json({
-      message: "Login successful",
-      user: userForFrontend,
-      token: token,
-      role: user.role,
-      redirectUrl: redirectUrl,
+  } catch (error) {
+    console.error('Error logging session:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to log session',
+      error: error.message
     });
-
-  } catch (err) {
-    console.error("Error during login:", err);
-    res.status(500).json({ error: "Server error during login." });
   }
 });
-
-
 
 // Create admin
 // --- Route: Create Admin Account (and assign to multiple establishments) ---
@@ -2634,78 +2673,47 @@ app.put('/api/super-admin/notifications', async (req, res) => {
     }
 });
 
-// GET /api/super-admin/session-history - Get user's session history for settings page
-app.get('/api/super-admin/session-history', authenticateToken, async (req, res) => {
+// Add this route after your login route:
+
+// Get session history for the current user
+app.get('/api/session-history', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    let connection;
     try {
-        const userId = req.user.id;
-        const limit = parseInt(req.query.limit) || 10;
-        
-        let sessionHistory;
-        try {
-            // Try to get from database first
-            sessionHistory = await SessionHistory.getSessionHistoryByUser(userId, limit);
-        } catch (error) {
-            console.warn('Error fetching from database, using fallback data:', error);
-            // Fallback data if database fails
-            sessionHistory = [
-                {
-                    id: Date.now() - 86400000, // yesterday
-                    user_id: userId,
-                    username: req.user.username || 'User',
-                    type: 'login',
-                    ip_address: '192.168.1.1',
-                    device_info: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-                    timestamp: new Date(Date.now() - 86400000).toISOString()
-                },
-                {
-                    id: Date.now() - 85400000, // yesterday + 1 hour
-                    user_id: userId,
-                    username: req.user.username || 'User',
-                    type: 'logout',
-                    ip_address: '192.168.1.1',
-                    device_info: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-                    timestamp: new Date(Date.now() - 85400000).toISOString()
-                },
-                {
-                    id: Date.now() - 3600000, // 1 hour ago
-                    user_id: userId,
-                    username: req.user.username || 'User',
-                    type: 'login',
-                    ip_address: '192.168.1.1',
-                    device_info: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-                    timestamp: new Date(Date.now() - 3600000).toISOString()
-                }
-            ];
-        }
-        
-        // Process the data to make it more user-friendly
-        const processedHistory = sessionHistory.map(session => {
-            // Extract device name from user agent
-            let deviceName = 'Unknown Device';
-            if (session.device_info) {
-                if (session.device_info.includes('Windows')) deviceName = 'Windows PC';
-                else if (session.device_info.includes('Macintosh')) deviceName = 'Mac';
-                else if (session.device_info.includes('iPhone')) deviceName = 'iPhone';
-                else if (session.device_info.includes('Android')) deviceName = 'Android Device';
-                else if (session.device_info.includes('iPad')) deviceName = 'iPad';
-                else if (session.device_info.includes('Linux')) deviceName = 'Linux PC';
-            }
-            
-            return {
-                id: session.id,
-                username: session.username,
-                type: session.type,
-                timestamp: new Date(session.timestamp).toLocaleString(),
-                device: deviceName,
-                ipAddress: session.ip_address || 'Unknown IP'
-            };
-        });
-        
-        res.status(200).json({ success: true, data: processedHistory });
-    } catch (error) {
-        console.error('Error fetching session history for settings page:', error);
-        res.status(500).json({ success: false, message: 'Failed to fetch session history' });
+      connection = await db.getConnection();
+      
+      const [sessions] = await connection.execute(
+        `SELECT id, username, session_type as type, ip_address as ipAddress, 
+         device_info as device, DATE_FORMAT(timestamp, '%M %d, %Y at %h:%i %p') as timestamp
+         FROM session_history 
+         WHERE user_id = ? 
+         ORDER BY timestamp DESC 
+         LIMIT 20`,
+        [userId]
+      );
+
+      res.status(200).json({
+        success: true,
+        data: sessions,
+        message: 'Session history retrieved successfully'
+      });
+
+    } finally {
+      if (connection) {
+        connection.release();
+      }
     }
+
+  } catch (error) {
+    console.error('Error fetching session history:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch session history',
+      error: error.message
+    });
+  }
 });
 
 // =======================================================
