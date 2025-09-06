@@ -44,13 +44,13 @@
 }
 
 .notifications-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  width: 100%;
-  padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 0 20px;
 }
 
 .notifications-title {
@@ -465,4 +465,292 @@
 
 .Notifpage-content::-webkit-scrollbar {
   display: none;
+}
+
+/* Filter Styles */
+.notifications-filter {
+    display: flex;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.filter-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.filter-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.7;
+}
+
+.filter-select {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid;
+    cursor: pointer;
+    min-width: 220px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.filter-select:hover {
+    opacity: 0.8;
+}
+
+.filter-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.filter-select:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Light Theme Styles */
+.bg-light-background .filter-select {
+    background-color: #ffffff;
+    color: #111827;
+    border-color: #e5e7eb;
+}
+
+.bg-light-background .filter-select:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bg-light-background .filter-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.bg-light-background .filter-select option {
+    background-color: #ffffff;
+    color: #111827;
+    padding: 8px 12px;
+}
+
+.bg-light-background .filter-icon {
+    color: #6b7280;
+}
+
+/* Dark Theme Styles */
+.bg-dark-background .filter-select {
+    background-color: #374151;
+    color: #f9fafb;
+    border-color: #4b5563;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%9ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+}
+
+.bg-dark-background .filter-select:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.bg-dark-background .filter-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+.bg-dark-background .filter-select option {
+    background-color: #374151;
+    color: #f9fafb;
+    padding: 8px 12px;
+}
+
+.bg-dark-background .filter-icon {
+    color: #9ca3af;
+}
+
+/* Action buttons styling to match */
+.notifications-button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    white-space: nowrap;
+}
+
+.mark-all-read-button {
+    background: #10b981;
+    color: white;
+}
+
+.mark-all-read-button:hover:not(:disabled) {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.mark-all-read-button:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.delete-all-button {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-all-button:hover:not(:disabled) {
+    background: #dc2626;
+    transform: translateY(-1px);
+}
+
+.delete-all-button:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.action-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Filter status styling */
+.filter-status {
+    margin-bottom: 16px;
+    padding: 8px 20px;
+    font-size: 14px;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+/* Theme-specific border classes */
+.border-light {
+    border-color: #e5e7eb;
+}
+
+.border-dark {
+    border-color: #4b5563;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .notifications-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .notifications-actions {
+        justify-content: center;
+        order: initial;
+    }
+    
+    .notifications-filter {
+        order: initial;
+        justify-content: center;
+        margin-bottom: 8px;
+    }
+    
+    .filter-select {
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .notifications-header {
+        padding: 0 10px;
+    }
+    
+    .notifications-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .notifications-filter {
+        margin-bottom: 0;
+    }
+    
+    .filter-select {
+        min-width: 100%;
+        width: 100%;
+    }
+    
+    .notifications-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .notifications-button {
+        padding: 8px 12px;
+        font-size: 13px;
+        height: 40px;
+    }
+    
+    .filter-select {
+        padding: 8px 12px;
+        font-size: 13px;
+        height: 40px;
+        padding-right: 36px;
+    }
+    
+    .filter-icon {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Focus styles for accessibility */
+.filter-select:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Custom scrollbar for select dropdown */
+.filter-select option {
+    border-radius: 4px;
+    margin: 2px 0;
+}
+
+/* Hover effects for better UX */
+.notifications-filter:hover .filter-icon {
+    opacity: 1;
+}
+
+/* Loading and empty state text colors */
+.loading-text,
+.no-notifications-text {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 16px;
+}
+
+.text-light-secondary-text {
+    color: #6b7280;
+}
+
+.text-dark-secondary-text {
+    color: #9ca3af;
 }

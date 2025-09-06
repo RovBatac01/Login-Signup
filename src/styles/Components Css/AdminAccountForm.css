@@ -283,4 +283,82 @@ select.admin-username-input option {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23fff' d='M6 8.825l4.975-4.975a.5.5 0 0 1 .707 0l.043.043a.5.5 0 0 1 0 .707L6.353 10.07a.5.5 0 0 1-.707 0L.275 4.6a.5.5 0 0 1 0-.707l.043-.043a.5.5 0 0 1 .707 0L6 8.825z'/%3E%3C/svg%3E");
 }
 
+/* Password input container and toggle button styles */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input {
+  padding-right: 45px !important; /* Make space for the toggle button */
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.password-toggle-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.password-toggle-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Theme-specific styles for the toggle button */
+.light .password-toggle-btn {
+  color: #6b7280;
+}
+
+.light .password-toggle-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #374151;
+}
+
+.dark .password-toggle-btn {
+  color: #9ca3af;
+}
+
+.dark .password-toggle-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #d1d5db;
+}
+
+/* Focus styles for accessibility */
+.password-toggle-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Ensure the input field maintains proper styling */
+.password-input-container .form-control {
+  border-radius: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .password-toggle-btn {
+    right: 8px;
+  }
+  
+  .password-input {
+    padding-right: 40px !important;
+  }
+}
+
 

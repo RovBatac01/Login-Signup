@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Form, Button, Container, Card, Alert } from "react-bootstrap";
+import { Eye, EyeOff } from "lucide-react"; // Import eye icons
 import axios from "axios";
 import "../styles/Components Css/AdminAccountForm.css";
 import { ThemeContext } from "../context/ThemeContext";
@@ -14,6 +15,10 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
     role: "Admin", // Default to 'Admin' so checkboxes show initially
     establishmentIds: [],
   });
+
+  // Password visibility states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
@@ -67,6 +72,15 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
 
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
+  };
+
+  // Toggle password visibility functions
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const validatePassword = (password) => {
@@ -125,6 +139,9 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
       setErrorMessage("");
       setSuccessMessage("");
       setEmailForOtp("");
+      // Reset password visibility states
+      setShowPassword(false);
+      setShowConfirmPassword(false);
       onClose();
     }, 1000);
   };
@@ -190,7 +207,7 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
     <Container className={`admin-form-container ${theme}`}>
       <Card.Body>
         <Form onSubmit={handleSubmit}>
-          {/* Admin Username, Email, Password, Confirm Password - remain unchanged */}
+          {/* Admin Username, Email - remain unchanged */}
           <Form.Group className="admin-form-group">
             <Form.Label className="admin-form-label">Admin Username</Form.Label>
             <Form.Control
@@ -219,32 +236,56 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
             />
           </Form.Group>
 
+          {/* Password field with show/hide functionality */}
           <Form.Group className="admin-form-group">
             <Form.Label className="admin-form-label">Password</Form.Label>
-            <Form.Control
-              type="password"
-              name="password"
-              value={adminData.password}
-              onChange={handleChange}
-              placeholder="Enter password"
-              required
-              disabled={isOtpSent}
-              className="admin-username-input"
-            />
+            <div className="password-input-container">
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={adminData.password}
+                onChange={handleChange}
+                placeholder="Enter password"
+                required
+                disabled={isOtpSent}
+                className="admin-username-input password-input"
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={togglePasswordVisibility}
+                disabled={isOtpSent}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </Form.Group>
 
+          {/* Confirm Password field with show/hide functionality */}
           <Form.Group className="admin-form-group">
             <Form.Label className="admin-form-label">Confirm Password</Form.Label>
-            <Form.Control
-              type="password"
-              name="confirmPassword"
-              value={adminData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm password"
-              required
-              disabled={isOtpSent}
-              className="admin-username-input"
-            />
+            <div className="password-input-container">
+              <Form.Control
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={adminData.confirmPassword}
+                onChange={handleChange}
+                placeholder="Confirm password"
+                required
+                disabled={isOtpSent}
+                className="admin-username-input password-input"
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={toggleConfirmPasswordVisibility}
+                disabled={isOtpSent}
+                aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </Form.Group>
 
           {/* Role Dropdown */}

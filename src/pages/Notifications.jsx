@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Bell, CheckCircle, AlertTriangle, XCircle, Trash2, UserCheck, Check, X, CalendarCheck } from 'lucide-react';
+import { Bell, CheckCircle, AlertTriangle, XCircle, Trash2, UserCheck, Check, X, CalendarCheck, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import '../styles/Pages Css/Notifications.css';
@@ -8,7 +8,6 @@ import PageTitle from "../components/PageTitle";
 import { ThemeContext } from '../context/ThemeContext';
 
 // --- Helper Functions for User Notifications (kept outside as they might be used elsewhere) ---
-// If these are *also* only used within NotificationsPage, consider moving them inside as well.
 const getUserNotificationsKey = (userId) => `userNotifications_${userId}`;
 
 const loadUserNotifications = (userId) => {
@@ -33,7 +32,7 @@ const NotificationIcon = ({ type }) => {
         case 'new_user':
             return <UserCheck className="icon-info" />;
         case 'schedule':
-            return <CalendarCheck className="icon-info" />; // Using CalendarCheck icon for scheduled events
+            return <CalendarCheck className="icon-info" />;
         case 'success':
             return <CheckCircle className="icon-success" />;
         case 'warning':
@@ -48,7 +47,6 @@ const NotificationIcon = ({ type }) => {
 };
 
 // --- NotificationCard component ---
-// Removed onApproveRequest, onDeclineRequest from props
 const NotificationCard = ({ notification, onMarkAsRead, onDelete }) => {
     const { theme } = useContext(ThemeContext);
 
@@ -83,7 +81,6 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete }) => {
                             <p className={`notification-message ${notification.read ? 'read' : 'unread'}`}>
                                 {notification.message}
                             </p>
-                            {/* Display status only for 'request' type */}
                             {notification.type === 'request' && notification.status && (
                                 <p className={`notification-status status-${notification.status}`}>
                                     Status: {notification.status.charAt(0).toUpperCase() + notification.status.slice(1)}
@@ -92,7 +89,6 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete }) => {
                         </div>
                     </div>
                     <div className="notification-actions">
-                        {/* Mark as Read button (not for access requests, and optionally not for schedule) */}
                         {!notification.read && notification.type !== 'request' && notification.type !== 'schedule' && (
                             <button
                                 onClick={() => onMarkAsRead(notification.id)}
@@ -102,26 +98,6 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete }) => {
                                 <CheckCircle className="mark-read-icon" />
                             </button>
                         )}
-
-                        {/* Approval/Decline buttons for 'request' type and 'pending' status - REMOVED */}
-                        {/* {notification.type === 'request' && notification.status === 'pending' && (
-                            <>
-                                <button
-                                    onClick={() => onApproveRequest(notification.id, notification.fromUserId)}
-                                    className={`notification-action-button approve-button`}
-                                    title="Approve Request"
-                                >
-                                    <Check className="approve-request-icon" />
-                                </button>
-                                <button
-                                    onClick={() => onDeclineRequest(notification.id, notification.fromUserId)}
-                                    className={`notification-action-button decline-button`}
-                                    title="Decline Request"
-                                >
-                                    <X className="decline-request-icon" />
-                                </button>
-                            </>
-                        )} */}
 
                         <button
                             onClick={() => onDelete(notification.id)}
@@ -143,13 +119,28 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete }) => {
 // --- NotificationsPage (Super Admin's Main Component) ---
 const NotificationsPage = () => {
     const [notifications, setNotifications] = useState([]);
+    const [filteredNotifications, setFilteredNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [selectedFilter, setSelectedFilter] = useState('all');
     const { theme } = useContext(ThemeContext);
 
-    const API_BASE_URL = "https://login-signup-3470.onrender.com"; // Ensure this matches your backend URL
+    const API_BASE_URL = "https://login-signup-3470.onrender.com";
 
-    // --- Helper Functions for Super Admin Notifications (MOVED INSIDE COMPONENT) ---
-    // Wrapped with useCallback to ensure stable function references for dependency arrays.
+    // --- Filter Options ---
+    const filterOptions = [
+        { value: 'all', label: 'All Notifications', count: 0 },
+        { value: 'sensor', label: 'Sensor Alerts', count: 0 },
+        { value: 'request', label: 'Access Requests', count: 0 },
+        { value: 'new_user', label: 'New Users', count: 0 },
+        { value: 'schedule', label: 'Scheduled Events', count: 0 },
+        { value: 'success', label: 'Success', count: 0 },
+        { value: 'warning', label: 'Warnings', count: 0 },
+        { value: 'error', label: 'Errors', count: 0 },
+        { value: 'info', label: 'Information', count: 0 },
+        { value: 'unread', label: 'Unread Only', count: 0 }
+    ];
+
+    // --- Helper Functions ---
     const loadSuperAdminNotifications = useCallback(() => {
         try {
             const storedNotifications = localStorage.getItem('superAdminNotifications');
@@ -168,14 +159,56 @@ const NotificationsPage = () => {
         }
     }, []);
 
+    // --- Filter notifications based on selected filter ---
+    const filterNotifications = useCallback((notifications, filter) => {
+        switch (filter) {
+            case 'all':
+                return notifications;
+            case 'unread':
+                return notifications.filter(n => !n.read);
+            case 'sensor':
+            case 'request':
+            case 'new_user':
+            case 'schedule':
+            case 'success':
+            case 'warning':
+            case 'error':
+            case 'info':
+                return notifications.filter(n => n.type === filter);
+            default:
+                return notifications;
+        }
+    }, []);
+
+    // --- Update filter counts ---
+    const updateFilterCounts = useCallback((notifications) => {
+        return filterOptions.map(option => {
+            let count = 0;
+            switch (option.value) {
+                case 'all':
+                    count = notifications.length;
+                    break;
+                case 'unread':
+                    count = notifications.filter(n => !n.read).length;
+                    break;
+                default:
+                    count = notifications.filter(n => n.type === option.value).length;
+                    break;
+            }
+            return { ...option, count };
+        });
+    }, []);
+
     // --- Function to fetch notifications and events from the backend ---
     const fetchNotifications = useCallback(async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token'); // Get admin's token
+            const token = localStorage.getItem('token');
             if (!token) {
                 console.warn("No authentication token found for admin. Cannot fetch notifications.");
-                setNotifications(loadSuperAdminNotifications()); // Fallback to localStorage
+                const localNotifications = loadSuperAdminNotifications();
+                setNotifications(localNotifications);
+                setFilteredNotifications(filterNotifications(localNotifications, selectedFilter));
                 setLoading(false);
                 return;
             }
@@ -187,43 +220,57 @@ const NotificationsPage = () => {
             });
 
             if (response.data.success) {
-                // Ensure 'type' is 'sensor' for these notifications as per backend endpoint
                 const fetchedNotifications = response.data.notifications.map(n => ({
                     ...n,
-                    type: n.type || 'sensor' // Default to 'sensor' if not explicitly set by backend for some reason
+                    type: n.type || 'sensor'
                 }));
                 setNotifications(fetchedNotifications);
-                saveSuperAdminNotifications(fetchedNotifications); // Update localStorage cache
+                setFilteredNotifications(filterNotifications(fetchedNotifications, selectedFilter));
+                saveSuperAdminNotifications(fetchedNotifications);
                 console.log("Frontend (Super Admin): Sensor notifications fetched from database.");
             } else {
                 console.error("Failed to fetch sensor notifications:", response.data.message);
-                setNotifications(loadSuperAdminNotifications()); // Fallback on backend error
+                const localNotifications = loadSuperAdminNotifications();
+                setNotifications(localNotifications);
+                setFilteredNotifications(filterNotifications(localNotifications, selectedFilter));
             }
         } catch (error) {
             console.error("Error fetching sensor notifications from backend:", error);
-            setNotifications(loadSuperAdminNotifications()); // Fallback on network error
+            const localNotifications = loadSuperAdminNotifications();
+            setNotifications(localNotifications);
+            setFilteredNotifications(filterNotifications(localNotifications, selectedFilter));
         } finally {
             setLoading(false);
         }
-    }, [API_BASE_URL, loadSuperAdminNotifications, saveSuperAdminNotifications]); // Dependencies for fetchNotifications
+    }, [API_BASE_URL, loadSuperAdminNotifications, saveSuperAdminNotifications, filterNotifications, selectedFilter]);
+
+    // --- Handle filter change ---
+    const handleFilterChange = (filterValue) => {
+        setSelectedFilter(filterValue);
+        setFilteredNotifications(filterNotifications(notifications, filterValue));
+    };
 
     // Effect hook to fetch data on component mount and set up polling
     useEffect(() => {
         fetchNotifications();
-        const pollInterval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
-        return () => clearInterval(pollInterval); // Cleanup on unmount
-    }, [fetchNotifications]); // Re-run if fetchNotifications changes (controlled by useCallback)
+        const pollInterval = setInterval(fetchNotifications, 30000);
+        return () => clearInterval(pollInterval);
+    }, [fetchNotifications]);
+
+    // Effect hook to update filtered notifications when notifications change
+    useEffect(() => {
+        setFilteredNotifications(filterNotifications(notifications, selectedFilter));
+    }, [notifications, selectedFilter, filterNotifications]);
 
     // Effect hook to save notifications to localStorage whenever 'notifications' state changes
     useEffect(() => {
-        if (!loading) { // Only save once loading is complete
+        if (!loading) {
             saveSuperAdminNotifications(notifications);
             console.log("Frontend (Super Admin): Notifications saved to localStorage.");
         }
-    }, [notifications, loading, saveSuperAdminNotifications]); // Dependencies for saving
+    }, [notifications, loading, saveSuperAdminNotifications]);
 
     // --- Backend API calls for sensor notifications ---
-
     const markAsRead = async (id) => {
         try {
             const token = localStorage.getItem('token');
@@ -237,7 +284,6 @@ const NotificationsPage = () => {
 
             if (response.data.success) {
                 setNotifications(prevNotifications => {
-                    // Update the status locally for immediate UI feedback
                     const updated = prevNotifications.map(n =>
                         n.id === id ? { ...n, read: true, status: 'read' } : n
                     );
@@ -270,7 +316,6 @@ const NotificationsPage = () => {
 
             if (response.data.success) {
                 setNotifications(prevNotifications => {
-                    // Remove the notification locally for immediate UI feedback
                     const updated = prevNotifications.filter(n => n.id !== id);
                     console.log("Frontend (Super Admin): Deleted notification (via API):", id);
                     return updated;
@@ -301,7 +346,6 @@ const NotificationsPage = () => {
 
             if (response.data.success) {
                 setNotifications(prevNotifications => {
-                    // Mark all relevant notifications as read locally
                     const updated = prevNotifications.map(n => ({ ...n, read: true, status: 'read' }));
                     console.log("Frontend (Super Admin): Marked all notifications as read (via API).");
                     return updated;
@@ -331,7 +375,7 @@ const NotificationsPage = () => {
             });
 
             if (response.data.success) {
-                setNotifications([]); // Clear all notifications locally
+                setNotifications([]);
                 console.log("Frontend (Super Admin): Deleted all notifications (via API).");
             } else {
                 console.error("Failed to delete all notifications:", response.data.message);
@@ -343,19 +387,36 @@ const NotificationsPage = () => {
         }
     };
 
-    // Removed handleApproveRequest and handleDeclineRequest functions
-    // const handleApproveRequest = async (notificationId, userId) => { ... };
-    // const handleDeclineRequest = async (notificationId, userId) => { ... };
-
-
     const unreadCount = notifications.filter(n => !n.read).length;
+    const updatedFilterOptions = updateFilterCounts(notifications);
 
     return (
         <div className={`notifications-container bg-${theme}-background text-${theme}-text`}>
             <div className="notifications-wrapper">
                 <div className="notifications-header">
                     <PageTitle title="NOTIFICATIONS" />
+                
+
                     <div className="notifications-actions">
+
+                                            {/* Filter Dropdown */}
+                    <div className="notifications-filter">
+                        <div className="filter-dropdown">
+                            <Filter className="filter-icon" />
+                            <select
+                                value={selectedFilter}
+                                onChange={(e) => handleFilterChange(e.target.value)}
+                                className={`filter-select bg-${theme}-background text-${theme}-text border-${theme}`}
+                            >
+                                {updatedFilterOptions.map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label} ({option.count})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    
                         <button
                             onClick={markAllAsRead}
                             disabled={unreadCount === 0}
@@ -375,19 +436,33 @@ const NotificationsPage = () => {
                     </div>
                 </div>
 
+                {/* Filter Status */}
+                <div className="filter-status">
+                    <span className={`text-${theme}-secondary-text`}>
+                        {selectedFilter === 'all' 
+                            ? `Showing all ${filteredNotifications.length} notifications`
+                            : `Showing ${filteredNotifications.length} ${updatedFilterOptions.find(opt => opt.value === selectedFilter)?.label.toLowerCase() || 'notifications'}`
+                        }
+                    </span>
+                </div>
+
                 {loading ? (
                     <div className={`loading-text text-${theme}-secondary-text`}>Loading notifications and events from database...</div>
-                ) : notifications.length === 0 ? (
-                    <div className={`no-notifications-text text-${theme}-secondary-text italic`}>No notifications or events available.</div>
+                ) : filteredNotifications.length === 0 ? (
+                    <div className={`no-notifications-text text-${theme}-secondary-text italic`}>
+                        {selectedFilter === 'all' 
+                            ? 'No notifications or events available.'
+                            : `No ${updatedFilterOptions.find(opt => opt.value === selectedFilter)?.label.toLowerCase() || 'notifications'} found.`
+                        }
+                    </div>
                 ) : (
                     <AnimatePresence>
-                        {notifications.map(notification => (
+                        {filteredNotifications.map(notification => (
                             <NotificationCard
                                 key={notification.id}
                                 notification={notification}
                                 onMarkAsRead={markAsRead}
                                 onDelete={deleteNotification}
-                                // Removed onApproveRequest and onDeclineRequest props
                             />
                         ))}
                     </AnimatePresence>
