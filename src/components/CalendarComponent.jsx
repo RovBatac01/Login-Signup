@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext'; // Import the custom hook to
 
 // Define your backend API base URL
 const API_BASE_URL = 'https://login-signup-3470.onrender.com'; // Make sure this matches your backend
+// const API_BASE_URL = 'http://localhost:5000';
 
 export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -53,21 +54,23 @@ export default function Calendar() {
   // --- API Interaction Functions ---
 
   // Function to fetch all events from the backend and organize them by date
-  // This will be called on initial load and after any CUD operation.
   const fetchEventsFromBackend = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Changed from /events-all to /api/events-all to match your backend route
-      const response = await fetch(`${API_BASE_URL}/api/events-all`);
+      // FIXED: Change to /events (remove the -all suffix and api/ prefix)
+      console.log("Fetching events from:", `${API_BASE_URL}/api/events`);
+      const response = await fetch(`${API_BASE_URL}/api/events`);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const allEvents = await response.json();
+      console.log("Fetched events:", allEvents);
 
       const organizedEvents = {};
       allEvents.forEach(event => {
-        // MySQL `DATE` type returns a string like 'YYYY-MM-DD'
         const eventDate = new Date(event.event_date);
         const dateKey = getDateKey(eventDate);
         if (!organizedEvents[dateKey]) {
@@ -78,11 +81,11 @@ export default function Calendar() {
           title: event.title,
           time: event.time,
           description: event.description,
-          date: eventDate, // Store as Date object for consistency
+          date: eventDate,
         });
       });
+      
       setEvents(organizedEvents);
-
     } catch (err) {
       console.error('Failed to fetch events:', err);
       setError('Failed to load events. Please try again.');
@@ -90,9 +93,8 @@ export default function Calendar() {
     } finally {
       setLoading(false);
     }
-  }, []); // No dependencies, as it fetches all events
+  }, []); 
 
-  // useEffect to load events from the backend on initial mount
   useEffect(() => {
     fetchEventsFromBackend();
   }, [fetchEventsFromBackend]);
@@ -106,12 +108,13 @@ export default function Calendar() {
     try {
       const eventData = {
         title: newEvent.title.trim(),
-        time: newEvent.time || null, // Send null if empty
-        description: newEvent.description.trim() || null, // Send null if empty
-        event_date: formatDateToYYYYMMDD(newEvent.date), // Format for backend
+        time: newEvent.time || null,
+        description: newEvent.description.trim() || null,
+        event_date: formatDateToYYYYMMDD(newEvent.date),
       };
 
-      // Changed from /events to /api/events to match your backend route
+      // FIXED: Change to /event (no api/ prefix)
+      console.log("Adding event:", eventData);
       const response = await fetch(`${API_BASE_URL}/api/events`, {
         method: 'POST',
         headers: {
@@ -124,7 +127,6 @@ export default function Calendar() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // After adding, refresh events from the backend to ensure UI is in sync
       fetchEventsFromBackend();
       closeEventModal();
     } catch (err) {
@@ -140,7 +142,8 @@ export default function Calendar() {
     setLoading(true);
     setError(null);
     try {
-      // Changed from /events/${eventId} to /api/events/${eventId} to match your backend route
+      // FIXED: Change to /event/:id (no api/ prefix)
+      console.log("Deleting event:", eventId);
       const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
         method: 'DELETE',
       });
@@ -149,7 +152,6 @@ export default function Calendar() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // After deleting, refresh events from the backend to ensure UI is in sync
       fetchEventsFromBackend();
     } catch (err) {
       console.error('Error deleting event:', err);

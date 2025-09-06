@@ -4,7 +4,20 @@ body,
 .login-page, 
 .auth-container,
 .auth-page {
-  background-color: #d6ebff !important; /* Light blue color from image */
+  background-color: #d6ebff; /* Light blue color from image */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  
+}
+
+body, 
+.app-container, 
+.login-page, 
+.auth-container,
+.auth-page
+.dark {
+  background-color: #1a1a1a; /* Light blue color from image */
   min-height: 100vh;
   margin: 0;
   padding: 0;

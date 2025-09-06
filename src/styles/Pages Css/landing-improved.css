@@ -362,7 +362,6 @@ body::-webkit-scrollbar {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, var(--color-primary-brand) 0%, rgba(74, 138, 244, 0.6) 100%);
   background-size: cover;
   background-position: center;
   transition: transform var(--transition-speed);
@@ -1511,5 +1510,110 @@ body::-webkit-scrollbar {
 
   .form-group {
     margin-bottom: 15px;
+  }
+}
+
+
+/* Add these styles to: c:\xampp\htdocs\Login-Signup\src\styles\Pages Css\landing-improved.css */
+
+/* Navbar Logo Styling */
+.aquasense-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.aquasense-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+/* Hero Logo Styling */
+.hero-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.hero-logo {
+  height: 100px;
+  width: auto;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
+/* About Logo Styling */
+.about-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.about-logo {
+  max-width: 80%;
+  height: auto;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.15));
+}
+
+/* Footer Logo Styling */
+.footer-brand-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.footer-logo {
+  height: 35px;
+  width: auto;
+  opacity: 0.9;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .aquasense-logo {
+    height: 32px;
+  }
+  
+  .hero-logo {
+    height: 80px;
+  }
+  
+  .about-logo {
+    max-width: 60%;
+  }
+  
+  .footer-logo {
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .aquasense-brand-container {
+    gap: 8px;
+  }
+  
+  .aquasense-logo {
+    height: 25px;
+  }
+  
+  .hero-logo {
+    height: 70px;
+  }
+  
+  .about-logo {
+    max-width: 50%;
+  }
+  
+  .footer-logo {
+    height: 24px;
   }
 }

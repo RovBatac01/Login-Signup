@@ -3,6 +3,10 @@ import '../styles/Pages Css/landing-improved.css';
 import { ThemeContext } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
+// Import the AquaSense logo
+import aquasenseLogo from '../assets/aquasense-logo.png';
+import sensors from '../assets/sensors.png';
+
 // Social media icons
 import facebookIcon from '../assets/facebook.png';
 import instagramIcon from '../assets/instagram.png';
@@ -139,7 +143,14 @@ const LandingImproved = () => {
     <div className={`aquasense-main-container ${theme}`}>
       {/* Navbar */}
       <nav className="aquasense-navbar" ref={navRef}>
-        <div className="aquasense-brand">AQUASENSE</div>
+        <div className="aquasense-brand-container">
+          <img 
+            src={aquasenseLogo} 
+            alt="AquaSense Logo" 
+            className="aquasense-logo" 
+          />
+          <div className="aquasense-brand">AQUASENSE</div>
+        </div>
         
         {/* Mobile menu button */}
         <div className="mobile-menu-button" onClick={toggleMobileMenu}>
@@ -245,8 +256,14 @@ const LandingImproved = () => {
           <h2 className="section-title">Who We Are</h2>
         </div>
         <div className="about-container">
-          {/* This div will contain a background image via CSS */}
-          <div className="about-image"></div>
+          {/* About image with logo */}
+          <div className="about-image">
+            <img 
+              src={sensors} 
+              alt="AquaSense Logo" 
+              className="about-logo"
+            />
+          </div>
           
           <div className="about-content">
             <div className="about-subtitle">Our Story</div>
@@ -574,7 +591,14 @@ const LandingImproved = () => {
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-brand">
-            <h3 className="footer-title">AQUASENSE</h3>
+            <div className="footer-brand-container">
+              <img 
+                src={aquasenseLogo} 
+                alt="AquaSense Logo" 
+                className="footer-logo" 
+              />
+              <h3 className="footer-title">AQUASENSE</h3>
+            </div>
             <p className="footer-text">
               Providing innovative water quality monitoring solutions for a safer and sustainable future.
             </p>

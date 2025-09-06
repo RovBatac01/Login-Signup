@@ -147,11 +147,12 @@
 /* Main Content Grid (Establishments + Calendar) */
 .mainContentGrid {
   display: flex;
-  gap: 10px; /* Further reduced from 15px to 10px */
-  flex-grow: 1; /* Allow this section to grow */
+  gap: 10px;
+  flex-grow: 1;
   width: 100%;
-  padding: 0 15px; /* Reduced from 0 20px to 0 15px */
-  margin-top: 0; /* Ensure no extra margin at the top */
+  padding: 0 15px;
+  margin-top: 0;
+  align-items: stretch; /* Ensure children stretch to equal height */
 }
 
 /* Set width for establishment section (2/3) */
@@ -178,19 +179,21 @@
 
 /* Establishment Section */
 .establishmentSection {
-    background: var(--card-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 15px; /* Reduced from 20px to 15px */
-    padding: 15px; /* Further reduced from 20px to 15px */
-    box-shadow: 0 10px 20px var(--shadow-color); /* Reduced shadow intensity */
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow-y: auto; 
-    height: 665px;
-    width: 100%;
+  background: var(--card-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 10px 20px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  height: auto; /* Remove fixed height */
+  width: 100%;
+  flex: 2;
+  min-height: 500px; /* Ensures minimum height for both sections */
 }
 
 
@@ -308,14 +311,14 @@
 
 /* Each establishment card takes up 50% of space minus the gap */
 .establishmentsList > * {
-    flex: 0 0 calc(50% - 10px); /* Updated from 15px to 10px to match the new gap */
-    max-width: calc(50% - 10px); /* Also updated to match new gap */
+    flex: 0 0 calc(100% - 10px); /* Changed from 50% to 100% = 1 per row */
+    max-width: calc(100% - 10px); /* Changed from 50% to 100% */
 }
 
-/* Optional: Add media query for smaller screens if 2 columns become too cramped */
-@media (max-width: 768px) { /* Adjust breakpoint as needed */
+/* Remove or modify the media query since we want 1 per row on all screen sizes */
+@media (max-width: 768px) {
     .establishmentsList > * {
-        flex: 0 0 100%; /* Take full width on smaller screens */
+        flex: 0 0 100%; /* Keep 100% for smaller screens */
         max-width: 100%;
     }
 }
@@ -394,15 +397,20 @@
 /* Calendar Section */
 .calendarSection {
   background-color: var(--card-bg);
-  border-radius: 10px; /* Reduced from 12px to 10px */
-  padding: 3px; /* Reduced from 5px to 3px */
-  box-sizing: border-box; 
-  box-shadow: 0px 3px 10px var(--shadow-color); /* Reduced shadow */
+  border-radius: 10px;
+  padding: 3px;
+  box-sizing: border-box;
+  box-shadow: 0px 3px 10px var(--shadow-color);
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center calendar within its section */
-  height: fit-content;
-  overflow-y: scroll;
+  align-items: center;
+  height: auto; /* Remove fit-content */
+  width: 100%;
+  flex: 1;
+  min-height: 500px; /* Ensures minimum height for both sections */
+  /* Match establishmentSection min-height for evenness */
+  justify-content: stretch;
+  overflow-y: auto;
 }
 
 .calendarSection::-webkit-scrollbar {
@@ -567,19 +575,29 @@
   padding: 10px;
 }
 
+.mainContentGrid > .establishmentSection,
+.mainContentGrid > .calendarSection {
+  height: 100%;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1200px) {
   .mainContentGrid {
-    flex-direction: column; /* Stack on smaller screens */
+    flex-direction: column;
+    align-items: stretch;
   }
-  
-  /* Reset flex values for stacked layout */
-  .mainContentGrid .establishmentSection,
-  .mainContentGrid .calendarSection,
-  .mainContentGrid .establishmentDetailsSection {
-    flex: none;
+  .mainContentGrid > .establishmentSection,
+  .mainContentGrid > .calendarSection {
+    min-height: 350px;
+    height: auto;
     width: 100%;
   }
+}
+
+.establishmentSection,
+.calendarSection {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border: 1px solid var(--card-border);
 }
 
 @media (max-width: 768px) {

@@ -3,48 +3,70 @@
 /* --- Base Layout --- */
 .settings-page-container {
     display: flex;
-    height: 100vh; /* Fixed height for the container to enable inner scrolling */
-    background-color: #DDDDDD; /* Light theme background */
-    color: #1f2937; /* Light theme text color */
+    height: 100vh;
+    /* Fixed height for the container to enable inner scrolling */
+    background-color: #DDDDDD;
+    /* Light theme background */
+    color: #1f2937;
+    /* Light theme text color */
     transition: background-color 0.3s ease, color 0.3s ease;
-    font-family: 'montserrat'; /* Assuming Inter or similar is used */
+    font-family: 'montserrat';
+    /* Assuming Inter or similar is used */
 }
 
 /* Dark Theme Specifics - Matching image's dark aesthetic */
 .dark-theme.settings-page-container {
-    background-color: #1a1a1a; /* Very dark background, similar to image */
-    color: #e0e0e0; /* Off-white text for dark theme */
+    background-color: #1a1a1a;
+    /* Very dark background, similar to image */
+    color: #e0e0e0;
+    /* Off-white text for dark theme */
 }
 
 .settings-page-content-wrapper {
-    flex: 1; /* Take remaining space after sidebar */
+    flex: 1;
+    /* Take remaining space after sidebar */
     padding: 1rem;
-    display: flex; /* Added flex to center the card vertically */
-    flex-direction: column; /* Arrange items in a column */
-    overflow: hidden; /* Hide overflow on this wrapper to prevent page scroll */
+    display: flex;
+    /* Added flex to center the card vertically */
+    flex-direction: column;
+    /* Arrange items in a column */
+    overflow: hidden;
+    /* Hide overflow on this wrapper to prevent page scroll */
 }
 
 .settings-page-card-wrapper {
     width: 100%;
-    margin: auto; /* Center the card horizontally and vertically within the flex container */
-    background-color: #ffffff; /* Light theme card background */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for light theme */
-    border-radius: 0.5rem; /* Rounded corners */
+    margin: auto;
+    /* Center the card horizontally and vertically within the flex container */
+    background-color: #ffffff;
+    /* Light theme card background */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Subtle shadow for light theme */
+    border-radius: 0.5rem;
+    /* Rounded corners */
     padding: 2rem;
-    flex: 1; /* Allow the card to grow and shrink */
-    max-height: calc(100vh - 4rem); /* Calculate max-height based on viewport height minus total padding */
-    overflow-y: scroll; /* Make ONLY the card content scrollable */
-    display: flex; /* Added flex for internal layout of card content */
-    flex-direction: column; /* Stack sections vertically */
-    gap: 1.5rem; /* Space between major sections */
+    flex: 1;
+    /* Allow the card to grow and shrink */
+    max-height: calc(100vh - 4rem);
+    /* Calculate max-height based on viewport height minus total padding */
+    overflow-y: scroll;
+    /* Make ONLY the card content scrollable */
+    display: flex;
+    /* Added flex for internal layout of card content */
+    flex-direction: column;
+    /* Stack sections vertically */
+    gap: 1.5rem;
+    /* Space between major sections */
 
     /* --- Scrollbar Hiding --- */
     /* For WebKit browsers (Chrome, Safari, Edge) */
     &::-webkit-scrollbar {
         display: none;
     }
+
     /* For Firefox */
-    scrollbar-width: none; /* Firefox specific property */
+    scrollbar-width: none;
+    /* Firefox specific property */
     /* For IE and Edge (legacy) */
     -ms-overflow-style: none;
 }
@@ -116,7 +138,8 @@
     color: #9ca3af;
 }
 
-.settings-page-device-info, .settings-page-ip-info {
+.settings-page-device-info,
+.settings-page-ip-info {
     display: inline-flex;
     align-items: center;
 }
@@ -171,96 +194,101 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for light theme */
-    border-radius: 0.5rem; /* Rounded corners */
-    padding: 2rem;
-    flex: 1; /* Allow the card to grow and shrink */
-    max-height: calc(100vh - 4rem); /* Calculate max-height based on viewport height minus total padding */
-    overflow-y: scroll; /* Make ONLY the card content scrollable */
-    display: flex; /* Added flex for internal layout of card content */
-    flex-direction: column; /* Stack sections vertically */
-    gap: 1.5rem; /* Space between major sections */
-
-    /* --- Scrollbar Hiding --- */
-    /* For WebKit browsers (Chrome, Safari, Edge) */
-    &::-webkit-scrollbar {
-        display: none;
+    from {
+        transform: rotate(0deg);
     }
-    /* For Firefox */
-    scrollbar-width: none; /* Firefox specific property */
-    /* For IE and Edge (legacy) */
-    -ms-overflow-style: none;
-}
 
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 /* Dark Theme Specifics for Card - Matching image's dark aesthetic */
 .dark-theme .settings-page-card-wrapper {
-    background-color: #2a2a2a; /* Slightly lighter dark background for cards */
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); /* Deeper shadow for dark mode */
+    background-color: #2a2a2a;
+    /* Slightly lighter dark background for cards */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    /* Deeper shadow for dark mode */
 }
 
 /* --- Main Title --- */
 .settings-page-main-title {
-    font-size: 2.25rem; /* Larger title */
-    font-weight: 700; /* Bold */
+    font-size: 2.25rem;
+    /* Larger title */
+    font-weight: 700;
+    /* Bold */
     margin-bottom: 2rem;
-    text-align: left; /* Aligned left like in the image */
-    color: #1f2937; /* Light theme */
+    text-align: left;
+    /* Aligned left like in the image */
+    color: #1f2937;
+    /* Light theme */
     font-family: 'montserrat';
 }
 
 .dark-theme .settings-page-main-title {
-    color: #f3f4f6; /* Light text for dark theme */
+    color: #f3f4f6;
+    /* Light text for dark theme */
 }
 
 /* --- Collapsible Category Section Headers --- */
 .settings-page-section-category {
-    margin-bottom: 1.5rem; /* Space between categories */
+    margin-bottom: 1.5rem;
+    /* Space between categories */
 }
 
 .settings-page-category-header {
     display: flex;
     align-items: center;
-    font-size: 1.5rem; /* Larger font for category titles */
+    font-size: 1.5rem;
+    /* Larger font for category titles */
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 0.5rem;
-    color: #1f2937; /* Light theme */
-    padding-bottom: 0.5rem; /* Small padding at bottom */
-    border-bottom: 1px solid #e0e0e0; /* Subtle separator */
+    color: #1f2937;
+    /* Light theme */
+    padding-bottom: 0.5rem;
+    /* Small padding at bottom */
+    border-bottom: 1px solid #e0e0e0;
+    /* Subtle separator */
     transition: color 0.3s ease, border-color 0.3s ease;
     font-family: 'montserrat';
 }
 
 .dark-theme .settings-page-category-header {
-    color: #f3f4f6; /* Light text for dark theme */
-    border-bottom-color: #444444; /* Darker separator */
+    color: #f3f4f6;
+    /* Light text for dark theme */
+    border-bottom-color: #444444;
+    /* Darker separator */
 }
 
 .settings-page-category-header:hover {
-    color: #3b82f6; /* Blue hover for headers */
+    color: #3b82f6;
+    /* Blue hover for headers */
 }
 
 .settings-page-category-icon {
-    margin-right: 0.75rem; /* Icon spacing */
-    color: #6b7280; /* Default icon color */
+    margin-right: 0.75rem;
+    /* Icon spacing */
+    color: #6b7280;
+    /* Default icon color */
     transition: color 0.3s ease;
 }
 
 .dark-theme .settings-page-category-icon {
-    color: #9ca3af; /* Lighter gray for icons in dark theme */
+    color: #9ca3af;
+    /* Lighter gray for icons in dark theme */
 }
 
 .settings-page-category-header:hover .settings-page-category-icon {
-    color: #3b82f6; /* Blue icon on header hover */
+    color: #3b82f6;
+    /* Blue icon on header hover */
 }
 
 .settings-page-toggle-icon {
-    margin-left: auto; /* Push arrow to the right */
-    color: #6b7280; /* Default arrow color */
+    margin-left: auto;
+    /* Push arrow to the right */
+    color: #6b7280;
+    /* Default arrow color */
 }
 
 .dark-theme .settings-page-toggle-icon {
@@ -269,7 +297,8 @@
 
 .settings-page-category-description {
     font-size: 0.9rem;
-    color: #6b7280; /* Muted description text */
+    color: #6b7280;
+    /* Muted description text */
     margin-bottom: 1.5rem;
     font-family: 'poppins';
 }
@@ -290,62 +319,82 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1.25rem; /* Padding inside list item */
-    background-color: #f9fafb; /* Light background for items */
-    border-radius: 0.375rem; /* Rounded corners for items */
-    margin-bottom: 0.75rem; /* Space between items */
+    padding: 1rem 1.25rem;
+    /* Padding inside list item */
+    background-color: #f9fafb;
+    /* Light background for items */
+    border-radius: 0.375rem;
+    /* Rounded corners for items */
+    margin-bottom: 0.75rem;
+    /* Space between items */
     cursor: pointer;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Subtle shadow for items */
-    border: 1px solid #e5e7eb; /* Light border */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    /* Subtle shadow for items */
+    border: 1px solid #e5e7eb;
+    /* Light border */
     font-family: 'poppins';
 }
 
 .dark-theme .settings-page-list-item {
-    background-color: #333333; /* Darker background for items, matching image */
-    border-color: #444444; /* Darker border for items */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Slightly more pronounced shadow in dark mode */
+    background-color: #333333;
+    /* Darker background for items, matching image */
+    border-color: #444444;
+    /* Darker border for items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Slightly more pronounced shadow in dark mode */
 }
 
 .settings-page-list-item:hover {
-    background-color: #e0e7ff; /* Lighter blue on hover */
+    background-color: #e0e7ff;
+    /* Lighter blue on hover */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dark-theme .settings-page-list-item:hover {
-    background-color: #444444; /* Slightly lighter dark blue on hover, matching image's subtle hover */
+    background-color: #444444;
+    /* Slightly lighter dark blue on hover, matching image's subtle hover */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .settings-page-item-content {
     display: flex;
     align-items: center;
-    flex-grow: 1; /* Allow content to take space */
+    flex-grow: 1;
+    /* Allow content to take space */
 }
 
 .settings-page-item-icon {
-    margin-right: 0.75rem; /* Icon spacing */
-    color: #6b7280; /* Default icon color */
+    margin-right: 0.75rem;
+    /* Icon spacing */
+    color: #6b7280;
+    /* Default icon color */
 }
 
 .dark-theme .settings-page-item-icon {
-    color: #9ca3af; /* Lighter icon color in dark theme */
+    color: #9ca3af;
+    /* Lighter icon color in dark theme */
 }
 
 .settings-page-item-text {
     font-size: 1rem;
     font-weight: 500;
-    color: #1f2937; /* Light text for light theme */
+    color: #1f2937;
+    /* Light text for light theme */
 }
 
 .dark-theme .settings-page-item-text {
-    color: #e0e0e0; /* Off-white text for dark theme */
+    color: #e0e0e0;
+    /* Off-white text for dark theme */
 }
 
 .settings-page-item-arrow {
-    flex-shrink: 0; /* Prevent arrow from shrinking */
-    margin-left: 1rem; /* Space between text and arrow */
-    color: #6b7280; /* Default arrow color */
+    flex-shrink: 0;
+    /* Prevent arrow from shrinking */
+    margin-left: 1rem;
+    /* Space between text and arrow */
+    color: #6b7280;
+    /* Default arrow color */
 }
 
 .dark-theme .settings-page-item-arrow {
@@ -354,10 +403,13 @@
 
 /* --- Nested Forms (for Edit Profile/Change Password) --- */
 .settings-page-nested-form {
-    padding: 1rem 0; /* Padding around the form within a list item */
-    margin-top: 1rem; /* Space from the clickable header */
-    border-top: 1px solid #e0e0e0; /* Separator for the form */
-        font-family: 'poppins';
+    padding: 1rem 0;
+    /* Padding around the form within a list item */
+    margin-top: 1rem;
+    /* Space from the clickable header */
+    border-top: 1px solid #e0e0e0;
+    /* Separator for the form */
+    font-family: 'poppins';
 }
 
 .dark-theme .settings-page-nested-form {
@@ -379,9 +431,11 @@
 .settings-page-input-field {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #d1d5db; /* Light theme border */
+    border: 1px solid #d1d5db;
+    /* Light theme border */
     border-radius: 0.375rem;
-    background-color: #f9fafb; /* Light theme input background */
+    background-color: #f9fafb;
+    /* Light theme input background */
     font-size: 1rem;
     color: #1f2937;
     outline: none;
@@ -465,8 +519,10 @@
     display: inline-block;
     width: 3.5rem;
     height: 2rem;
-    flex-shrink: 0; /* Prevent switch from shrinking */
-    margin-left: 1rem; /* Space from label */
+    flex-shrink: 0;
+    /* Prevent switch from shrinking */
+    margin-left: 1rem;
+    /* Space from label */
 }
 
 .settings-page-switch-label input {
@@ -482,7 +538,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #4b5563; /* Gray background for slider track */
+    background-color: #4b5563;
+    /* Gray background for slider track */
     transition: 0.4s;
     border-radius: 2rem;
 }
@@ -503,15 +560,16 @@
     border-radius: 50%;
 }
 
-input:checked + .settings-page-slider {
-    background-color: #3b82f6; /* Blue for active state */
+input:checked+.settings-page-slider {
+    background-color: #3b82f6;
+    /* Blue for active state */
 }
 
-input:focus + .settings-page-slider {
+input:focus+.settings-page-slider {
     box-shadow: 0 0 1px #3b82f6;
 }
 
-input:checked + .settings-page-slider:before {
+input:checked+.settings-page-slider:before {
     transform: translateX(1.5rem);
 }
 
@@ -519,10 +577,14 @@ input:checked + .settings-page-slider:before {
 
 /* Calendar Container adjustments */
 .calendar-container {
-    max-width: 500px; /* Increased max-width for larger screens */
-    width: 95%; /* Use percentage for fluidity */
-    margin: 20px auto; /* Center with some margin */
-    padding: 20px; /* Default padding */
+    max-width: 500px;
+    /* Increased max-width for larger screens */
+    width: 95%;
+    /* Use percentage for fluidity */
+    margin: 20px auto;
+    /* Center with some margin */
+    padding: 20px;
+    /* Default padding */
     border-radius: 16px;
     box-shadow: 0 10px 25px var(--calendar-shadow);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -532,33 +594,41 @@ input:checked + .settings-page-slider:before {
 
 /* Calendar Header adjustments */
 .calendar-header {
-    padding: 12px 18px; /* Slightly reduced padding for header */
+    padding: 12px 18px;
+    /* Slightly reduced padding for header */
 }
 
 .month-year {
-    font-size: 22px; /* Slightly larger font for month/year */
+    font-size: 22px;
+    /* Slightly larger font for month/year */
 }
 
 /* Weekdays and Calendar Grid */
 .weekdays {
-    gap: 2px; /* Reduce gap slightly */
+    gap: 2px;
+    /* Reduce gap slightly */
     padding: 8px 0;
 }
 
 .weekday span {
-    font-size: 13px; /* Slightly smaller weekday font */
+    font-size: 13px;
+    /* Slightly smaller weekday font */
 }
 
 .calendar-grid {
-    gap: 3px; /* Reduce gap slightly */
+    gap: 3px;
+    /* Reduce gap slightly */
     padding: 8px;
 }
 
-.calendar-day, .calendar-empty-day {
-    height: 45px; /* Slightly larger day cells */
+.calendar-day,
+.calendar-empty-day {
+    height: 45px;
+    /* Slightly larger day cells */
     width: 45px;
     font-size: 15px;
-    border-radius: 10px; /* Slightly more rounded */
+    border-radius: 10px;
+    /* Slightly more rounded */
 }
 
 /* Selected Date Display */
@@ -610,8 +680,10 @@ input:checked + .settings-page-slider:before {
 /* Modal adjustments */
 .my-app-calendar-event-modal {
     padding: 25px;
-    width: 95%; /* Ensure it takes full width on smaller screens */
-    max-width: 450px; /* Slightly reduced max-width for modal */
+    width: 95%;
+    /* Ensure it takes full width on smaller screens */
+    max-width: 450px;
+    /* Slightly reduced max-width for modal */
 }
 
 .my-app-calendar-event-modal-header {
@@ -658,20 +730,26 @@ input:checked + .settings-page-slider:before {
 /* Tablets and larger phones (e.g., 768px to 1024px) */
 @media (max-width: 1024px) {
     .calendar-container {
-        max-width: 450px; /* Allow calendar to be slightly larger */
+        max-width: 450px;
+        /* Allow calendar to be slightly larger */
         padding: 20px;
     }
+
     .month-year {
         font-size: 20px;
     }
-    .calendar-day, .calendar-empty-day {
+
+    .calendar-day,
+    .calendar-empty-day {
         height: 42px;
         width: 42px;
         font-size: 14px;
     }
+
     .weekday span {
         font-size: 13px;
     }
+
     .my-app-calendar-event-modal {
         max-width: 400px;
         padding: 20px;
@@ -681,32 +759,43 @@ input:checked + .settings-page-slider:before {
 /* Smaller tablets and large phones (e.g., 481px to 768px) */
 @media (max-width: 768px) {
     .settings-page-content-wrapper {
-        padding: 1.5rem; /* Reduced padding for content wrapper */
+        padding: 1.5rem;
+        /* Reduced padding for content wrapper */
     }
+
     .settings-page-card-wrapper {
-        padding: 1.5rem; /* Reduced padding for card */
-        max-height: calc(100vh - 3rem); /* Adjust max-height for smaller padding */
+        padding: 1.5rem;
+        /* Reduced padding for card */
+        max-height: calc(100vh - 3rem);
+        /* Adjust max-height for smaller padding */
     }
+
     .settings-page-main-title {
         font-size: 2rem;
     }
+
     .settings-page-category-header {
         font-size: 1.3rem;
     }
+
     .settings-page-category-description {
         font-size: 0.85rem;
     }
+
     .settings-page-list-item {
         padding: 0.8rem 1rem;
         margin-bottom: 0.6rem;
     }
+
     .settings-page-item-text {
         font-size: 0.95rem;
     }
+
     .settings-page-input-field {
         padding: 0.6rem;
         font-size: 0.9rem;
     }
+
     .settings-page-button {
         padding: 0.6rem 1rem;
         font-size: 0.95rem;
@@ -714,20 +803,26 @@ input:checked + .settings-page-slider:before {
 
     /* Calendar specific adjustments for this breakpoint */
     .calendar-container {
-        max-width: 350px; /* Further reduce max-width for smaller tablets/large phones */
+        max-width: 350px;
+        /* Further reduce max-width for smaller tablets/large phones */
         padding: 18px;
     }
+
     .month-year {
         font-size: 18px;
     }
-    .calendar-day, .calendar-empty-day {
+
+    .calendar-day,
+    .calendar-empty-day {
         height: 40px;
         width: 40px;
         font-size: 13px;
     }
+
     .weekday span {
         font-size: 12px;
     }
+
     .my-app-calendar-event-modal {
         max-width: 350px;
         padding: 20px;
@@ -737,34 +832,45 @@ input:checked + .settings-page-slider:before {
 /* Small mobile devices (e.g., up to 480px) */
 @media (max-width: 480px) {
     .settings-page-content-wrapper {
-        padding: 1rem; /* Even smaller padding */
+        padding: 1rem;
+        /* Even smaller padding */
     }
+
     .settings-page-card-wrapper {
-        padding: 1rem; /* Even smaller padding */
-        max-height: calc(100vh - 2rem); /* Adjust max-height */
+        padding: 1rem;
+        /* Even smaller padding */
+        max-height: calc(100vh - 2rem);
+        /* Adjust max-height */
     }
+
     .settings-page-main-title {
         font-size: 1.75rem;
     }
+
     .settings-page-category-header {
         font-size: 1.1rem;
         padding-bottom: 0.3rem;
     }
+
     .settings-page-category-description {
         font-size: 0.8rem;
         margin-bottom: 1rem;
     }
+
     .settings-page-list-item {
         padding: 0.7rem 0.8rem;
         margin-bottom: 0.5rem;
     }
+
     .settings-page-item-text {
         font-size: 0.9rem;
     }
+
     .settings-page-input-field {
         padding: 0.5rem;
         font-size: 0.85rem;
     }
+
     .settings-page-button {
         padding: 0.5rem 0.8rem;
         font-size: 0.9rem;
@@ -772,8 +878,10 @@ input:checked + .settings-page-slider:before {
 
     /* Calendar specific adjustments for mobile */
     .calendar-container {
-        max-width: 100%; /* Full width on small screens */
-        margin: 10px auto; /* Reduced margin */
+        max-width: 100%;
+        /* Full width on small screens */
+        margin: 10px auto;
+        /* Reduced margin */
         border-radius: 12px;
         padding: 16px;
     }
@@ -786,7 +894,8 @@ input:checked + .settings-page-slider:before {
         font-size: 18px;
     }
 
-    .calendar-day, .calendar-empty-day {
+    .calendar-day,
+    .calendar-empty-day {
         height: 36px;
         width: 36px;
         font-size: 13px;
@@ -796,6 +905,7 @@ input:checked + .settings-page-slider:before {
     .weekday {
         height: 36px;
     }
+
     .weekday span {
         font-size: 11px;
     }
@@ -852,14 +962,22 @@ input:checked + .settings-page-slider:before {
 /* Focus states for accessibility */
 .nav-button:focus,
 .calendar-day:focus,
-.theme-toggle-button:focus, /* Added theme toggle button */
-.add-event-btn:focus, /* Added add event button */
-.close-btn:focus, /* Added close button */
-.delete-event-btn:focus, /* Added delete button */
-.my-app-calendar-event-modal-close-btn:focus, /* Added modal close button */
-.my-app-calendar-event-cancel-btn:focus, /* Added modal cancel button */
-.my-app-calendar-event-save-btn:focus /* Added modal save button */
-{
+.theme-toggle-button:focus,
+/* Added theme toggle button */
+.add-event-btn:focus,
+/* Added add event button */
+.close-btn:focus,
+/* Added close button */
+.delete-event-btn:focus,
+/* Added delete button */
+.my-app-calendar-event-modal-close-btn:focus,
+/* Added modal close button */
+.my-app-calendar-event-cancel-btn:focus,
+/* Added modal cancel button */
+.my-app-calendar-event-save-btn:focus
+
+/* Added modal save button */
+    {
     outline: 2px solid var(--calendar-selected-bg);
     outline-offset: 2px;
 }
@@ -887,13 +1005,22 @@ input:checked + .settings-page-slider:before {
 }
 
 .calendar-day.selected .event-indicator {
-    background-color: var(--calendar-selected-text); /* Indicator should contrast with selected day */
+    background-color: var(--calendar-selected-text);
+    /* Indicator should contrast with selected day */
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 /* Add event button */
@@ -925,11 +1052,13 @@ input:checked + .settings-page-slider:before {
 /* Event List */
 .event-list {
     margin-top: 20px;
-    background-color: var(--calendar-display-bg); /* Use calendar-display-bg for consistent background */
+    background-color: var(--calendar-display-bg);
+    /* Use calendar-display-bg for consistent background */
     border: 1px solid var(--calendar-border);
     border-radius: 8px;
     overflow: hidden;
-    color: var(--calendar-text); /* Ensure text color is theme-aware */
+    color: var(--calendar-text);
+    /* Ensure text color is theme-aware */
 }
 
 .event-list-header {
@@ -937,7 +1066,8 @@ input:checked + .settings-page-slider:before {
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background-color: var(--calendar-header-bg); /* Consistent header background */
+    background-color: var(--calendar-header-bg);
+    /* Consistent header background */
     border-bottom: 1px solid var(--calendar-border);
 }
 
@@ -988,7 +1118,8 @@ input:checked + .settings-page-slider:before {
     padding: 12px 16px;
     border-bottom: 1px solid var(--calendar-border);
     transition: background-color 0.2s ease;
-    background-color: var(--calendar-day-bg); /* Use day background for event items */
+    background-color: var(--calendar-day-bg);
+    /* Use day background for event items */
 }
 
 .event-item:last-child {
@@ -1021,7 +1152,8 @@ input:checked + .settings-page-slider:before {
 .time-icon {
     width: 12px;
     height: 12px;
-    color: var(--calendar-text-secondary); /* Ensure icon color is themed */
+    color: var(--calendar-text-secondary);
+    /* Ensure icon color is themed */
 }
 
 .event-description {
@@ -1036,7 +1168,8 @@ input:checked + .settings-page-slider:before {
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
-    color: #ef4444; /* Red for delete button, typically independent of theme */
+    color: #ef4444;
+    /* Red for delete button, typically independent of theme */
     transition: all 0.2s ease;
 }
 
@@ -1056,7 +1189,8 @@ input:checked + .settings-page-slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Overlay color stays consistent for visibility */
+    background-color: rgba(0, 0, 0, 0.6);
+    /* Overlay color stays consistent for visibility */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1068,7 +1202,8 @@ input:checked + .settings-page-slider:before {
     color: var(--modal-text-color);
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Shadow typically doesn't change much with theme */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    /* Shadow typically doesn't change much with theme */
     max-width: 500px;
     width: 90%;
     position: relative;
@@ -1104,7 +1239,8 @@ input:checked + .settings-page-slider:before {
 }
 
 .my-app-calendar-event-modal-close-btn:hover {
-    color: #f00; /* Red on hover, regardless of theme */
+    color: #f00;
+    /* Red on hover, regardless of theme */
 }
 
 .my-app-calendar-event-modal-close-btn .close-icon {
@@ -1142,7 +1278,8 @@ input:checked + .settings-page-slider:before {
 
 .my-app-calendar-event-form-input::placeholder,
 .my-app-calendar-event-form-textarea::placeholder {
-    color: var(--modal-label-color); /* Themed placeholder text */
+    color: var(--modal-label-color);
+    /* Themed placeholder text */
     opacity: 0.7;
 }
 
@@ -1211,10 +1348,14 @@ input:checked + .settings-page-slider:before {
 .add-event-btn:focus,
 .close-btn:focus,
 .delete-event-btn:focus,
-.my-app-calendar-event-modal-close-btn:focus, /* Updated */
-.my-app-calendar-event-cancel-btn:focus,     /* Updated */
-.my-app-calendar-event-save-btn:focus         /* Updated */
-{
+.my-app-calendar-event-modal-close-btn:focus,
+/* Updated */
+.my-app-calendar-event-cancel-btn:focus,
+/* Updated */
+.my-app-calendar-event-save-btn:focus
+
+/* Updated */
+    {
     outline: 2px solid var(--calendar-selected-bg);
     outline-offset: 2px;
 }
@@ -1242,13 +1383,22 @@ input:checked + .settings-page-slider:before {
 }
 
 .calendar-day.selected .event-indicator {
-    background-color: var(--calendar-selected-text); /* Indicator should contrast with selected day */
+    background-color: var(--calendar-selected-text);
+    /* Indicator should contrast with selected day */
 }
 
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
 
 /* Add event button */
@@ -1280,11 +1430,13 @@ input:checked + .settings-page-slider:before {
 /* Event List */
 .event-list {
     margin-top: 20px;
-    background-color: var(--calendar-display-bg); /* Use calendar-display-bg for consistent background */
+    background-color: var(--calendar-display-bg);
+    /* Use calendar-display-bg for consistent background */
     border: 1px solid var(--calendar-border);
     border-radius: 8px;
     overflow: hidden;
-    color: var(--calendar-text); /* Ensure text color is theme-aware */
+    color: var(--calendar-text);
+    /* Ensure text color is theme-aware */
 }
 
 .event-list-header {
@@ -1292,7 +1444,8 @@ input:checked + .settings-page-slider:before {
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background-color: var(--calendar-header-bg); /* Consistent header background */
+    background-color: var(--calendar-header-bg);
+    /* Consistent header background */
     border-bottom: 1px solid var(--calendar-border);
 }
 
@@ -1343,7 +1496,8 @@ input:checked + .settings-page-slider:before {
     padding: 12px 16px;
     border-bottom: 1px solid var(--calendar-border);
     transition: background-color 0.2s ease;
-    background-color: var(--calendar-day-bg); /* Use day background for event items */
+    background-color: var(--calendar-day-bg);
+    /* Use day background for event items */
 }
 
 .event-item:last-child {
@@ -1376,7 +1530,8 @@ input:checked + .settings-page-slider:before {
 .time-icon {
     width: 12px;
     height: 12px;
-    color: var(--calendar-text-secondary); /* Ensure icon color is themed */
+    color: var(--calendar-text-secondary);
+    /* Ensure icon color is themed */
 }
 
 .event-description {
@@ -1391,7 +1546,8 @@ input:checked + .settings-page-slider:before {
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
-    color: #ef4444; /* Red for delete button, typically independent of theme */
+    color: #ef4444;
+    /* Red for delete button, typically independent of theme */
     transition: all 0.2s ease;
 }
 
