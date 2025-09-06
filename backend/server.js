@@ -634,98 +634,121 @@ app.post("/login", async (req, res) => {
 // Create admin
 // --- Route: Create Admin Account (and assign to multiple establishments) ---
 app.post('/admin', async (req, res) => {
-    const { username, email, password, confirmPassword, role, establishmentIds } = req.body; // Added establishmentIds
+    const { username, email, password, confirmPassword, role, establishmentIds } = req.body;
 
     // Basic validation
-    if (!username || !email || !password || !confirmPassword || !role || !establishmentIds || !Array.isArray(establishmentIds) || establishmentIds.length === 0) {
-        return res.status(400).json({ error: "All fields are required, including at least one establishment." });
+    if (!username || !email || !password || !confirmPassword || !role) {
+        return res.status(400).json({ error: "Username, email, password, confirmPassword, and role are required." });
     }
     if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match." });
     }
 
-    // Role validation (ensure it's an admin role for this endpoint)
+    // Role validation
     if (role !== 'Admin' && role !== 'Super Admin') {
         return res.status(400).json({ error: "Invalid role specified. Must be 'Admin' or 'Super Admin'." });
     }
 
-    let connection; // Declare connection here for try/catch/finally scope
-    try {
-        connection = await db.getConnection(); // Get a connection from the pool
-        await connection.beginTransaction(); // Start a transaction
+    // Establishment validation (only required for Admin)
+    if (role === 'Admin') {
+        if (!establishmentIds || !Array.isArray(establishmentIds) || establishmentIds.length === 0) {
+            return res.status(400).json({ error: "Admin must be assigned to at least one establishment." });
+        }
+    }
 
-        // 1. Check if user with this email already exists
+    let connection;
+    try {
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+
+        // 1. Check if user already exists
         const [existingUser] = await connection.execute('SELECT id FROM users WHERE email = ?', [email]);
         if (existingUser.length > 0) {
-            await connection.rollback(); // Rollback transaction if user exists
+            await connection.rollback();
             return res.status(409).json({ error: "User with this email already exists." });
         }
 
-        // 2. Validate Establishment IDs
-        for (const id of establishmentIds) {
-            if (typeof id !== 'number' && typeof id !== 'string' || isNaN(parseInt(id))) {
-                await connection.rollback();
-                return res.status(400).json({ error: `Invalid establishment ID type: ${id}` });
-            }
-            const [estCheck] = await connection.execute('SELECT id FROM estab WHERE id = ?', [id]);
-            if (estCheck.length === 0) {
-                await connection.rollback();
-                return res.status(400).json({ error: `Establishment with ID ${id} not found.` });
+        // 2. If Admin, validate Establishment IDs
+        if (role === 'Admin') {
+            for (const id of establishmentIds) {
+                if (typeof id !== 'number' && typeof id !== 'string' || isNaN(parseInt(id))) {
+                    await connection.rollback();
+                    return res.status(400).json({ error: `Invalid establishment ID type: ${id}` });
+                }
+                const [estCheck] = await connection.execute('SELECT id FROM estab WHERE id = ?', [id]);
+                if (estCheck.length === 0) {
+                    await connection.rollback();
+                    return res.status(400).json({ error: `Establishment with ID ${id} not found.` });
+                }
             }
         }
 
-        // 3. Hash the password
+        // 3. Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // 4. Generate OTP and expiry time
+        // 4. Generate OTP
         const otpCode = otpGenerator.generate(6, {
             upperCaseAlphabets: false,
             lowerCaseAlphabets: false,
             specialChars: false,
         });
-        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
+        const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-        // 5. Insert the new user into your database
-        const [insertResult] = await connection.execute( // Use connection.execute for transactions
+        // 5. Insert user
+        const [insertResult] = await connection.execute(
             "INSERT INTO users (username, email, password_hash, role, email_verified, verification_code, otp_expires) VALUES (?, ?, ?, ?, ?, ?, ?)",
             [username, email, hashedPassword, role, 0, otpCode, otpExpiresAt]
         );
         const userId = insertResult.insertId;
 
-        // 6. Assign User (Admin) to Establishments
-        for (const establishmentId of establishmentIds) {
-            await connection.execute(
-                "INSERT INTO admin_establishments (user_id, establishment_id) VALUES (?, ?)",
-                [userId, establishmentId]
-            );
+        // 6. Assign establishments
+        if (role === 'Super Admin') {
+            // Assign ALL establishments
+            const [allEstabs] = await connection.execute("SELECT id FROM estab");
+            for (const est of allEstabs) {
+                await connection.execute(
+                    "INSERT INTO admin_establishments (user_id, establishment_id) VALUES (?, ?)",
+                    [userId, est.id]
+                );
+            }
+        } else {
+            // Assign only chosen ones
+            for (const establishmentId of establishmentIds) {
+                await connection.execute(
+                    "INSERT INTO admin_establishments (user_id, establishment_id) VALUES (?, ?)",
+                    [userId, establishmentId]
+                );
+            }
         }
 
-        // 7. Send the OTP email
-        const subject = "Verify Your Admin Account Email";
-        const messageBody = `Your verification code for your Admin account is: ${otpCode}. This code is valid for 10 minutes.`;
-        // Removed uniqueSubject suffix as OTP itself provides uniqueness in context
+        // 7. Send OTP email
+        const subject = role === 'Super Admin' 
+            ? "Verify Your Super Admin Account Email" 
+            : "Verify Your Admin Account Email";
+        const messageBody = `Your verification code for your ${role} account is: ${otpCode}. This code is valid for 10 minutes.`;
+        
         await sendEmail(email, subject, messageBody);
         console.log(`OTP email sent to ${email}`);
 
-        await connection.commit(); // Commit the transaction if all operations succeed
+        await connection.commit();
 
         res.status(201).json({
-            message: 'Admin account created successfully! Please verify your email with the OTP sent.',
+            message: `${role} account created successfully! Please verify your email with the OTP sent.`,
             userId: userId
         });
 
     } catch (error) {
         if (connection) {
-            await connection.rollback(); // Rollback transaction on error
+            await connection.rollback();
         }
         console.error("Admin creation error:", error);
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(409).json({ error: "Email or username already exists." });
         }
-        res.status(500).json({ error: "Failed to create admin account." });
+        res.status(500).json({ error: "Failed to create account." });
     } finally {
         if (connection) {
-            connection.release(); // Release the connection back to the pool
+            connection.release();
         }
     }
 });
