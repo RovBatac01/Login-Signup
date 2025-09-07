@@ -1880,6 +1880,7 @@ app.post('/save-user', async (req, res) => {
 });
 
 // Request device access for Google login users
+// Request device access for Google login users (around line 1905)
 app.post('/api/request-device-access', authMiddleware, async (req, res) => {
   try {
     const { userId, deviceId, email, username } = req.body;
@@ -1895,7 +1896,7 @@ app.post('/api/request-device-access', authMiddleware, async (req, res) => {
     try {
       connection = await db.getConnection();
       
-      // Update user with device_id and set access_approved to 0 (pending)
+      // Update user with device_id 
       await connection.execute(
         'UPDATE users SET device_id = ? WHERE id = ?',
         [deviceId, userId]
@@ -1916,9 +1917,9 @@ app.post('/api/request-device-access', authMiddleware, async (req, res) => {
       // Create notifications for each admin
       for (const admin of admins) {
         await connection.execute(
-          `INSERT INTO admin_notifications (admin_id, user_id, type, message, status, created_at) 
-           VALUES (?, ?, ?, ?, ?, NOW())`,
-          [admin.id, userId, 'request', notificationMessage, 'pending']
+          `INSERT INTO notif (type, title, message, user_id, timestamp, is_read, priority, status) 
+           VALUES (?, ?, ?, ?, NOW(), ?, ?, ?)`,
+          ['request', 'Access Request', notificationMessage, userId, 0, 'normal', 'pending']
         );
       }
 
@@ -1940,22 +1941,6 @@ app.post('/api/request-device-access', authMiddleware, async (req, res) => {
       success: false,
       error: 'Failed to submit access request'
     });
-  }
-});
-
-app.get('/api/events', async (req, res) => {
-  const { date } = req.query;
-  try {
-    if (date) {
-      const [rows] = await pool.execute('SELECT * FROM events WHERE event_date = ? ORDER BY time, id', [date]);
-      res.json(rows);
-    } else {
-      const [rows] = await pool.execute('SELECT * FROM events ORDER BY event_date, time');
-      res.json(rows);
-    }
-  } catch (err) {
-    console.error('Error fetching events:', err);
-    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
