@@ -27,6 +27,11 @@ const SocialLogin = () => {
 
       const { isNewUser, hasAccess, token, userId, email, username, role } = response.data;
 
+      // DEBUG: Log the values
+      console.log("🔍 Debug - isNewUser:", isNewUser);
+      console.log("🔍 Debug - hasAccess:", hasAccess);
+      console.log("🔍 Debug - Should show modal:", isNewUser || !hasAccess);
+
       if (isNewUser || !hasAccess) {
         // New user or user without access - store data and redirect to userDB
         localStorage.setItem('token', token);
@@ -36,6 +41,10 @@ const SocialLogin = () => {
         localStorage.setItem('userRole', 'User');
         localStorage.setItem('needsDeviceAccess', 'true'); // Flag to show modal in userDB
         localStorage.setItem('isGoogleLogin', 'true'); // Flag to identify Google login
+        
+        // DEBUG: Confirm flags are set
+        console.log("🔍 Debug - needsDeviceAccess flag set:", localStorage.getItem('needsDeviceAccess'));
+        console.log("🔍 Debug - isGoogleLogin flag set:", localStorage.getItem('isGoogleLogin'));
         
         console.log("🔄 New Google user - redirecting to userDB for device access request");
         navigate("/userDB");
@@ -60,6 +69,8 @@ const SocialLogin = () => {
         };
         localStorage.setItem('user', JSON.stringify(userObject));
 
+        console.log("🔄 Existing user with access - navigating based on role");
+        
         // Navigate based on role
         if (role === "Admin") {
           navigate("/adminDB");

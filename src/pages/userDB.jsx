@@ -21,6 +21,8 @@ import axios from 'axios'; // Import axios for API calls
 // Import socket.io-client and your socket instance
 import io from 'socket.io-client';
 import socket from '../DashboardMeters/socket'; // Make sure this path is correct
+// Import Bootstrap components for Google login modal
+import { Modal, Button, Form } from 'react-bootstrap';
 
 // API base URL - make sure this matches your backend
 const API_BASE_URL = "https://login-signup-3470.onrender.com";
@@ -67,6 +69,102 @@ const Userdb = () => {
     // NEW STATE: To store the sensors associated with the user's device
     const [associatedSensors, setAssociatedSensors] = useState([]);
     const [loadingSensors, setLoadingSensors] = useState(true);
+
+    // Google Login Device Modal States
+    const [showGoogleDeviceModal, setShowGoogleDeviceModal] = useState(false);
+    const [googleDeviceId, setGoogleDeviceId] = useState('');
+    const [googleDeviceError, setGoogleDeviceError] = useState('');
+    const [isSubmittingGoogleDevice, setIsSubmittingGoogleDevice] = useState(false);
+    const [googleAccessStatus, setGoogleAccessStatus] = useState(null);
+
+    // Check for Google login device access requirement on component mount
+    useEffect(() => {
+        console.log("🔍 Checking for Google login device access flags");
+        
+        // Check if user needs device access (from Google login)
+        const needsDeviceAccess = localStorage.getItem('needsDeviceAccess');
+        const isGoogleLogin = localStorage.getItem('isGoogleLogin');
+        
+        console.log("🔍 needsDeviceAccess:", needsDeviceAccess);
+        console.log("🔍 isGoogleLogin:", isGoogleLogin);
+        
+        if (needsDeviceAccess === 'true' && isGoogleLogin === 'true') {
+            console.log("✅ Showing Google device modal");
+            setShowGoogleDeviceModal(true);
+        } else {
+            console.log("❌ Not showing Google device modal");
+        }
+    }, []);
+
+    // Google device access handlers
+    const handleGoogleDeviceSubmit = async () => {
+        if (!googleDeviceId.trim()) {
+            setGoogleDeviceError('Device ID is required');
+            return;
+        }
+
+        setIsSubmittingGoogleDevice(true);
+        setGoogleDeviceError('');
+
+        try {
+            const token = getToken();
+            const userId = currentUser?.id;
+            const email = currentUser?.email;
+            const username = currentUser?.username;
+
+            console.log("🔄 Submitting Google device access request for:", { userId, deviceId: googleDeviceId, email, username });
+
+            // Submit access request with device ID
+            const requestResponse = await axios.post(`${API_BASE_URL}/api/request-device-access`, {
+                userId: userId,
+                deviceId: googleDeviceId.trim(),
+                email: email,
+                username: username
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (requestResponse.data.success) {
+                setGoogleAccessStatus('pending');
+                
+                // Clear the flags
+                localStorage.removeItem('needsDeviceAccess');
+                localStorage.removeItem('isGoogleLogin');
+                localStorage.setItem('accessStatus', 'pending');
+                
+                console.log("✅ Google access request submitted for device ID:", googleDeviceId);
+                
+                // Show success message and close modal after delay
+                setTimeout(() => {
+                    setShowGoogleDeviceModal(false);
+                    // Refresh the page or update UI to show pending status
+                    window.location.reload();
+                }, 2000);
+                
+            } else {
+                setGoogleDeviceError('Failed to submit access request. Please try again.');
+            }
+        } catch (error) {
+            console.error("Error submitting Google access request:", error);
+            setGoogleDeviceError(error.response?.data?.error || 'Failed to submit access request');
+        } finally {
+            setIsSubmittingGoogleDevice(false);
+        }
+    };
+
+    const handleGoogleDeviceModalClose = () => {
+        // Only allow closing if not pending
+        if (googleAccessStatus !== 'pending') {
+            setShowGoogleDeviceModal(false);
+            setGoogleDeviceId('');
+            setGoogleDeviceError('');
+            // Clear flags
+            localStorage.removeItem('needsDeviceAccess');
+            localStorage.removeItem('isGoogleLogin');
+        }
+    };
 
     // Effect for initial setup and verification check and controlling AccessRestrictedModal visibility
     useEffect(() => {
@@ -359,16 +457,101 @@ const Userdb = () => {
                     message={alertMessage}
                     onClose={() => setShowAlert(false)}
                 />
+                {/* Google Login Device Access Modal */}
+                <Modal 
+                    show={showGoogleDeviceModal} 
+                    onHide={googleAccessStatus === 'pending' ? undefined : handleGoogleDeviceModalClose}
+                    backdrop="static"
+                    keyboard={false}
+                    centered
+                >
+                    <Modal.Header closeButton={googleAccessStatus !== 'pending'}>
+                        <Modal.Title>
+                            {googleAccessStatus === 'pending' ? '✅ Access Request Submitted' : '🔐 Complete Your Google Login'}
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {googleAccessStatus === 'pending' ? (
+                            <div className="text-center">
+                                <div className="mb-3">
+                                    <div className="spinner-border text-primary" role="status">
+                                        <span className="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                                <h5 className="text-success mb-3">Request Submitted Successfully!</h5>
+                                <p className="mb-2">
+                                    Your access request for device <strong>{googleDeviceId}</strong> has been submitted.
+                                </p>
+                                <p className="mb-2">
+                                    An admin will review your request and approve access to the device.
+                                </p>
+                                <p className="text-muted small">
+                                    The page will refresh to show your current status.
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                <p className="mb-3">
+                                    Welcome! To complete your Google login, please enter the Device ID you want to access. 
+                                    Your request will be sent to the admin for approval.
+                                </p>
+                                
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Device ID <span className="text-danger">*</span></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter the Device ID you want to access"
+                                        value={googleDeviceId}
+                                        onChange={(e) => {
+                                            setGoogleDeviceId(e.target.value);
+                                            setGoogleDeviceError('');
+                                        }}
+                                        disabled={isSubmittingGoogleDevice}
+                                        className={googleDeviceError ? 'is-invalid' : ''}
+                                    />
+                                    {googleDeviceError && (
+                                        <div className="invalid-feedback d-block">
+                                            {googleDeviceError}
+                                        </div>
+                                    )}
+                                </Form.Group>
+
+                                <div className="bg-light p-3 rounded">
+                                    <h6 className="mb-2">📋 What happens next:</h6>
+                                    <ol className="mb-0 ps-3 small">
+                                        <li>Your access request will be sent to the device admin</li>
+                                        <li>The admin will review and approve/deny your request</li>
+                                        <li>You'll receive a notification once approved</li>
+                                        <li>After approval, you can access device-specific features</li>
+                                    </ol>
+                                </div>
+                            </>
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        {googleAccessStatus !== 'pending' && (
+                            <>
+                                <Button 
+                                    variant="secondary" 
+                                    onClick={handleGoogleDeviceModalClose}
+                                    disabled={isSubmittingGoogleDevice}
+                                >
+                                    Skip for Now
+                                </Button>
+                                <Button 
+                                    variant="primary" 
+                                    onClick={handleGoogleDeviceSubmit}
+                                    disabled={isSubmittingGoogleDevice || !googleDeviceId.trim()}
+                                >
+                                    {isSubmittingGoogleDevice ? 'Submitting Request...' : 'Request Access'}
+                                </Button>
+                            </>
+                        )}
+                    </Modal.Footer>
+                </Modal>
             </div>
         );
     }
-
-          {/* Water Quality Information Modal */}
-      <WaterQualityInfoModal 
-        isOpen={showWaterQualityInfo} 
-        onClose={() => setShowWaterQualityInfo(false)}
-        activeParameter={activeParameter}
-      />
 
     return (
         <div className={`${styles.userDb} ${theme}`}>
@@ -376,9 +559,9 @@ const Userdb = () => {
                 <Sidebar theme={theme} toggleTheme={toggleTheme} />
                 <div className={styles.userDbContents}>
                     <PageTitle title="DASHBOARD" />
-                                <div className={styles.infoButtonContainer}>
-              <InfoButton onClick={() => setShowWaterQualityInfo(true)} text="Water Quality Information" />
-            </div>
+                    <div className={styles.infoButtonContainer}>
+                        <InfoButton onClick={() => setShowWaterQualityInfo(true)} text="Water Quality Information" />
+                    </div>
                     <div className={styles.meterRowFlex}>
                         {associatedSensors.length > 0 ? (
                             associatedSensors.map((sensor) => {
@@ -423,6 +606,99 @@ const Userdb = () => {
                 onClose={() => setShowAlert(false)}
             />
 
+            {/* Google Login Device Access Modal */}
+            <Modal 
+                show={showGoogleDeviceModal} 
+                onHide={googleAccessStatus === 'pending' ? undefined : handleGoogleDeviceModalClose}
+                backdrop="static"
+                keyboard={false}
+                centered
+            >
+                <Modal.Header closeButton={googleAccessStatus !== 'pending'}>
+                    <Modal.Title>
+                        {googleAccessStatus === 'pending' ? '✅ Access Request Submitted' : '🔐 Complete Your Google Login'}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {googleAccessStatus === 'pending' ? (
+                        <div className="text-center">
+                            <div className="mb-3">
+                                <div className="spinner-border text-primary" role="status">
+                                    <span className="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                            <h5 className="text-success mb-3">Request Submitted Successfully!</h5>
+                            <p className="mb-2">
+                                Your access request for device <strong>{googleDeviceId}</strong> has been submitted.
+                            </p>
+                            <p className="mb-2">
+                                An admin will review your request and approve access to the device.
+                            </p>
+                            <p className="text-muted small">
+                                The page will refresh to show your current status.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <p className="mb-3">
+                                Welcome! To complete your Google login, please enter the Device ID you want to access. 
+                                Your request will be sent to the admin for approval.
+                            </p>
+                            
+                            <Form.Group className="mb-3">
+                                <Form.Label>Device ID <span className="text-danger">*</span></Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter the Device ID you want to access"
+                                    value={googleDeviceId}
+                                    onChange={(e) => {
+                                        setGoogleDeviceId(e.target.value);
+                                        setGoogleDeviceError('');
+                                    }}
+                                    disabled={isSubmittingGoogleDevice}
+                                    className={googleDeviceError ? 'is-invalid' : ''}
+                                />
+                                {googleDeviceError && (
+                                    <div className="invalid-feedback d-block">
+                                        {googleDeviceError}
+                                    </div>
+                                )}
+                            </Form.Group>
+
+                            <div className="bg-light p-3 rounded">
+                                <h6 className="mb-2">📋 What happens next:</h6>
+                                <ol className="mb-0 ps-3 small">
+                                    <li>Your access request will be sent to the device admin</li>
+                                    <li>The admin will review and approve/deny your request</li>
+                                    <li>You'll receive a notification once approved</li>
+                                    <li>After approval, you can access device-specific features</li>
+                                </ol>
+                            </div>
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    {googleAccessStatus !== 'pending' && (
+                        <>
+                            <Button 
+                                variant="secondary" 
+                                onClick={handleGoogleDeviceModalClose}
+                                disabled={isSubmittingGoogleDevice}
+                            >
+                                Skip for Now
+                            </Button>
+                            <Button 
+                                variant="primary" 
+                                onClick={handleGoogleDeviceSubmit}
+                                disabled={isSubmittingGoogleDevice || !googleDeviceId.trim()}
+                            >
+                                {isSubmittingGoogleDevice ? 'Submitting Request...' : 'Request Access'}
+                            </Button>
+                        </>
+                    )}
+                </Modal.Footer>
+            </Modal>
+
             {/* Global Pop-up Warning Notification (Centered on Screen) */}
             {showWarningPopup && (
                 <div className="warning-popup"> {/* Ensure you have this class in your CSS */}
@@ -436,12 +712,12 @@ const Userdb = () => {
                 </div>
             )}
 
-                      {/* Water Quality Information Modal */}
-      <WaterQualityInfoModal 
-        isOpen={showWaterQualityInfo} 
-        onClose={() => setShowWaterQualityInfo(false)}
-        activeParameter={activeParameter}
-      />
+            {/* Water Quality Information Modal */}
+            <WaterQualityInfoModal 
+                isOpen={showWaterQualityInfo} 
+                onClose={() => setShowWaterQualityInfo(false)}
+                activeParameter={activeParameter}
+            />
       
         </div>
     );
