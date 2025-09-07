@@ -1897,7 +1897,7 @@ app.post('/api/request-device-access', authMiddleware, async (req, res) => {
       
       // Update user with device_id and set access_approved to 0 (pending)
       await connection.execute(
-        'UPDATE users SET device_id = ? = 0 WHERE id = ?',
+        'UPDATE users SET device_id = ? WHERE id = ?',
         [deviceId, userId]
       );
 
