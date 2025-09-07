@@ -1787,58 +1787,6 @@ app.post('/save-user', async (req, res) => {
   }
 });
 
-// Add this route to your server.js file:
-
-// Update device ID for Google login users
-app.post('/api/update-device-id', authMiddleware, async (req, res) => {
-  try {
-    const { userId, deviceId } = req.body;
-    
-    if (!userId || !deviceId) {
-      return res.status(400).json({
-        success: false,
-        error: 'User ID and Device ID are required'
-      });
-    }
-
-    let connection;
-    try {
-      connection = await db.getConnection();
-      
-      // Update the user's device_id
-      const [result] = await connection.execute(
-        'UPDATE users SET device_id = ? WHERE id = ?',
-        [deviceId, userId]
-      );
-
-      if (result.affectedRows === 0) {
-        return res.status(404).json({
-          success: false,
-          error: 'User not found'
-        });
-      }
-
-      console.log(`✅ Device ID updated for user ${userId}: ${deviceId}`);
-
-      res.json({
-        success: true,
-        message: 'Device ID updated successfully',
-        deviceId: deviceId
-      });
-
-    } finally {
-      if (connection) connection.release();
-    }
-
-  } catch (error) {
-    console.error('❌ Error updating device ID:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to update device ID'
-    });
-  }
-});
-
 app.get('/api/events', async (req, res) => {
   const { date } = req.query;
   try {
