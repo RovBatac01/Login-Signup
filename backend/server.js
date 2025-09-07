@@ -1573,6 +1573,102 @@ app.get('/api/total-sensors', (req, res) => {
   });
 });
 
+// Add these routes to your server.js file:
+
+// Get total users by device ID
+app.get('/api/total-users-by-device/:deviceId', authMiddleware, async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+    
+    console.log('🔍 Received request for users by device ID:', deviceId);
+    
+    if (!deviceId || deviceId === 'undefined' || deviceId === 'null') {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid device ID is required'
+      });
+    }
+    
+    let connection;
+    try {
+      connection = await db.getConnection();
+      
+      const [result] = await connection.execute(
+        'SELECT COUNT(*) as totalUsers FROM users WHERE device_id = ?',
+        [deviceId]
+      );
+      
+      console.log('✅ Query result for users by device:', result[0]);
+      
+      res.json({
+        success: true,
+        totalUsers: result[0].totalUsers,
+        deviceId: deviceId
+      });
+      
+    } finally {
+      if (connection) connection.release();
+    }
+    
+  } catch (error) {
+    console.error('❌ Error fetching total users by device:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch total users by device'
+    });
+  }
+});
+
+// Get total sensors by device ID
+app.get('/api/total-sensors-by-device/:deviceId', authMiddleware, async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+    
+    console.log('🔍 Received request for sensors by device ID:', deviceId);
+    
+    if (!deviceId || deviceId === 'undefined' || deviceId === 'null') {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid device ID is required'
+      });
+    }
+    
+    let connection;
+    try {
+      connection = await db.getConnection();
+      
+      // Query sensors through establishments that have the matching device_id
+      // Adjust this query based on your actual database schema
+      const [result] = await connection.execute(
+        `SELECT COUNT(DISTINCT s.id) as totalSensors 
+         FROM sensors s
+         JOIN estab_sensors es ON s.id = es.sensor_id
+         JOIN estab e ON es.estab_id = e.id
+         WHERE e.device_id = ?`,
+        [deviceId]
+      );
+      
+      console.log('✅ Query result for sensors by device:', result[0]);
+      
+      res.json({
+        success: true,
+        totalSensors: result[0].totalSensors,
+        deviceId: deviceId
+      });
+      
+    } finally {
+      if (connection) connection.release();
+    }
+    
+  } catch (error) {
+    console.error('❌ Error fetching total sensors by device:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch total sensors by device'
+    });
+  }
+});
+
 // --- NEW API ENDPOINT FOR APPROVING USER ACCESS ---
 app.put("/api/admin/access-requests/:notificationId/approve", verifyToken, authorizeAdmin, async (req, res) => {
     // Extract notificationId from URL parameters
