@@ -1671,17 +1671,13 @@ app.get('/api/total-sensors-by-device/:deviceId', authMiddleware, async (req, re
 
 // --- NEW API ENDPOINT FOR APPROVING USER ACCESS ---
 app.put("/api/admin/access-requests/:notificationId/approve", verifyToken, authorizeAdmin, async (req, res) => {
-    // Extract notificationId from URL parameters
     const { notificationId } = req.params;
-    // Extract userId from the request body (as sent by the frontend)
     const { userId } = req.body;
 
-    console.log("🟢 /api/admin/access-requests/:notificationId/approve: Received request to approve user access.");
-    console.log("🟢 /api/admin/access-requests/:notificationId/approve: Params:", { notificationId });
-    console.log("🟢 /api/admin/access-requests/:notificationId/approve: Request Body:", { userId });
+    console.log("🟢 Approving access request - Notification ID:", notificationId, "User ID:", userId);
 
     if (!userId || !notificationId) {
-        console.log("🔴 /api/admin/access-requests/:notificationId/approve: Missing User ID or Notification ID in request.");
+        console.log("🔴 Missing User ID or Notification ID in request.");
         return res.status(400).json({ success: false, message: "User ID and Notification ID are required for approval." });
     }
 
@@ -1690,100 +1686,260 @@ app.put("/api/admin/access-requests/:notificationId/approve", verifyToken, autho
         connection = await db.getConnection();
         await connection.beginTransaction();
 
-        console.log("🔵 /api/admin/access-requests/:notificationId/approve: Transaction started.");
+        console.log("🔵 Transaction started for approval process.");
 
-        // 1. Update the user's is_verified status in the database
+        // 1. Update the user's is_verified status to 1 (approved)
         const updateUserSql = "UPDATE users SET is_verified = 1 WHERE id = ?";
-        console.log("🔵 /api/admin/access-requests/:notificationId/approve: Executing SQL to update user verification:", updateUserSql, "with userId:", userId);
-        const [updateUserResult] = await connection.query(updateUserSql, [userId]);
+        console.log("🔵 Updating user verification status:", updateUserSql, "with userId:", userId);
+        const [updateUserResult] = await connection.execute(updateUserSql, [userId]);
 
-        console.log("🔵 /api/admin/access-requests/:notificationId/approve: User update SQL result:", updateUserResult);
+        console.log("🔵 User update result:", updateUserResult);
         if (updateUserResult.affectedRows === 0) {
-            console.log("🟠 /api/admin/access-requests/:notificationId/approve: User not found or already verified. Affected rows: 0.");
+            console.log("🟠 User not found or already verified. Affected rows: 0.");
             await connection.rollback();
-            console.error("🔴 /api/admin/access-requests/:notificationId/approve: Transaction rolled back as no user was found/updated.");
+            console.error("🔴 Transaction rolled back - user not found/updated.");
             return res.status(404).json({ success: false, message: "User not found or already verified." });
         }
-        console.log(`✅ /api/admin/access-requests/:notificationId/approve: User ${userId} is_verified updated. Affected rows: ${updateUserResult.affectedRows}`);
+        console.log(`✅ User ${userId} is_verified updated to 1. Affected rows: ${updateUserResult.affectedRows}`);
 
-        // 2. Update the notification status in the 'notif' table
+        // 2. Update the notification status
         const updateNotificationSql = "UPDATE notif SET status = ?, is_read = 1 WHERE id = ? AND type = 'request'";
-        console.log("🔵 /api/admin/access-requests/:notificationId/approve: Executing SQL to update notification status:", updateNotificationSql, "with notificationId:", notificationId);
-        const [updateNotifResult] = await connection.query(updateNotificationSql, ['approved', notificationId]);
+        console.log("🔵 Updating notification status:", updateNotificationSql, "with notificationId:", notificationId);
+        const [updateNotifResult] = await connection.execute(updateNotificationSql, ['approved', notificationId]);
 
-        console.log("🔵 /api/admin/access-requests/:notificationId/approve: Notification update SQL result:", updateNotifResult);
+        console.log("🔵 Notification update result:", updateNotifResult);
         if (updateNotifResult.affectedRows === 0) {
-            console.log("🟠 /api/admin/access-requests/:notificationId/approve: Notification not found or not a pending request. Affected rows: 0.");
-            // This might happen if the notification was already processed or deleted.
-            // We can still commit the user update if the user update was successful,
-            // but it's safer to rollback if the primary record of the request isn't found/updated.
+            console.log("🟠 Notification not found or not a pending request. Affected rows: 0.");
             await connection.rollback();
-            console.error("🔴 /api/admin/access-requests/:notificationId/approve: Transaction rolled back as notification was not found/updated.");
+            console.error("🔴 Transaction rolled back - notification not found/updated.");
             return res.status(404).json({ success: false, message: "Access request notification not found or already processed." });
         }
-        console.log(`✅ /api/admin/access-requests/:notificationId/approve: Notification ${notificationId} status updated to 'approved'.`);
-
+        console.log(`✅ Notification ${notificationId} status updated to 'approved'.`);
 
         // Commit the transaction
         await connection.commit();
-        console.log(`🎉 /api/admin/access-requests/:notificationId/approve: User ${userId} successfully verified and request ${notificationId} processed. Transaction committed.`);
+        console.log(`🎉 User ${userId} successfully verified and request ${notificationId} processed. Transaction committed.`);
         res.status(200).json({ success: true, message: "User access approved successfully." });
 
     } catch (err) {
         if (connection) {
-            await connection.rollback(); // Rollback on any error
-            console.error("🔴 /api/admin/access-requests/:notificationId/approve: Transaction rolled back due to error:", err);
+            await connection.rollback();
+            console.error("🔴 Transaction rolled back due to error:", err);
         }
-        console.error("🔴 /api/admin/access-requests/:notificationId/approve: Error during user approval process:", err);
+        console.error("🔴 Error during user approval process:", err);
         res.status(500).json({ success: false, message: "Failed to verify user and process request due to a server error." });
     } finally {
         if (connection) {
             connection.release();
-            console.log("🔵 /api/admin/access-requests/:notificationId/approve: Database connection released.");
+            console.log("🔵 Database connection released.");
+        }
+    }
+});
+
+// Decline access request route
+app.put("/api/admin/access-requests/:notificationId/decline", verifyToken, authorizeAdmin, async (req, res) => {
+    const { notificationId } = req.params;
+    const { userId } = req.body;
+
+    console.log("🟡 Declining access request - Notification ID:", notificationId, "User ID:", userId);
+
+    if (!userId || !notificationId) {
+        return res.status(400).json({ success: false, message: "User ID and Notification ID are required for decline." });
+    }
+
+    let connection;
+    try {
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+
+        // 1. Keep user's is_verified as 0 (denied access)
+        // Optionally, you could remove the device_id or add a "declined" status
+        const updateUserSql = "UPDATE users SET device_id = NULL WHERE id = ?";
+        const [updateUserResult] = await connection.execute(updateUserSql, [userId]);
+
+        // 2. Update the notification status to 'declined'
+        const updateNotificationSql = "UPDATE notif SET status = ?, is_read = 1 WHERE id = ? AND type = 'request'";
+        const [updateNotifResult] = await connection.execute(updateNotificationSql, ['declined', notificationId]);
+
+        if (updateNotifResult.affectedRows === 0) {
+            await connection.rollback();
+            return res.status(404).json({ success: false, message: "Access request notification not found." });
+        }
+
+        await connection.commit();
+        console.log(`🎉 User ${userId} access request declined and notification ${notificationId} processed.`);
+        res.status(200).json({ success: true, message: "User access request declined successfully." });
+
+    } catch (err) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error("🔴 Error during decline process:", err);
+        res.status(500).json({ success: false, message: "Failed to process decline request." });
+    } finally {
+        if (connection) {
+            connection.release();
         }
     }
 });
 
 // Save user to the database google login
+// Add these routes to handle Google login access requests:
+
+// Modified save-user route to handle access status
 app.post('/save-user', async (req, res) => {
-  const { email, name } = req.body;
-
   try {
-    let userId;
-
-    const [existingUsers] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
-
-    if (existingUsers.length > 0) {
-      userId = existingUsers[0].id;
-      console.log('User with email', email, 'already exists. Logging in.');
-    } else {
-      const insertQuery = `INSERT INTO users (email, username) VALUES (?, ?)`;
-      const [result] = await db.query(insertQuery, [email, name]);
-      userId = result.insertId;
-      console.log('New user created with email:', email);
+    const { email, name } = req.body;
+    
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Email and name are required' });
     }
 
-    // Generate JWT Token
-    // *** CHANGE JWT_SECRET TO secretKey HERE! ***
-    const token = jwt.sign(
-      { userId: userId, email: email, username: name }, // Payload
-      secretKey, // <--- THIS IS THE CHANGE: Use 'secretKey' here
-      { expiresIn: '1h' } // Token expiration
-    );
+    let connection;
+    try {
+      connection = await db.getConnection();
+      
+      // Check if user already exists
+      const [existingUser] = await connection.execute(
+        'SELECT id, username, email, role, device_id, is_verified FROM users WHERE email = ?',
+        [email]
+      );
 
-    res.status(200).json({
-      message: 'User processed and logged in successfully',
-      token: token, // Send the token back!
-      userId: userId,
-      email: email,
-      username: name // Include username in response
+      if (existingUser.length > 0) {
+        // Existing user
+        const user = existingUser[0];
+        
+        // Generate token
+        const token = jwt.sign(
+          { 
+            id: user.id, 
+            username: user.username, 
+            email: user.email,
+            role: user.role,
+            deviceId: user.device_id
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: '24h' }
+        );
+
+        return res.json({
+          success: true,
+          isNewUser: false,
+          hasAccess: user.is_verified === 1 && user.device_id,
+          token,
+          userId: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          device_id: user.device_id
+        });
+      } else {
+        // New user - create account
+        const username = name.replace(/\s+/g, '').toLowerCase() + Math.floor(Math.random() * 1000);
+        
+        const [insertResult] = await connection.execute(
+          `INSERT INTO users (username, email, password_hash, role, is_verified, email_verified, access_approved) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [username, email, 'google_auth', 'User', 1, 1, 0] // access_approved = 0 for new users
+        );
+
+        const newUserId = insertResult.insertId;
+
+        // Generate token
+        const token = jwt.sign(
+          { 
+            id: newUserId, 
+            username: username, 
+            email: email,
+            role: 'User'
+          },
+          process.env.JWT_SECRET,
+          { expiresIn: '24h' }
+        );
+
+        return res.json({
+          success: true,
+          isNewUser: true,
+          hasAccess: false,
+          token,
+          userId: newUserId,
+          username: username,
+          email: email,
+          role: 'User'
+        });
+      }
+
+    } finally {
+      if (connection) connection.release();
+    }
+
+  } catch (error) {
+    console.error('Error in save-user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Request device access for Google login users
+app.post('/api/request-device-access', authMiddleware, async (req, res) => {
+  try {
+    const { userId, deviceId, email, username } = req.body;
+    
+    if (!userId || !deviceId) {
+      return res.status(400).json({
+        success: false,
+        error: 'User ID and Device ID are required'
+      });
+    }
+
+    let connection;
+    try {
+      connection = await db.getConnection();
+      
+      // Update user with device_id and set access_approved to 0 (pending)
+      await connection.execute(
+        'UPDATE users SET device_id = ? = 0 WHERE id = ?',
+        [deviceId, userId]
+      );
+
+      // Create notification for admin(s) with the same device ID
+      const notificationMessage = `New access request from ${username} (${email}) for device ${deviceId}`;
+      
+      // Find admins with the same device_id
+      const [admins] = await connection.execute(
+        `SELECT u.id FROM users u 
+         JOIN admin_establishments ae ON u.id = ae.user_id 
+         JOIN estab e ON ae.establishment_id = e.id 
+         WHERE e.device_id = ? AND u.role = 'Admin'`,
+        [deviceId]
+      );
+
+      // Create notifications for each admin
+      for (const admin of admins) {
+        await connection.execute(
+          `INSERT INTO admin_notifications (admin_id, user_id, type, message, status, created_at) 
+           VALUES (?, ?, ?, ?, ?, NOW())`,
+          [admin.id, userId, 'request', notificationMessage, 'pending']
+        );
+      }
+
+      console.log(`✅ Access request created for user ${userId} requesting device ${deviceId}`);
+
+      res.json({
+        success: true,
+        message: 'Access request submitted successfully',
+        deviceId: deviceId
+      });
+
+    } finally {
+      if (connection) connection.release();
+    }
+
+  } catch (error) {
+    console.error('❌ Error creating access request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to submit access request'
     });
-
-  } catch (err) {
-    console.error('Error in /save-user:', err);
-    // You might want to add a more specific message if the error is due to the secret
-    // e.g., if (err.name === 'JsonWebTokenError') { ... }
-    res.status(500).json({ error: 'Server error during social login process.' });
   }
 });
 
