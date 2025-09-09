@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react"; // Import useEffect
 import "../styles/Components Css/AccessRestrictedModal.css";
 
-const AccessRestrictedModal = ({ isOpen, onClose, onRequestSend, message, showDeviceIdInput = true }) => {
+const AccessRestrictedModal = ({ isOpen, onClose, onRequestSend, onRefresh, message, showDeviceIdInput = true }) => {
     // If the modal is not open, don't render anything
     if (!isOpen) return null;
 
@@ -26,6 +26,13 @@ const AccessRestrictedModal = ({ isOpen, onClose, onRequestSend, message, showDe
         // Optionally, close the modal immediately after sending the request,
         // or let the parent component (Userdb) handle it based on response
         // onClose();
+    };
+
+    // Function to handle refresh button click
+    const handleRefreshClick = () => {
+        if (onRefresh) {
+            onRefresh();
+        }
     };
 
     return (
@@ -64,6 +71,17 @@ const AccessRestrictedModal = ({ isOpen, onClose, onRequestSend, message, showDe
                             Send Access Request
                         </button>
                     )}
+                    
+                    {/* Refresh button - always show when request has been sent */}
+                    {!showDeviceIdInput && onRefresh && (
+                        <button
+                            className="modal-button refresh"
+                            onClick={handleRefreshClick}
+                        >
+                            Check Status
+                        </button>
+                    )}
+                    
                     {/* If showDeviceIdInput is false, it means request has been sent,
                         so the message will indicate waiting for approval, and no input is needed.
                         We can still show a button to acknowledge/log out. */}

@@ -21,8 +21,6 @@ import axios from 'axios'; // Import axios for API calls
 // Import socket.io-client and your socket instance
 import io from 'socket.io-client';
 import socket from '../DashboardMeters/socket'; // Make sure this path is correct
-// Import Bootstrap components for Google login modal
-import { Modal, Button, Form } from 'react-bootstrap';
 
 // API base URL - make sure this matches your backend
 const API_BASE_URL = "https://login-signup-3470.onrender.com";
@@ -70,102 +68,6 @@ const Userdb = () => {
     const [associatedSensors, setAssociatedSensors] = useState([]);
     const [loadingSensors, setLoadingSensors] = useState(true);
 
-    // Google Login Device Modal States
-    const [showGoogleDeviceModal, setShowGoogleDeviceModal] = useState(false);
-    const [googleDeviceId, setGoogleDeviceId] = useState('');
-    const [googleDeviceError, setGoogleDeviceError] = useState('');
-    const [isSubmittingGoogleDevice, setIsSubmittingGoogleDevice] = useState(false);
-    const [googleAccessStatus, setGoogleAccessStatus] = useState(null);
-
-    // Check for Google login device access requirement on component mount
-    useEffect(() => {
-        console.log("🔍 Checking for Google login device access flags");
-        
-        // Check if user needs device access (from Google login)
-        const needsDeviceAccess = localStorage.getItem('needsDeviceAccess');
-        const isGoogleLogin = localStorage.getItem('isGoogleLogin');
-        
-        console.log("🔍 needsDeviceAccess:", needsDeviceAccess);
-        console.log("🔍 isGoogleLogin:", isGoogleLogin);
-        
-        if (needsDeviceAccess === 'true' && isGoogleLogin === 'true') {
-            console.log("✅ Showing Google device modal");
-            setShowGoogleDeviceModal(true);
-        } else {
-            console.log("❌ Not showing Google device modal");
-        }
-    }, []);
-
-    // Google device access handlers
-    const handleGoogleDeviceSubmit = async () => {
-        if (!googleDeviceId.trim()) {
-            setGoogleDeviceError('Device ID is required');
-            return;
-        }
-
-        setIsSubmittingGoogleDevice(true);
-        setGoogleDeviceError('');
-
-        try {
-            const token = getToken();
-            const userId = currentUser?.id;
-            const email = currentUser?.email;
-            const username = currentUser?.username;
-
-            console.log("🔄 Submitting Google device access request for:", { userId, deviceId: googleDeviceId, email, username });
-
-            // Submit access request with device ID
-            const requestResponse = await axios.post(`${API_BASE_URL}/api/request-device-access`, {
-                userId: userId,
-                deviceId: googleDeviceId.trim(),
-                email: email,
-                username: username
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (requestResponse.data.success) {
-                setGoogleAccessStatus('pending');
-                
-                // Clear the flags
-                localStorage.removeItem('needsDeviceAccess');
-                localStorage.removeItem('isGoogleLogin');
-                localStorage.setItem('accessStatus', 'pending');
-                
-                console.log("✅ Google access request submitted for device ID:", googleDeviceId);
-                
-                // Show success message and close modal after delay
-                setTimeout(() => {
-                    setShowGoogleDeviceModal(false);
-                    // Refresh the page or update UI to show pending status
-                    window.location.reload();
-                }, 2000);
-                
-            } else {
-                setGoogleDeviceError('Failed to submit access request. Please try again.');
-            }
-        } catch (error) {
-            console.error("Error submitting Google access request:", error);
-            setGoogleDeviceError(error.response?.data?.error || 'Failed to submit access request');
-        } finally {
-            setIsSubmittingGoogleDevice(false);
-        }
-    };
-
-    const handleGoogleDeviceModalClose = () => {
-        // Only allow closing if not pending
-        if (googleAccessStatus !== 'pending') {
-            setShowGoogleDeviceModal(false);
-            setGoogleDeviceId('');
-            setGoogleDeviceError('');
-            // Clear flags
-            localStorage.removeItem('needsDeviceAccess');
-            localStorage.removeItem('isGoogleLogin');
-        }
-    };
-
     // Effect for initial setup and verification check and controlling AccessRestrictedModal visibility
     useEffect(() => {
         const user = currentUser;
@@ -212,31 +114,67 @@ const Userdb = () => {
     useEffect(() => {
         let pollInterval;
         if (isPolling) {
-            pollInterval = setInterval(() => {
-                const storedUserString = localStorage.getItem("user");
-                let updatedUser = null;
-                let newIsVerified = false;
-
-                if (storedUserString) {
-                    try {
-                        updatedUser = JSON.parse(storedUserString);
-                        newIsVerified = String(updatedUser.isVerified).toLowerCase() === "true" || updatedUser.isVerified === true;
-                        // Use AuthContext's login to update its state and localStorage
-                        login(updatedUser, getToken()); // This ensures AuthContext is truly in sync
-                    } catch (e) {
-                        console.error("Error parsing user from localStorage during polling:", e);
+            pollInterval = setInterval(async () => {
+                try {
+                    // Make API call to refresh user data from server
+                    const token = getToken();
+                    if (!token) {
+                        console.log("No token available for polling");
+                        setIsPolling(false);
+                        return;
                     }
-                }
 
-                console.log("Polling for verification status (from localStorage):", newIsVerified);
-                // Also log the deviceId from the updated user during polling
-                console.log("Polling for deviceId (from localStorage updatedUser):", updatedUser?.deviceId);
+                    console.log("🔄 Polling for verification status via API call");
+                    const response = await axios.get(`${API_BASE_URL}/api/user/me`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
 
-                if (newIsVerified) {
-                    setShowAccessModal(false);
-                    setIsPolling(false);
-                    setAlertMessage("Your account has been verified! You can now access all features.");
-                    setShowAlert(true);
+                    if (response.data && response.data.user) {
+                        const updatedUser = response.data.user;
+                        const newIsVerified = updatedUser.isVerified === true || updatedUser.isVerified === 1;
+                        
+                        console.log("🔄 Polling result - Updated user:", updatedUser);
+                        console.log("🔄 Polling result - New verification status:", newIsVerified);
+                        console.log("🔄 Polling result - Device ID:", updatedUser.deviceId);
+
+                        // Update AuthContext with fresh user data
+                        login(updatedUser, token);
+
+                        if (newIsVerified) {
+                            setShowAccessModal(false);
+                            setIsPolling(false);
+                            setAlertMessage("Your account has been verified! You can now access all features.");
+                            setShowAlert(true);
+                            console.log("✅ User verified via API polling - stopping poll and refreshing UI");
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error during verification polling:", error);
+                    // Fallback to localStorage check if API fails
+                    const storedUserString = localStorage.getItem("user");
+                    let updatedUser = null;
+                    let newIsVerified = false;
+
+                    if (storedUserString) {
+                        try {
+                            updatedUser = JSON.parse(storedUserString);
+                            newIsVerified = String(updatedUser.isVerified).toLowerCase() === "true" || updatedUser.isVerified === true;
+                            login(updatedUser, getToken()); // Update AuthContext
+                        } catch (e) {
+                            console.error("Error parsing user from localStorage during polling:", e);
+                        }
+                    }
+
+                    console.log("🔄 Fallback polling for verification status (from localStorage):", newIsVerified);
+
+                    if (newIsVerified) {
+                        setShowAccessModal(false);
+                        setIsPolling(false);
+                        setAlertMessage("Your account has been verified! You can now access all features.");
+                        setShowAlert(true);
+                    }
                 }
             }, 5000);
         }
@@ -282,14 +220,17 @@ const Userdb = () => {
             const userDeviceId = deviceId; // Use the top-level deviceId from context
             const isUserVerified = currentUser?.isVerified; // Use currentUser for isVerified as it's a direct property
 
-            console.log("DEBUG: fetchAssociatedSensors called.");
-            console.log("DEBUG: userDeviceId (from AuthContext):", userDeviceId);
-            console.log("DEBUG: isUserVerified (from AuthContext):", isUserVerified);
-            console.log("DEBUG: currentUser object:", currentUser);
+            console.log("🔍 DEBUG: fetchAssociatedSensors called.");
+            console.log("🔍 DEBUG: userDeviceId (from AuthContext):", userDeviceId);
+            console.log("🔍 DEBUG: isUserVerified (from AuthContext):", isUserVerified);
+            console.log("🔍 DEBUG: currentUser object:", currentUser);
+            console.log("🔍 DEBUG: currentUser.isVerified raw value:", currentUser?.isVerified);
+            console.log("🔍 DEBUG: typeof currentUser.isVerified:", typeof currentUser?.isVerified);
 
             // Only proceed if deviceId exists AND user is verified
             if (!userDeviceId || !isUserVerified) {
-                console.log("Skipping sensor fetch: No userDeviceId or user not verified. Conditions not met.");
+                console.log("⚠️ Skipping sensor fetch: No userDeviceId or user not verified.");
+                console.log(`⚠️ Conditions: userDeviceId=${userDeviceId}, isUserVerified=${isUserVerified}`);
                 setLoadingSensors(false);
                 setAssociatedSensors([]); // Clear sensors if conditions aren't met
                 return;
@@ -299,17 +240,19 @@ const Userdb = () => {
             try {
                 const token = getToken(); // Get token from AuthContext
                 if (!token) {
-                    console.error("No token available for sensor fetch.");
+                    console.error("🔴 No token available for sensor fetch.");
                     setLoadingSensors(false);
                     return;
                 }
 
-                console.log(`Attempting to fetch sensors for device ID: ${userDeviceId}`);
+                console.log(`🔄 Attempting to fetch sensors for device ID: ${userDeviceId}`);
                 const response = await axios.get(`${API_BASE_URL}/api/devices/${userDeviceId}/sensors`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
                 });
+
+                console.log(`✅ Raw sensor response for device ${userDeviceId}:`, response.data);
 
                 if (response.data) {
                     const normalizedSensors = response.data.map(sensor => {
@@ -317,14 +260,20 @@ const Userdb = () => {
                     });
 
                     setAssociatedSensors(normalizedSensors);
-                    console.log(`Fetched and normalized sensors for device ${userDeviceId}:`, normalizedSensors);
+                    console.log(`✅ Fetched and normalized sensors for device ${userDeviceId}:`, normalizedSensors);
                 } else {
-                    console.error("No data received for sensors:", response);
+                    console.error("🔴 No data received for sensors:", response);
                     setAlertMessage("Failed to load device sensors: No data received.");
                     setShowAlert(true);
                 }
             } catch (error) {
-                console.error("Error fetching associated sensors:", error.response?.data || error);
+                console.error("🔴 Error fetching associated sensors:", error.response?.data || error);
+                console.error("🔴 Error details:", {
+                    status: error.response?.status,
+                    statusText: error.response?.statusText,
+                    data: error.response?.data,
+                    url: error.config?.url
+                });
                 setAlertMessage(error.response?.data?.error || "Error fetching device sensors.");
                 setShowAlert(true);
             } finally {
@@ -336,21 +285,28 @@ const Userdb = () => {
         // The dependency array now includes deviceId and currentUser.isVerified for reactivity
         // We ensure currentUser is not null/undefined before attempting to fetch
         if (currentUser) {
+            console.log("🔍 useEffect triggered for sensor fetch. Dependencies:", {
+                currentUser: currentUser?.id,
+                deviceId,
+                isVerified: currentUser?.isVerified
+            });
             fetchAssociatedSensors();
+        } else {
+            console.log("⚠️ useEffect skipped - no currentUser available");
         }
 
     }, [currentUser, deviceId, getToken]); // Dependencies on currentUser, deviceId, and getToken from AuthContext
 
     const handleSendRequest = async (deviceIdFromModal) => {
-        console.log("handleSendRequest function called.");
-        console.log("Received deviceId from modal:", deviceIdFromModal);
+        console.log("🔄 handleSendRequest function called.");
+        console.log("🔄 Received deviceId from modal:", deviceIdFromModal);
 
         // Get user info directly from AuthContext
         const username = currentUser?.username || "Unknown User";
         const userId = currentUser?.id || "unknown-id";
         const deviceIdToSend = deviceIdFromModal || ""; // Use empty string if deviceIdFromModal is null/undefined
 
-        console.log(`Extracted username: ${username}, userId: ${userId}, deviceIdToSend: ${deviceIdToSend}`);
+        console.log(`🔄 Extracted username: ${username}, userId: ${userId}, deviceIdToSend: ${deviceIdToSend}`);
 
         if (!deviceIdToSend || deviceIdToSend.trim() === "") {
             setAlertMessage("Please enter a valid Device ID to send the request.");
@@ -377,6 +333,7 @@ const Userdb = () => {
                 setAlertMessage(data.message);
                 setShowAlert(true);
                 setIsPolling(true);
+                console.log("✅ Access request sent successfully, starting polling");
                 if (data.user && data.token) {
                     login(data.user, data.token); // Update AuthContext with any new user/token data
                 }
@@ -385,8 +342,48 @@ const Userdb = () => {
                 setShowAlert(true);
             }
         } catch (error) {
-            console.error("Network or fetch error:", error);
+            console.error("🔴 Network or fetch error:", error);
             setAlertMessage("Could not connect to the server. Please try again later.");
+            setShowAlert(true);
+        }
+    };
+
+    // Manual refresh function to check verification status
+    const handleManualRefresh = async () => {
+        console.log("🔄 Manual refresh triggered");
+        try {
+            const token = getToken();
+            if (!token) {
+                setAlertMessage("No authentication token found. Please login again.");
+                setShowAlert(true);
+                return;
+            }
+
+            const response = await axios.get(`${API_BASE_URL}/api/user/me`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data && response.data.user) {
+                const updatedUser = response.data.user;
+                console.log("🔄 Manual refresh - Updated user data:", updatedUser);
+                
+                // Update AuthContext with fresh data
+                login(updatedUser, token);
+                
+                if (updatedUser.isVerified) {
+                    setAlertMessage("Account verified! Device access granted.");
+                    setShowAccessModal(false);
+                    setIsPolling(false);
+                } else {
+                    setAlertMessage("Account verification still pending. Please wait for admin approval.");
+                }
+                setShowAlert(true);
+            }
+        } catch (error) {
+            console.error("🔴 Error during manual refresh:", error);
+            setAlertMessage("Failed to refresh account status. Please try again later.");
             setShowAlert(true);
         }
     };
@@ -443,112 +440,22 @@ const Userdb = () => {
                     isOpen={showAccessModal || (!currentIsUserVerified && !isPolling)} // Keep modal open if conditions require it
                     onClose={handleCloseModal}
                     onRequestSend={handleSendRequest}
+                    onRefresh={handleManualRefresh}
                     message={
-                        // This message will still change based on currentDeviceId,
-                        // but the input will always be there if showDeviceIdInput is true below.
+                        // This message will change based on currentDeviceId and verification status
                         !currentDeviceId
                             ? "Please enter your Device ID to send an access request and get started."
-                            : "You need Admin approval to view dashboard features.  Enter your Device ID to request access. Please wait for approval to continue or log out."
+                            : !currentIsUserVerified
+                            ? `Your access request for device ${currentDeviceId} is pending admin approval. Click "Check Status" to refresh your verification status.`
+                            : "You need Admin approval to view dashboard features. Please wait for approval to continue or log out."
                     }
-                    showDeviceIdInput={true} // FORCED TRUE: Always show the input field
+                    showDeviceIdInput={!currentDeviceId} // Only show input if no device ID is set
                 />
                 <AlertDialog
                     isOpen={showAlert}
                     message={alertMessage}
                     onClose={() => setShowAlert(false)}
                 />
-                {/* Google Login Device Access Modal */}
-                <Modal 
-                    show={showGoogleDeviceModal} 
-                    onHide={googleAccessStatus === 'pending' ? undefined : handleGoogleDeviceModalClose}
-                    backdrop="static"
-                    keyboard={false}
-                    centered
-                >
-                    <Modal.Header closeButton={googleAccessStatus !== 'pending'}>
-                        <Modal.Title>
-                            {googleAccessStatus === 'pending' ? '✅ Access Request Submitted' : '🔐 Complete Your Google Login'}
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {googleAccessStatus === 'pending' ? (
-                            <div className="text-center">
-                                <div className="mb-3">
-                                    <div className="spinner-border text-primary" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
-                                </div>
-                                <h5 className="text-success mb-3">Request Submitted Successfully!</h5>
-                                <p className="mb-2">
-                                    Your access request for device <strong>{googleDeviceId}</strong> has been submitted.
-                                </p>
-                                <p className="mb-2">
-                                    An admin will review your request and approve access to the device.
-                                </p>
-                                <p className="text-muted small">
-                                    The page will refresh to show your current status.
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <p className="mb-3">
-                                    Welcome! To complete your Google login, please enter the Device ID you want to access. 
-                                    Your request will be sent to the admin for approval.
-                                </p>
-                                
-                                <Form.Group className="mb-3">
-                                    <Form.Label>Device ID <span className="text-danger">*</span></Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter the Device ID you want to access"
-                                        value={googleDeviceId}
-                                        onChange={(e) => {
-                                            setGoogleDeviceId(e.target.value);
-                                            setGoogleDeviceError('');
-                                        }}
-                                        disabled={isSubmittingGoogleDevice}
-                                        className={googleDeviceError ? 'is-invalid' : ''}
-                                    />
-                                    {googleDeviceError && (
-                                        <div className="invalid-feedback d-block">
-                                            {googleDeviceError}
-                                        </div>
-                                    )}
-                                </Form.Group>
-
-                                <div className="bg-light p-3 rounded">
-                                    <h6 className="mb-2">📋 What happens next:</h6>
-                                    <ol className="mb-0 ps-3 small">
-                                        <li>Your access request will be sent to the device admin</li>
-                                        <li>The admin will review and approve/deny your request</li>
-                                        <li>You'll receive a notification once approved</li>
-                                        <li>After approval, you can access device-specific features</li>
-                                    </ol>
-                                </div>
-                            </>
-                        )}
-                    </Modal.Body>
-                    <Modal.Footer>
-                        {googleAccessStatus !== 'pending' && (
-                            <>
-                                <Button 
-                                    variant="secondary" 
-                                    onClick={handleGoogleDeviceModalClose}
-                                    disabled={isSubmittingGoogleDevice}
-                                >
-                                    Skip for Now
-                                </Button>
-                                <Button 
-                                    variant="primary" 
-                                    onClick={handleGoogleDeviceSubmit}
-                                    disabled={isSubmittingGoogleDevice || !googleDeviceId.trim()}
-                                >
-                                    {isSubmittingGoogleDevice ? 'Submitting Request...' : 'Request Access'}
-                                </Button>
-                            </>
-                        )}
-                    </Modal.Footer>
-                </Modal>
             </div>
         );
     }
@@ -593,111 +500,21 @@ const Userdb = () => {
                 isOpen={showAccessModal}
                 onClose={handleCloseModal}
                 onRequestSend={handleSendRequest}
+                onRefresh={handleManualRefresh}
                 message={
                     !currentDeviceId
                         ? "Please enter your Device ID to send an access request and get started."
-                        : "You need Admin approval to view dashboard features. Enter your Device ID to request access. Please wait for approval to continue or log out."
+                        : !currentIsUserVerified
+                        ? `Your access request for device ${currentDeviceId} is pending admin approval. Click "Check Status" to refresh your verification status.`
+                        : "You need Admin approval to view dashboard features. Please wait for approval to continue or log out."
                 }
-                showDeviceIdInput={true} // FORCED TRUE: Always show the input field
+                showDeviceIdInput={!currentDeviceId} // Only show input if no device ID is set
             />
             <AlertDialog
                 isOpen={showAlert}
                 message={alertMessage}
                 onClose={() => setShowAlert(false)}
             />
-
-            {/* Google Login Device Access Modal */}
-            <Modal 
-                show={showGoogleDeviceModal} 
-                onHide={googleAccessStatus === 'pending' ? undefined : handleGoogleDeviceModalClose}
-                backdrop="static"
-                keyboard={false}
-                centered
-            >
-                <Modal.Header closeButton={googleAccessStatus !== 'pending'}>
-                    <Modal.Title>
-                        {googleAccessStatus === 'pending' ? '✅ Access Request Submitted' : '🔐 Complete Your Google Login'}
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {googleAccessStatus === 'pending' ? (
-                        <div className="text-center">
-                            <div className="mb-3">
-                                <div className="spinner-border text-primary" role="status">
-                                    <span className="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                            <h5 className="text-success mb-3">Request Submitted Successfully!</h5>
-                            <p className="mb-2">
-                                Your access request for device <strong>{googleDeviceId}</strong> has been submitted.
-                            </p>
-                            <p className="mb-2">
-                                An admin will review your request and approve access to the device.
-                            </p>
-                            <p className="text-muted small">
-                                The page will refresh to show your current status.
-                            </p>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="mb-3">
-                                Welcome! To complete your Google login, please enter the Device ID you want to access. 
-                                Your request will be sent to the admin for approval.
-                            </p>
-                            
-                            <Form.Group className="mb-3">
-                                <Form.Label>Device ID <span className="text-danger">*</span></Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter the Device ID you want to access"
-                                    value={googleDeviceId}
-                                    onChange={(e) => {
-                                        setGoogleDeviceId(e.target.value);
-                                        setGoogleDeviceError('');
-                                    }}
-                                    disabled={isSubmittingGoogleDevice}
-                                    className={googleDeviceError ? 'is-invalid' : ''}
-                                />
-                                {googleDeviceError && (
-                                    <div className="invalid-feedback d-block">
-                                        {googleDeviceError}
-                                    </div>
-                                )}
-                            </Form.Group>
-
-                            <div className="bg-light p-3 rounded">
-                                <h6 className="mb-2">📋 What happens next:</h6>
-                                <ol className="mb-0 ps-3 small">
-                                    <li>Your access request will be sent to the device admin</li>
-                                    <li>The admin will review and approve/deny your request</li>
-                                    <li>You'll receive a notification once approved</li>
-                                    <li>After approval, you can access device-specific features</li>
-                                </ol>
-                            </div>
-                        </>
-                    )}
-                </Modal.Body>
-                <Modal.Footer>
-                    {googleAccessStatus !== 'pending' && (
-                        <>
-                            <Button 
-                                variant="secondary" 
-                                onClick={handleGoogleDeviceModalClose}
-                                disabled={isSubmittingGoogleDevice}
-                            >
-                                Skip for Now
-                            </Button>
-                            <Button 
-                                variant="primary" 
-                                onClick={handleGoogleDeviceSubmit}
-                                disabled={isSubmittingGoogleDevice || !googleDeviceId.trim()}
-                            >
-                                {isSubmittingGoogleDevice ? 'Submitting Request...' : 'Request Access'}
-                            </Button>
-                        </>
-                    )}
-                </Modal.Footer>
-            </Modal>
 
             {/* Global Pop-up Warning Notification (Centered on Screen) */}
             {showWarningPopup && (

@@ -629,6 +629,53 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Get current user data - for refreshing user info on frontend
+app.get('/api/user/me', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log(`🔍 /api/user/me: Fetching current user data for userId: ${userId}`);
+
+    const connection = await pool.getConnection();
+    try {
+      // Fetch fresh user data from database
+      const [results] = await connection.execute(
+        "SELECT id, username, email, role, is_verified, device_id, establishment_id FROM users WHERE id = ?",
+        [userId]
+      );
+
+      if (results.length === 0) {
+        console.log(`🔴 /api/user/me: User not found for ID: ${userId}`);
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const user = results[0];
+      console.log(`✅ /api/user/me: Fresh user data fetched:`, user);
+
+      // Prepare user object for frontend (similar to login response)
+      const userForFrontend = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isVerified: user.is_verified === 1,
+        deviceId: user.device_id,
+        establishmentId: user.establishment_id
+      };
+
+      res.status(200).json({
+        success: true,
+        user: userForFrontend
+      });
+
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error(`🔴 Error in /api/user/me:`, error);
+    res.status(500).json({ error: "Server error while fetching user data" });
+  }
+});
+
 
 
 // Create admin

@@ -3,27 +3,17 @@ body,
 .app-container, 
 .login-page, 
 .auth-container,
-.auth-page {
+.auth-page
+.light {
   background-color: #d6ebff; /* Light blue color from image */
   min-height: 100vh;
   margin: 0;
-  padding: 0;
-  
+  padding: 0; 
 }
 
-body, 
-.app-container, 
-.login-page, 
-.auth-container,
-.auth-page
-.dark {
-  background-color: #1a1a1a; /* Light blue color from image */
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  
+.app-container.dark{
+        background-color: #1a1a1a;
 }
-
 
 /* Light Mode - Ensure Consistent UI Elements */
 .app-container.light a {
@@ -34,6 +24,7 @@ body,
 
 .app-container.dark a {
     color: #4da8da;
+
 }
 
 
