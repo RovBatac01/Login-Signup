@@ -686,6 +686,98 @@ app.get('/api/debug/user/:userId', authenticateToken, async (req, res) => {
   try {
     const userId = req.params.userId;
     console.log(`🔍 DEBUG: Fetching raw data for user ${userId}`);
+    
+    const connection = await pool.getConnection();
+    try {
+      const [results] = await connection.execute(
+        "SELECT id, username, email, role, is_verified, device_id, establishment_id FROM users WHERE id = ?",
+        [userId]
+      );
+      
+      if (results.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const user = results[0];
+      console.log(`🔍 DEBUG: Raw database data:`, user);
+      console.log(`🔍 DEBUG: is_verified type: ${typeof user.is_verified}, value: ${user.is_verified}`);
+      console.log(`🔍 DEBUG: device_id type: ${typeof user.device_id}, value: ${user.device_id}`);
+      
+      res.json({
+        success: true,
+        raw_data: user,
+        is_verified_type: typeof user.is_verified,
+        device_id_type: typeof user.device_id
+      });
+      
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error(`🔴 Error in debug endpoint:`, error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// NEW DEBUG ENDPOINT: Fix corrupted user data
+app.post('/api/debug/fix-user-data/:userId', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log(`🔧 FIXING: Attempting to fix corrupted data for user ${userId}`);
+    
+    const connection = await pool.getConnection();
+    try {
+      // First, check current data
+      const [beforeResults] = await connection.execute(
+        "SELECT id, username, email, is_verified, device_id FROM users WHERE id = ?",
+        [userId]
+      );
+      
+      if (beforeResults.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      const userBefore = beforeResults[0];
+      console.log(`🔍 BEFORE FIX: Raw data:`, userBefore);
+      
+      // If is_verified contains a device ID (like "85616"), fix it
+      if (typeof userBefore.is_verified === 'string' && userBefore.is_verified.match(/^\d+$/)) {
+        console.log(`🔧 FIXING: is_verified contains device ID "${userBefore.is_verified}", moving to device_id and setting is_verified to 1`);
+        
+        await connection.execute(
+          "UPDATE users SET is_verified = 1, device_id = ? WHERE id = ?",
+          [parseInt(userBefore.is_verified), userId]
+        );
+        
+        console.log(`✅ FIXED: User data corrected`);
+      }
+      
+      // Check data after fix
+      const [afterResults] = await connection.execute(
+        "SELECT id, username, email, is_verified, device_id FROM users WHERE id = ?",
+        [userId]
+      );
+      
+      const userAfter = afterResults[0];
+      console.log(`🔍 AFTER FIX: Raw data:`, userAfter);
+      
+      res.json({
+        success: true,
+        before: userBefore,
+        after: userAfter,
+        fixed: userBefore.is_verified !== userAfter.is_verified
+      });
+      
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error(`🔴 Error in fix endpoint:`, error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Continue with existing debug endpoint...
 
     const connection = await pool.getConnection();
     try {
@@ -1919,6 +2011,8 @@ app.post('/save-user', async (req, res) => {
         // Existing user
         const user = existingUser[0];
         console.log('🔵 /save-user: Found existing user:', user);
+        console.log('🔍 DEBUG - user.is_verified type:', typeof user.is_verified, 'value:', user.is_verified);
+        console.log('🔍 DEBUG - user.device_id type:', typeof user.device_id, 'value:', user.device_id);
         
         // Generate token
         console.log('🔵 /save-user: Generating JWT token');
@@ -1931,8 +2025,8 @@ app.post('/save-user', async (req, res) => {
             username: user.username, 
             email: user.email,
             role: user.role,
-            isVerified: user.is_verified,
-            deviceId: user.device_id
+            isVerified: user.is_verified === 1 || user.is_verified === true, // ✅ Convert to boolean
+            deviceId: user.device_id // Keep as-is (should be number or null)
           },
           jwtSecret,
           { expiresIn: '24h' }
@@ -1942,13 +2036,14 @@ app.post('/save-user', async (req, res) => {
         return res.json({
           success: true,
           isNewUser: false,
-          hasAccess: user.is_verified === 1 && user.device_id,
+          hasAccess: user.is_verified === 1 && user.device_id, // ✅ Proper boolean check
           token,
           userId: user.id,
           username: user.username,
           email: user.email,
           role: user.role,
-          device_id: user.device_id
+          device_id: user.device_id,
+          is_verified: user.is_verified === 1 || user.is_verified === true // ✅ Convert to boolean
         });
       } else {
         // New user - create account

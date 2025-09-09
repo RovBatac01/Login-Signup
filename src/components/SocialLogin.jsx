@@ -6,6 +6,7 @@ import { auth } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+ // Import centralized API config
 
 const SocialLogin = () => {
   const navigate = useNavigate();
@@ -75,10 +76,16 @@ const SocialLogin = () => {
           username: username,
           email: email,
           role: role || "User",
-          isVerified: response.data.hasAccess, // Use hasAccess from API
-          deviceId: response.data.device_id || null, // ❌ FIXED: Use device_id from API response
+          isVerified: Boolean(response.data.hasAccess), // ✅ ENSURE BOOLEAN: Convert to proper boolean
+          deviceId: response.data.device_id || null, // ✅ Use device_id from API response
           establishmentId: response.data.establishmentId || null
         };
+        
+        // CRITICAL DEBUG: Verify field assignments are correct
+        console.log("🔍 CRITICAL DEBUG - User object field assignments:");
+        console.log("🔍 - isVerified:", userObject.isVerified, "type:", typeof userObject.isVerified);
+        console.log("🔍 - deviceId:", userObject.deviceId, "type:", typeof userObject.deviceId);
+        console.log("🔍 - Final userObject:", userObject);
 
         // Use AuthContext login function to properly set user state
         login(userObject, token);
