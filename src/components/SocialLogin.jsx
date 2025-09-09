@@ -26,12 +26,15 @@ const SocialLogin = () => {
       // Send the user data to your backend and expect a token back
       const response = await axios.post("https://login-signup-3470.onrender.com/save-user", userData);
       console.log("Response data from backend:", response.data);
+      console.log("🔍 DETAILED DEBUG - Full response.data:", JSON.stringify(response.data, null, 2));
 
       const { isNewUser, hasAccess, token, userId, email, username, role } = response.data;
 
       // DEBUG: Log the values
       console.log("🔍 Debug - isNewUser:", isNewUser);
       console.log("🔍 Debug - hasAccess:", hasAccess);
+      console.log("🔍 Debug - response.data.device_id:", response.data.device_id);
+      console.log("🔍 Debug - response.data.deviceId:", response.data.deviceId);
       console.log("🔍 Debug - Should show modal:", isNewUser || !hasAccess);
 
       if (isNewUser || !hasAccess) {
@@ -73,7 +76,7 @@ const SocialLogin = () => {
           email: email,
           role: role || "User",
           isVerified: response.data.hasAccess, // Use hasAccess from API
-          deviceId: response.data.deviceId || null, // Use deviceId from API response
+          deviceId: response.data.device_id || null, // ❌ FIXED: Use device_id from API response
           establishmentId: response.data.establishmentId || null
         };
 

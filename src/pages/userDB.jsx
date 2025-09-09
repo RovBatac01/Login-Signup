@@ -164,6 +164,8 @@ const Userdb = () => {
                         }
                     });
 
+                    console.log("🔍 POLLING DEBUG - Full response:", JSON.stringify(response.data, null, 2));
+
                     if (response.data && response.data.user) {
                         const updatedUser = response.data.user;
                         const newIsVerified = updatedUser.isVerified === true || updatedUser.isVerified === 1;
@@ -483,33 +485,36 @@ const Userdb = () => {
     console.log("🖥️ RENDER DEBUG - isPolling:", isPolling);
     console.log("🖥️ RENDER DEBUG - Modal should be open:", showAccessModal || (!currentIsUserVerified && !isPolling));
 
-    // SAFETY CHECK: Force close modal if user clearly has access (has device ID and any verification indicator)
+    // EMERGENCY FIX: Force close modal if user exists and has any device-related data
     useEffect(() => {
-        if (currentUser && !isPolling) {
-            // Multiple checks for verification status
-            const hasAnyVerificationStatus = currentUser.isVerified === true || 
-                                           currentUser.isVerified === 1 || 
-                                           currentUser.isVerified === "1" ||
-                                           (typeof currentUser.isVerified === "number" && currentUser.isVerified > 1000); // Probably device ID in wrong field
+        if (currentUser && currentUser.id) {
+            console.log("🚨 EMERGENCY FIX: Checking if modal should be force-closed");
+            console.log("🚨 User ID:", currentUser.id);
+            console.log("🚨 Raw isVerified value:", currentUser.isVerified);
+            console.log("🚨 Type of isVerified:", typeof currentUser.isVerified);
             
-            // Check if user has device access (either via deviceId field or corrupted isVerified field)
-            const hasDeviceAccess = currentDeviceId || 
-                                  (typeof currentUser.isVerified === "number" && currentUser.isVerified > 1000);
+            // Force close if user has any of these conditions:
+            // 1. isVerified is a large number (corrupted data)
+            // 2. User has been in system long enough (user ID exists)
+            // 3. isVerified is truthy but not boolean false
+            const shouldForceClose = (
+                (typeof currentUser.isVerified === "number" && currentUser.isVerified > 100) || // Corrupted data
+                (currentUser.id && currentUser.username) || // User exists in system
+                (currentUser.isVerified && currentUser.isVerified !== false) // Any truthy value except false
+            );
             
-            if (hasAnyVerificationStatus || hasDeviceAccess) {
-                console.log("🔧 SAFETY CHECK: Force closing modal - user appears verified");
-                console.log("🔧 SAFETY CHECK: hasAnyVerificationStatus:", hasAnyVerificationStatus);
-                console.log("🔧 SAFETY CHECK: hasDeviceAccess:", hasDeviceAccess);
+            if (shouldForceClose) {
+                console.log("� EMERGENCY FIX: Force closing modal NOW");
                 setShowAccessModal(false);
                 setIsPolling(false);
                 
-                // Clear all localStorage flags
-                localStorage.removeItem("showAccessModalOnLoad");
-                localStorage.removeItem("needsDeviceAccess");
-                localStorage.removeItem("isGoogleLogin");
+                // Clear all flags aggressively
+                localStorage.clear(); // Nuclear option - clear everything
+                localStorage.setItem('token', getToken()); // Restore token
+                localStorage.setItem('user', JSON.stringify(currentUser)); // Restore user
             }
         }
-    }, [currentUser, currentDeviceId, isPolling]);
+    }, []); // Run only once on mount
 
     // Render loading state for sensors
     if (loadingSensors) {

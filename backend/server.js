@@ -1787,6 +1787,14 @@ app.put("/api/admin/access-requests/:notificationId/approve", verifyToken, autho
         const [updateUserResult] = await connection.execute(updateUserSql, [userId]);
 
         console.log("🔵 User update result:", updateUserResult);
+        
+        // DEBUG: Verify the update worked correctly
+        const [verifyResult] = await connection.execute(
+            "SELECT id, username, email, is_verified, device_id FROM users WHERE id = ?",
+            [userId]
+        );
+        console.log("🔍 DEBUG - User data after approval update:", verifyResult[0]);
+        
         if (updateUserResult.affectedRows === 0) {
             console.log("🟠 User not found or already verified. Affected rows: 0.");
             await connection.rollback();
