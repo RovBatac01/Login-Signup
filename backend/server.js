@@ -1872,6 +1872,7 @@ app.post('/save-user', async (req, res) => {
             username: user.username, 
             email: user.email,
             role: user.role,
+            isVerified: user.is_verified,
             deviceId: user.device_id
           },
           jwtSecret,
@@ -1914,7 +1915,9 @@ app.post('/save-user', async (req, res) => {
             id: newUserId, 
             username: username, 
             email: email,
-            role: 'User'
+            role: 'User',
+            isVerified: 0,  // New users are not verified
+            deviceId: null  // New users don't have device ID yet
           },
           jwtSecret,
           { expiresIn: '24h' }

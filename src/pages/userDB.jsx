@@ -79,12 +79,26 @@ const Userdb = () => {
         console.log("Current User Object on load (from AuthContext):", currentUser);
 
         const showModalFlag = localStorage.getItem("showAccessModalOnLoad");
+        const needsDeviceAccess = localStorage.getItem("needsDeviceAccess");
+        const isGoogleLogin = localStorage.getItem("isGoogleLogin");
+
+        console.log("🔍 Debug - showModalFlag:", showModalFlag);
+        console.log("🔍 Debug - needsDeviceAccess:", needsDeviceAccess);
+        console.log("🔍 Debug - isGoogleLogin:", isGoogleLogin);
 
         // Prioritize showing the modal if no device ID is associated, as the user needs to input it.
         if (!currentDeviceIdFromContext) {
             setShowAccessModal(true);
             setIsPolling(false); // No need to poll for verification if deviceId input is the current step
             console.log("User needs to input Device ID. Modal forced open.");
+        }
+        // Check for Google login flag - new users from Google login need device access
+        else if (needsDeviceAccess === "true" && !isVerified) {
+            setShowAccessModal(true);
+            localStorage.removeItem("needsDeviceAccess"); // Clear the flag after acting on it
+            localStorage.removeItem("isGoogleLogin"); // Clear the Google login flag
+            setIsPolling(true); // Start polling for verification
+            console.log("🔄 Google login user needs device access. Modal opened for verification polling.");
         }
         // If deviceId is present, but user is not verified, and modal flag is set from previous navigation/registration
         else if (showModalFlag === "true" && !isVerified) {
@@ -96,6 +110,8 @@ const Userdb = () => {
         // If the user is verified, hide the modal and stop polling
         else if (isVerified) {
             localStorage.removeItem("showAccessModalOnLoad"); // Clear the flag if user is now verified
+            localStorage.removeItem("needsDeviceAccess"); // Clear Google login flags too
+            localStorage.removeItem("isGoogleLogin");
             console.log("User is already verified, skipping access request modal.");
             setShowAccessModal(false);
             setIsPolling(false);

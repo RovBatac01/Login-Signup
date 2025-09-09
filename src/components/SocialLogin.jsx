@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BsFacebook, BsGithub } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 
 const SocialLogin = () => {
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleGoogleLogin = async () => {
     try {
@@ -34,42 +36,52 @@ const SocialLogin = () => {
 
       if (isNewUser || !hasAccess) {
         // New user or user without access - store data and redirect to userDB
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('userEmail', email);
-        localStorage.setItem('username', username);
-        localStorage.setItem('userRole', 'User');
         localStorage.setItem('needsDeviceAccess', 'true'); // Flag to show modal in userDB
         localStorage.setItem('isGoogleLogin', 'true'); // Flag to identify Google login
+        
+        // Create user object with all necessary fields
+        const userObject = {
+          id: userId,
+          username: username,
+          email: email,
+          role: 'User',
+          isVerified: false, // New users are not verified
+          deviceId: null,    // New users don't have device ID yet
+          establishmentId: null
+        };
+
+        // Use AuthContext login function to properly set user state
+        login(userObject, token);
         
         // DEBUG: Confirm flags are set
         console.log("🔍 Debug - needsDeviceAccess flag set:", localStorage.getItem('needsDeviceAccess'));
         console.log("🔍 Debug - isGoogleLogin flag set:", localStorage.getItem('isGoogleLogin'));
+        console.log("🔍 Debug - User object created:", userObject);
         
         console.log("🔄 New Google user - redirecting to userDB for device access request");
         navigate("/userDB");
         
       } else {
         // Existing user with access - proceed directly
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('userEmail', email);
-        localStorage.setItem('username', username);
-        localStorage.setItem('userRole', role || "User");
         localStorage.removeItem('needsDeviceAccess'); // Clear flag if exists
         localStorage.removeItem('isGoogleLogin'); // Clear flag if exists
         
-        // Store complete user object
+        // Create complete user object with all fields from API response
         const userObject = {
           id: userId,
           username: username,
           email: email,
-          device_id: response.data.device_id,
-          role: role || "User"
+          role: role || "User",
+          isVerified: response.data.hasAccess, // Use hasAccess from API
+          deviceId: response.data.deviceId || null, // Use deviceId from API response
+          establishmentId: response.data.establishmentId || null
         };
-        localStorage.setItem('user', JSON.stringify(userObject));
+
+        // Use AuthContext login function to properly set user state
+        login(userObject, token);
 
         console.log("🔄 Existing user with access - navigating based on role");
+        console.log("🔍 Debug - Existing user object:", userObject);
         
         // Navigate based on role
         if (role === "Admin") {
