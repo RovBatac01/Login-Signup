@@ -18,10 +18,12 @@ import PageTitle from "../components/PageTitle";
 import InfoButton from "../components/InfoButton";
 import WaterQualityInfoModal from "../components/WaterQualityInfoModal";
 import axios from 'axios'; // Import axios for API calls
-import API_BASE_URL from '../config/api'; // Import centralized API config
 // Import socket.io-client and your socket instance
 import io from 'socket.io-client';
 import socket from '../DashboardMeters/socket'; // Make sure this path is correct
+
+// API base URL - make sure this matches your backend
+const API_BASE_URL = "https://login-signup-3470.onrender.com";
 
 // Simple AlertDialog component to replace browser alerts
 const AlertDialog = ({ isOpen, message, onClose }) => {
@@ -400,28 +402,14 @@ const Userdb = () => {
     // Manual refresh function to check verification status
     const handleManualRefresh = async () => {
         console.log("🔄 Manual refresh triggered");
-        
-        // DEBUG: Check all localStorage data
-        console.log("🔍 DEBUG - All localStorage data:");
-        console.log("🔍 DEBUG - token:", localStorage.getItem('token') ? "EXISTS" : "MISSING");
-        console.log("🔍 DEBUG - user:", localStorage.getItem('user'));
-        console.log("🔍 DEBUG - userRole:", localStorage.getItem('userRole'));
-        
         try {
             const token = getToken();
-            console.log("🔍 DEBUG - Token from getToken():", token ? token.substring(0, 50) + "..." : "NO TOKEN");
+            console.log("🔍 DEBUG - Token from localStorage:", token ? token.substring(0, 50) + "..." : "NO TOKEN");
             console.log("🔍 DEBUG - Token length:", token ? token.length : 0);
             
             if (!token) {
-                console.log("🔴 DEBUG - No token found, user needs to re-login");
-                setAlertMessage("Session expired. Please logout and login again to refresh your access.");
+                setAlertMessage("No authentication token found. Please login again.");
                 setShowAlert(true);
-                
-                // Force logout to clear corrupted data
-                setTimeout(() => {
-                    logout();
-                    navigate("/login");
-                }, 3000);
                 return;
             }
 

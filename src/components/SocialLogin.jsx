@@ -6,7 +6,6 @@ import { auth } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
-import API_BASE_URL from "../config/api"; // Import centralized API config
 
 const SocialLogin = () => {
   const navigate = useNavigate();
@@ -25,7 +24,7 @@ const SocialLogin = () => {
       };
 
       // Send the user data to your backend and expect a token back
-      const response = await axios.post(`${API_BASE_URL}/save-user`, userData);
+      const response = await axios.post("https://login-signup-3470.onrender.com/save-user", userData);
       console.log("Response data from backend:", response.data);
       console.log("🔍 DETAILED DEBUG - Full response.data:", JSON.stringify(response.data, null, 2));
 
