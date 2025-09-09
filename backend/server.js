@@ -1836,17 +1836,21 @@ app.put("/api/admin/access-requests/:notificationId/decline", verifyToken, autho
 // Modified save-user route to handle access status
 app.post('/save-user', async (req, res) => {
   try {
+    console.log('🔵 /save-user: Request received with body:', req.body);
     const { email, name } = req.body;
     
     if (!email || !name) {
+      console.log('🔴 /save-user: Missing email or name');
       return res.status(400).json({ error: 'Email and name are required' });
     }
 
     let connection;
     try {
+      console.log('🔵 /save-user: Getting database connection');
       connection = await db.getConnection();
       
       // Check if user already exists
+      console.log('🔵 /save-user: Checking for existing user with email:', email);
       const [existingUser] = await connection.execute(
         'SELECT id, username, email, role, device_id, is_verified FROM users WHERE email = ?',
         [email]
@@ -1855,6 +1859,7 @@ app.post('/save-user', async (req, res) => {
       if (existingUser.length > 0) {
         // Existing user
         const user = existingUser[0];
+        console.log('🔵 /save-user: Found existing user:', user);
         
         // Generate token
         const token = jwt.sign(
@@ -1865,10 +1870,11 @@ app.post('/save-user', async (req, res) => {
             role: user.role,
             deviceId: user.device_id
           },
-          process.env.JWT_SECRET,
+          process.env.JWT_SECRET || 'fallback_secret_key',
           { expiresIn: '24h' }
         );
 
+        console.log('✅ /save-user: Returning existing user data');
         return res.json({
           success: true,
           isNewUser: false,
@@ -1883,14 +1889,16 @@ app.post('/save-user', async (req, res) => {
       } else {
         // New user - create account
         const username = name.replace(/\s+/g, '').toLowerCase() + Math.floor(Math.random() * 1000);
+        console.log('🔵 /save-user: Creating new user with username:', username);
         
         const [insertResult] = await connection.execute(
-          `INSERT INTO users (username, email, password_hash, role, is_verified, email_verified, access_approved) 
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [username, email, 'google_auth', 'User', 1, 1, 0] // access_approved = 0 for new users
+          `INSERT INTO users (username, email, password_hash, role, is_verified, email_verified) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [username, email, 'google_auth', 'User', 0, 1] // is_verified = 0 for new users (need device access approval)
         );
 
         const newUserId = insertResult.insertId;
+        console.log('✅ /save-user: Created new user with ID:', newUserId);
 
         // Generate token
         const token = jwt.sign(
@@ -1900,10 +1908,11 @@ app.post('/save-user', async (req, res) => {
             email: email,
             role: 'User'
           },
-          process.env.JWT_SECRET,
+          process.env.JWT_SECRET || 'fallback_secret_key',
           { expiresIn: '24h' }
         );
 
+        console.log('✅ /save-user: Returning new user data');
         return res.json({
           success: true,
           isNewUser: true,
@@ -1917,12 +1926,16 @@ app.post('/save-user', async (req, res) => {
       }
 
     } finally {
-      if (connection) connection.release();
+      if (connection) {
+        connection.release();
+        console.log('🔵 /save-user: Database connection released');
+      }
     }
 
   } catch (error) {
-    console.error('Error in save-user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('🔴 Error in save-user:', error);
+    console.error('🔴 Error stack:', error.stack);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 
