@@ -404,12 +404,16 @@ const Userdb = () => {
         console.log("🔄 Manual refresh triggered");
         try {
             const token = getToken();
+            console.log("🔍 DEBUG - Token from localStorage:", token ? token.substring(0, 50) + "..." : "NO TOKEN");
+            console.log("🔍 DEBUG - Token length:", token ? token.length : 0);
+            
             if (!token) {
                 setAlertMessage("No authentication token found. Please login again.");
                 setShowAlert(true);
                 return;
             }
 
+            console.log("🔄 Making API call to /api/user/me");
             const response = await axios.get(`${API_BASE_URL}/api/user/me`, {
                 headers: {
                     'Authorization': `Bearer ${token}`

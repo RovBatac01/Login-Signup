@@ -66,6 +66,9 @@ const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
+    console.log('🔍 authenticateToken: Auth header:', authHeader ? authHeader.substring(0, 30) + "..." : "NO HEADER");
+    console.log('🔍 authenticateToken: Extracted token:', token ? token.substring(0, 30) + "..." : "NO TOKEN");
+
     if (token == null) {
         console.log('🔴 authenticateToken: No token provided.');
         return res.sendStatus(401); // No token
@@ -74,6 +77,8 @@ const authenticateToken = (req, res, next) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
             console.log('🔴 authenticateToken: Invalid token:', err.message);
+            console.log('🔴 authenticateToken: JWT_SECRET available:', !!process.env.JWT_SECRET);
+            console.log('🔴 authenticateToken: Token sample:', token.substring(0, 50));
             return res.sendStatus(403); // Token is no longer valid or tampered
         }
         // Attach the decoded user payload to the request
