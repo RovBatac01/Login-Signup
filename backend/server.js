@@ -676,6 +676,52 @@ app.get('/api/user/me', authenticateToken, async (req, res) => {
   }
 });
 
+// DEBUG ENDPOINT: Check user data directly from database
+app.get('/api/debug/user/:userId', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log(`🔍 DEBUG: Fetching raw data for user ${userId}`);
+
+    const connection = await pool.getConnection();
+    try {
+      // Fetch raw user data from database
+      const [results] = await connection.execute(
+        "SELECT * FROM users WHERE id = ?",
+        [userId]
+      );
+
+      if (results.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const user = results[0];
+      console.log(`🔍 DEBUG: Raw database user data:`, user);
+
+      res.status(200).json({
+        success: true,
+        rawUser: user,
+        processedUser: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          isVerified: user.is_verified === 1,
+          deviceId: user.device_id,
+          establishmentId: user.establishment_id,
+          rawIsVerified: user.is_verified,
+          rawDeviceId: user.device_id
+        }
+      });
+
+    } finally {
+      connection.release();
+    }
+  } catch (error) {
+    console.error(`🔴 Error in debug endpoint:`, error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 
 // Create admin

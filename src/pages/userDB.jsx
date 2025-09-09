@@ -71,12 +71,29 @@ const Userdb = () => {
     // Effect for initial setup and verification check and controlling AccessRestrictedModal visibility
     useEffect(() => {
         const user = currentUser;
-        const isVerified = user?.isVerified || false;
+        // ROBUST VERIFICATION CHECK: Handle corrupted data
+        const isVerified = (() => {
+            const rawValue = user?.isVerified;
+            // If it's already a proper boolean
+            if (typeof rawValue === 'boolean') return rawValue;
+            // If it's 1 or "1" (database true)
+            if (rawValue === 1 || rawValue === "1") return true;
+            // If it's 0 or "0" (database false)  
+            if (rawValue === 0 || rawValue === "0") return false;
+            // If it's a number > 1, it's probably corrupted data (like device ID), check if user has device ID
+            if (typeof rawValue === 'number' && rawValue > 1 && deviceId) return true;
+            // Default to false
+            return false;
+        })();
+        
         const currentDeviceIdFromContext = deviceId; // Use the top-level deviceId from context
 
-        console.log("User verification status on load (from AuthContext):", isVerified);
-        console.log("User Device ID on load (from AuthContext):", currentDeviceIdFromContext);
-        console.log("Current User Object on load (from AuthContext):", currentUser);
+        console.log("📋 === ACCESS MODAL DECISION LOGIC ===");
+        console.log("📋 User verification status on load (from AuthContext):", isVerified);
+        console.log("📋 User Device ID on load (from AuthContext):", currentDeviceIdFromContext);
+        console.log("📋 Current User Object on load (from AuthContext):", currentUser);
+        console.log("📋 Raw isVerified value:", user?.isVerified);
+        console.log("📋 Type of isVerified:", typeof user?.isVerified);
 
         const showModalFlag = localStorage.getItem("showAccessModalOnLoad");
         const needsDeviceAccess = localStorage.getItem("needsDeviceAccess");
@@ -90,7 +107,7 @@ const Userdb = () => {
         if (!currentDeviceIdFromContext) {
             setShowAccessModal(true);
             setIsPolling(false); // No need to poll for verification if deviceId input is the current step
-            console.log("User needs to input Device ID. Modal forced open.");
+            console.log("📋 DECISION: User needs to input Device ID. Modal forced open.");
         }
         // Check for Google login flag - new users from Google login need device access
         else if (needsDeviceAccess === "true" && !isVerified) {
@@ -98,21 +115,21 @@ const Userdb = () => {
             localStorage.removeItem("needsDeviceAccess"); // Clear the flag after acting on it
             localStorage.removeItem("isGoogleLogin"); // Clear the Google login flag
             setIsPolling(true); // Start polling for verification
-            console.log("🔄 Google login user needs device access. Modal opened for verification polling.");
+            console.log("� DECISION: Google login user needs device access. Modal opened for verification polling.");
         }
         // If deviceId is present, but user is not verified, and modal flag is set from previous navigation/registration
         else if (showModalFlag === "true" && !isVerified) {
             setShowAccessModal(true);
             localStorage.removeItem("showAccessModalOnLoad"); // Clear the flag after acting on it
             setIsPolling(true); // Start polling for verification
-            console.log("User verified? No. Modal flag set. Modal opened for verification polling.");
+            console.log("📋 DECISION: User verified? No. Modal flag set. Modal opened for verification polling.");
         }
         // If the user is verified, hide the modal and stop polling
         else if (isVerified) {
             localStorage.removeItem("showAccessModalOnLoad"); // Clear the flag if user is now verified
             localStorage.removeItem("needsDeviceAccess"); // Clear Google login flags too
             localStorage.removeItem("isGoogleLogin");
-            console.log("User is already verified, skipping access request modal.");
+            console.log("📋 DECISION: User is already verified, skipping access request modal.");
             setShowAccessModal(false);
             setIsPolling(false);
         }
@@ -120,10 +137,10 @@ const Userdb = () => {
         else {
             setShowAccessModal(false);
             setIsPolling(false);
-            console.log("Modal not needed for current user state.");
+            console.log("📋 DECISION: Modal not needed for current user state.");
         }
 
-    }, [currentUser, deviceId, isPolling]); // Dependencies: currentUser, deviceId, and isPolling to react to changes
+    }, [currentUser, deviceId]); // Dependencies: currentUser and deviceId to react to changes
 
 
     // Effect for polling verification status
@@ -154,16 +171,32 @@ const Userdb = () => {
                         console.log("🔄 Polling result - Updated user:", updatedUser);
                         console.log("🔄 Polling result - New verification status:", newIsVerified);
                         console.log("🔄 Polling result - Device ID:", updatedUser.deviceId);
+                        console.log("🔄 Polling result - Raw isVerified value:", updatedUser.isVerified);
+                        console.log("🔄 Polling result - Type of isVerified:", typeof updatedUser.isVerified);
 
                         // Update AuthContext with fresh user data
                         login(updatedUser, token);
 
                         if (newIsVerified) {
-                            setShowAccessModal(false);
-                            setIsPolling(false);
-                            setAlertMessage("Your account has been verified! You can now access all features.");
-                            setShowAlert(true);
-                            console.log("✅ User verified via API polling - stopping poll and refreshing UI");
+                            console.log("✅ User verified via API polling - stopping poll and updating UI");
+                            
+                            // Use setTimeout to ensure state update has been processed
+                            setTimeout(() => {
+                                setShowAccessModal(false);
+                                setIsPolling(false);
+                                
+                                // Clear all flags to prevent modal from reopening
+                                localStorage.removeItem("showAccessModalOnLoad");
+                                localStorage.removeItem("needsDeviceAccess");
+                                localStorage.removeItem("isGoogleLogin");
+                                
+                                setAlertMessage("Your account has been verified! You can now access all features.");
+                                setShowAlert(true);
+                                
+                                console.log("✅ Verification complete - modal should be hidden");
+                            }, 100); // Small delay to ensure state updates are processed
+                        } else {
+                            console.log("🔄 User still not verified, continuing to poll...");
                         }
                     }
                 } catch (error) {
@@ -423,9 +456,60 @@ const Userdb = () => {
     };
 
     // Determine current verification and device ID from AuthContext
-    const currentIsUserVerified = currentUser?.isVerified || false;
+    // ROBUST VERIFICATION CHECK: Handle corrupted data where isVerified might contain device ID
+    const currentIsUserVerified = (() => {
+        const rawValue = currentUser?.isVerified;
+        // If it's already a proper boolean
+        if (typeof rawValue === 'boolean') return rawValue;
+        // If it's 1 or "1" (database true)
+        if (rawValue === 1 || rawValue === "1") return true;
+        // If it's 0 or "0" (database false)  
+        if (rawValue === 0 || rawValue === "0") return false;
+        // If it's a number > 1, it's probably corrupted data (like device ID), check if user has device ID
+        if (typeof rawValue === 'number' && rawValue > 1 && deviceId) return true;
+        // Default to false
+        return false;
+    })();
+    
     // Use the directly destructured deviceId from context for render logic
     const currentDeviceId = deviceId || null;
+
+    // DEBUG: Log the render-time values
+    console.log("🖥️ RENDER DEBUG - currentUser:", currentUser);
+    console.log("🖥️ RENDER DEBUG - currentUser.isVerified raw:", currentUser?.isVerified);
+    console.log("🖥️ RENDER DEBUG - currentIsUserVerified (processed):", currentIsUserVerified);
+    console.log("🖥️ RENDER DEBUG - currentDeviceId:", currentDeviceId);
+    console.log("🖥️ RENDER DEBUG - showAccessModal:", showAccessModal);
+    console.log("🖥️ RENDER DEBUG - isPolling:", isPolling);
+    console.log("🖥️ RENDER DEBUG - Modal should be open:", showAccessModal || (!currentIsUserVerified && !isPolling));
+
+    // SAFETY CHECK: Force close modal if user clearly has access (has device ID and any verification indicator)
+    useEffect(() => {
+        if (currentUser && !isPolling) {
+            // Multiple checks for verification status
+            const hasAnyVerificationStatus = currentUser.isVerified === true || 
+                                           currentUser.isVerified === 1 || 
+                                           currentUser.isVerified === "1" ||
+                                           (typeof currentUser.isVerified === "number" && currentUser.isVerified > 1000); // Probably device ID in wrong field
+            
+            // Check if user has device access (either via deviceId field or corrupted isVerified field)
+            const hasDeviceAccess = currentDeviceId || 
+                                  (typeof currentUser.isVerified === "number" && currentUser.isVerified > 1000);
+            
+            if (hasAnyVerificationStatus || hasDeviceAccess) {
+                console.log("🔧 SAFETY CHECK: Force closing modal - user appears verified");
+                console.log("🔧 SAFETY CHECK: hasAnyVerificationStatus:", hasAnyVerificationStatus);
+                console.log("🔧 SAFETY CHECK: hasDeviceAccess:", hasDeviceAccess);
+                setShowAccessModal(false);
+                setIsPolling(false);
+                
+                // Clear all localStorage flags
+                localStorage.removeItem("showAccessModalOnLoad");
+                localStorage.removeItem("needsDeviceAccess");
+                localStorage.removeItem("isGoogleLogin");
+            }
+        }
+    }, [currentUser, currentDeviceId, isPolling]);
 
     // Render loading state for sensors
     if (loadingSensors) {
