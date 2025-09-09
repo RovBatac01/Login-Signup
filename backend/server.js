@@ -1847,7 +1847,7 @@ app.post('/save-user', async (req, res) => {
     let connection;
     try {
       console.log('🔵 /save-user: Getting database connection');
-      connection = await db.getConnection();
+      connection = await pool.getConnection();  // Use pool instead of db
       
       // Check if user already exists
       console.log('🔵 /save-user: Checking for existing user with email:', email);
@@ -1862,6 +1862,10 @@ app.post('/save-user', async (req, res) => {
         console.log('🔵 /save-user: Found existing user:', user);
         
         // Generate token
+        console.log('🔵 /save-user: Generating JWT token');
+        const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
+        console.log('🔵 /save-user: JWT Secret available:', !!jwtSecret);
+        
         const token = jwt.sign(
           { 
             id: user.id, 
@@ -1870,7 +1874,7 @@ app.post('/save-user', async (req, res) => {
             role: user.role,
             deviceId: user.device_id
           },
-          process.env.JWT_SECRET || 'fallback_secret_key',
+          jwtSecret,
           { expiresIn: '24h' }
         );
 
@@ -1901,6 +1905,10 @@ app.post('/save-user', async (req, res) => {
         console.log('✅ /save-user: Created new user with ID:', newUserId);
 
         // Generate token
+        console.log('🔵 /save-user: Generating JWT token for new user');
+        const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_key';
+        console.log('🔵 /save-user: JWT Secret available:', !!jwtSecret);
+        
         const token = jwt.sign(
           { 
             id: newUserId, 
@@ -1908,7 +1916,7 @@ app.post('/save-user', async (req, res) => {
             email: email,
             role: 'User'
           },
-          process.env.JWT_SECRET || 'fallback_secret_key',
+          jwtSecret,
           { expiresIn: '24h' }
         );
 
@@ -1936,6 +1944,23 @@ app.post('/save-user', async (req, res) => {
     console.error('🔴 Error in save-user:', error);
     console.error('🔴 Error stack:', error.stack);
     res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// Test endpoint for debugging database connection
+app.get('/test-db', async (req, res) => {
+  try {
+    console.log('🔵 /test-db: Testing database connection');
+    const connection = await pool.getConnection();
+    
+    const [result] = await connection.execute('SELECT 1 as test');
+    connection.release();
+    
+    console.log('✅ /test-db: Database connection successful');
+    res.json({ success: true, message: 'Database connection working', result });
+  } catch (error) {
+    console.error('🔴 /test-db: Database connection failed:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
