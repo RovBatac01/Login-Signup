@@ -169,6 +169,11 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
+const allowedOrigins = [
+  "http://localhost:5173",              // dev
+  "https://aquasensesolutions.onrender.com", // frontend hosted on Render
+];
+
 // Create the single HTTP server that will handle both Express and Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -180,7 +185,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-  origin: "*",
+  origin: "allowedOrigins",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
@@ -1005,12 +1010,6 @@ app.put("/api/users/:id", async (req, res) => {
       .json({ error: "Failed to update user. Please try again later." });
   }
 });
-
-// Function to send OTP email (placeholder)
-const sendOtpEmail = async (email, otp, type) => {
-  console.log(`Sending a ${type} OTP: ${otp} to ${email}`);
-  // In a real app, this would use a service like Nodemailer
-};
 
 // Route to handle forgot password request
 app.post('/api/forgot-password', async (req, res) => {
