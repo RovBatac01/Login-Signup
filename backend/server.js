@@ -2145,19 +2145,33 @@ app.post('/api/request-device-access', authMiddleware, async (req, res) => {
 // Endpoint to fetch events for a specific date (if needed for specific date view)
 
 // Example: GET /api/events?date=2024-03-15
+// Replace your existing GET /api/events endpoint with this:
 app.get('/api/events', async (req, res) => {
-  const { date } = req.query; // date should be in 'YYYY-MM-DD' format
-
-  if (!date) {
-    return res.status(400).json({ error: 'Date parameter is required.' });
-  }
-
   try {
-    const [rows] = await pool.execute('SELECT * FROM events WHERE event_date = ? ORDER BY time, id', [date]);
+    const { date } = req.query;
+    
+    let query;
+    let params = [];
+    
+    if (date) {
+      // If date is provided, filter by that specific date
+      query = 'SELECT * FROM events WHERE event_date = ? ORDER BY time, id';
+      params = [date];
+    } else {
+      // If no date provided, return all events
+      query = 'SELECT * FROM events ORDER BY event_date DESC, time, id';
+    }
+    
+    console.log('📅 Fetching events with query:', query, 'params:', params);
+    
+    const [rows] = await pool.execute(query, params);
+    
+    console.log(`📅 Found ${rows.length} events`);
     res.json(rows);
+    
   } catch (err) {
-    console.error('Error fetching events for date:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error fetching events:', err);
+    res.status(500).json({ error: 'Internal server error fetching events' });
   }
 });
 
