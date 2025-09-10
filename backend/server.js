@@ -185,7 +185,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-  origin: "*",
+  origin: "allowedOrigins",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
