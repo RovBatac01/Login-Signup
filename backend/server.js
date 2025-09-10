@@ -169,6 +169,11 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
+const allowedOrigins = [
+  "http://localhost:5173",              // dev
+  "https://aquasensesolutions.onrender.com", // frontend hosted on Render
+];
+
 // Create the single HTTP server that will handle both Express and Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
