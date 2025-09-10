@@ -180,10 +180,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-  origin: [
-    "*",
-    'https://login-signup-3470.onrender.com/api/forgot-password',
-  ],
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
