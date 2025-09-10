@@ -5,7 +5,9 @@ import axios from 'axios';
 import '../styles/Pages Css/Notifications.css';
 import Sidebar from '../components/Sidebar';
 import { ThemeContext } from '../context/ThemeContext';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext for deviceId
 import PageTitle from "../components/PageTitle";
+import API_BASE_URL from "../config/api"; // Import centralized API config
 
 // --- NotificationIcon component (updated for 'schedule' and 'request' type) ---
 const NotificationIcon = ({ type }) => {
@@ -67,6 +69,24 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete, onApprove, onD
                             </h4>
                             <p className={`notification-message ${notification.read ? 'read' : 'unread'}`}>
                                 {notification.message}
+                                {/* Show device ID for request notifications */}
+                                {notification.type === 'request' && notification.request_device_id && (
+                                    <span 
+                                        className="device-id-badge"
+                                        style={{
+                                            display: 'inline-block',
+                                            backgroundColor: '#e3f2fd',
+                                            color: '#1976d2',
+                                            padding: '2px 8px',
+                                            borderRadius: '12px',
+                                            fontSize: '0.8em',
+                                            marginLeft: '8px',
+                                            fontWeight: 'bold'
+                                        }}
+                                    >
+                                        Device ID: {notification.request_device_id}
+                                    </span>
+                                )}
                             </p>
                             {/* Display status for requests if not pending */}
                             {notification.type === 'request' && notification.status !== 'pending' && (
@@ -128,8 +148,9 @@ const AdminNotificationsPage = () => {
     const [loading, setLoading] = useState(true);
     const [selectedFilter, setSelectedFilter] = useState('all');
     const { theme } = useContext(ThemeContext);
+    const { currentUser, deviceId } = useContext(AuthContext); // Get deviceId from auth context
 
-    const API_BASE_URL = "https://login-signup-3470.onrender.com";
+    // Remove hardcoded API_BASE_URL since we're importing it now
 
     // --- Filter Options ---
     const filterOptions = [
@@ -228,7 +249,20 @@ const AdminNotificationsPage = () => {
                 return;
             }
 
-            const response = await axios.get(`${API_BASE_URL}/api/admin/notifications`, {
+            // Check if admin has deviceId for filtering device-specific requests
+            const adminDeviceId = deviceId || currentUser?.deviceId;
+            console.log("🔍 Admin Device ID for filtering:", adminDeviceId);
+
+            // Construct API URL with device ID filter if available
+            let apiUrl = `${API_BASE_URL}/api/admin/notifications`;
+            if (adminDeviceId) {
+                apiUrl += `?deviceId=${adminDeviceId}`;
+                console.log("🔍 Fetching notifications filtered by device ID:", adminDeviceId);
+            } else {
+                console.log("🔍 Fetching all notifications (no device ID filter)");
+            }
+
+            const response = await axios.get(apiUrl, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -242,7 +276,7 @@ const AdminNotificationsPage = () => {
                 setNotifications(fetchedNotifications);
                 setFilteredNotifications(filterNotifications(fetchedNotifications, selectedFilter));
                 saveAdminNotifications(fetchedNotifications);
-                console.log("Frontend (Admin): All notifications fetched from database.");
+                console.log(`Frontend (Admin): ${fetchedNotifications.length} notifications fetched from database (filtered by device ${adminDeviceId || 'all'}).`);
             } else {
                 console.error("Failed to fetch all notifications:", response.data.message);
                 const localNotifications = loadAdminNotifications();
@@ -257,7 +291,7 @@ const AdminNotificationsPage = () => {
         } finally {
             setLoading(false);
         }
-    }, [API_BASE_URL, loadAdminNotifications, saveAdminNotifications, filterNotifications, selectedFilter]);
+    }, [API_BASE_URL, loadAdminNotifications, saveAdminNotifications, filterNotifications, selectedFilter, deviceId, currentUser]);
 
     // Effect hook to fetch data on component mount and set up polling
     useEffect(() => {
@@ -435,6 +469,8 @@ const AdminNotificationsPage = () => {
                 <div className="notifications-header">
                     <PageTitle title="NOTIFICATIONS" />
                     
+
+                    
                     <div className="notifications-actions">
                         {/* Filter Dropdown */}
                         <div className="notifications-filter">
@@ -481,6 +517,23 @@ const AdminNotificationsPage = () => {
                             : `Showing ${filteredNotifications.length} ${updatedFilterOptions.find(opt => opt.value === selectedFilter)?.label.toLowerCase() || 'notifications'}`
                         }
                     </span>
+
+                                        {/* Show current device filter status */}
+                    {deviceId && (
+                        <div 
+                            className={`device-filter-status text-${theme}-secondary-text`}
+                            style={{
+                                backgroundColor: theme === 'dark' ? '#2d3748' : '#f7fafc',
+                                padding: '8px 16px',
+                                borderRadius: '8px',
+                                margin: '10px 0',
+                                border: `1px solid ${theme === 'dark' ? '#4a5568' : '#e2e8f0'}`,
+                                fontSize: '14px'
+                            }}
+                        >
+                            <span>📍 Showing notifications for Device ID: <strong>{deviceId}</strong></span>
+                        </div>
+                    )}
                 </div>
 
                 {loading ? (

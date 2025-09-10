@@ -777,50 +777,6 @@ app.post('/api/debug/fix-user-data/:userId', authenticateToken, async (req, res)
   }
 });
 
-// Continue with existing debug endpoint...
-
-    const connection = await pool.getConnection();
-    try {
-      // Fetch raw user data from database
-      const [results] = await connection.execute(
-        "SELECT * FROM users WHERE id = ?",
-        [userId]
-      );
-
-      if (results.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      const user = results[0];
-      console.log(`🔍 DEBUG: Raw database user data:`, user);
-
-      res.status(200).json({
-        success: true,
-        rawUser: user,
-        processedUser: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          isVerified: user.is_verified === 1,
-          deviceId: user.device_id,
-          establishmentId: user.establishment_id,
-          rawIsVerified: user.is_verified,
-          rawDeviceId: user.device_id
-        }
-      });
-
-    } finally {
-      connection.release();
-    }
-  } catch (error) {
-    console.error(`🔴 Error in debug endpoint:`, error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-
-
 // Create admin
 // --- Route: Create Admin Account (and assign to multiple establishments) ---
 app.post('/admin', async (req, res) => {
@@ -2379,7 +2335,9 @@ app.post('/api/access-requests', async (req, res) => {
 });
 
 app.get('/api/admin/notifications', authenticateAdminRoute, async (req, res) => {
-    const { type: filterType } = req.query; // Get the optional 'type' query parameter
+    const { type: filterType, deviceId } = req.query; // Get optional 'type' and 'deviceId' query parameters
+    
+    console.log(`🔍 Admin notifications request - filterType: ${filterType}, deviceId: ${deviceId}`);
 
     try {
         const connection = await pool.getConnection();
@@ -2416,24 +2374,37 @@ app.get('/api/admin/notifications', authenticateAdminRoute, async (req, res) => 
                 combinedNotifications = mappedEventsAsNotifications;
 
             } else {
-                // Fetch actual notifications (all types)
-                const [notificationsRows] = await connection.execute(
-                    `SELECT
+                // Fetch actual notifications with optional device ID filtering
+                let notificationQuery = `SELECT
                         id,
                         type,
                         title,
                         message,
                         timestamp AS createdAt,
                         is_read AS \`read\`,
-                        user_id ,
+                        user_id,
                         related_id,
                         priority,
-                        status
-                    FROM notif
-                    ORDER BY timestamp DESC`
-                );
+                        status,
+                        device_id as request_device_id
+                    FROM notif`;
+                
+                let queryParams = [];
+                
+                // Add device ID filtering for request-type notifications
+                if (deviceId) {
+                    notificationQuery += ` WHERE (type != 'request' OR device_id = ?)`;
+                    queryParams.push(deviceId);
+                    console.log(`🔍 Filtering notifications by device ID: ${deviceId}`);
+                }
+                
+                notificationQuery += ` ORDER BY timestamp DESC`;
 
-                // Fetch scheduled events
+                const [notificationsRows] = await connection.execute(notificationQuery, queryParams);
+
+                console.log(`🔍 Fetched ${notificationsRows.length} notifications for admin (device filter: ${deviceId || 'none'})`);
+
+                // Fetch scheduled events (not filtered by device ID)
                 const [eventsRows] = await connection.execute(
                     `SELECT
                         id,
