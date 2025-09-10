@@ -1006,131 +1006,130 @@ app.put("/api/users/:id", async (req, res) => {
   }
 });
 
-// Forgot password route (OTP generation and sending)
-app.post('/api/forgot-password', async (req, res) => { // 'async' is already there, good!
-  const { email } = req.body;
+// Function to send OTP email (placeholder)
+const sendOtpEmail = async (email, otp, type) => {
+  console.log(`Sending a ${type} OTP: ${otp} to ${email}`);
+  // In a real app, this would use a service like Nodemailer
+};
 
-  if (!email || !email.includes('@')) {
-    return res.status(400).json({ message: 'Invalid email address.' });
-  }
+// Route to handle forgot password request
+app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
 
-  // Generate a 6-digit OTP
-  const otp = crypto.randomInt(100000, 999999).toString();
-
-  // Store OTP in database or a temporary storage for validation
-  const sql = 'UPDATE users SET reset_otp = ?, otp_expires = ? WHERE email = ?';
-  const expiration = new Date(Date.now() + 10 * 60 * 1000); // OTP expires in 10 minutes
-
-  try { // Added try-catch for the database operation
-    const [result] = await db.query(sql, [otp, expiration, email]); // Corrected: Await db.query
-
-    if (result.affectedRows === 0) {
-      // If no user found, return 404 but don't expose if email exists for security
-      return res.status(404).json({ message: 'If a user with that email exists, an OTP has been sent.' });
+    if (!email || !email.includes('@')) {
+        return res.status(400).json({ message: 'Invalid email address.' });
     }
 
-    // Send OTP email to the user
-    await sendOtpEmail(email, otp, 'reset-password'); // sendOtpEmail should be async
-    res.status(200).json({
-      message: 'OTP sent to your email. Please check your inbox.',
-    });
-  } catch (emailError) { // Catch block for email sending errors
-    console.error('Error sending OTP email or updating OTP:', emailError);
-    res.status(500).json({ message: 'Failed to send OTP or store it. Please try again later.' });
-  }
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const expiration = new Date(Date.now() + 10 * 60 * 1000);
+
+    try {
+        const sql = 'UPDATE users SET reset_otp = ?, otp_expires = ? WHERE email = ?';
+        const [result] = await db.query(sql, [otp, expiration, email]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'If a user with that email exists, an OTP has been sent.' });
+        }
+
+        await sendOtpEmail(email, otp, 'reset-password');
+        res.status(200).json({
+            message: 'OTP sent to your email. Please check your inbox.',
+        });
+    } catch (emailError) {
+        console.error('Error sending OTP email or updating OTP:', emailError);
+        res.status(500).json({ message: 'Failed to send OTP. Please try again later.' });
+    }
 });
 
-// validate otp (Fixed typo from 'validtae itp' to 'validate otp')
-app.post('/api/validate-otp', async (req, res) => { // Added 'async'
-  const { email, otp } = req.body;
+// Route to validate OTP
+app.post('/api/validate-otp', async (req, res) => {
+    const { email, otp } = req.body;
 
-  if (!email || !otp) {
-    return res.status(400).json({ message: 'Email and OTP are required.' });
-  }
-
-  const querySql = `SELECT reset_otp, otp_expires FROM users WHERE email = ?`; // Changed 'query' to 'querySql' for clarity
-  try { // Added try-catch
-    const [results] = await db.query(querySql, [email]); // Corrected: Await db.query
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'User not found.' });
+    if (!email || !otp) {
+        return res.status(400).json({ message: 'Email and OTP are required.' });
     }
 
-    const user = results[0];
-    const currentTime = new Date();
-    const otpExpiration = new Date(user.otp_expires);
+    const querySql = `SELECT reset_otp, otp_expires FROM users WHERE email = ?`;
+    try {
+        const [results] = await db.query(querySql, [email]);
 
-    if (user.reset_otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP.' });
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = results[0];
+        const currentTime = new Date();
+        const otpExpiration = new Date(user.otp_expires);
+
+        if (user.reset_otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP.' });
+        }
+
+        if (currentTime > otpExpiration) {
+            return res.status(400).json({ message: 'OTP has expired.' });
+        }
+
+        return res.status(200).json({ message: 'OTP verified successfully.' });
+    } catch (err) {
+        console.error('Database error during OTP validation:', err);
+        return res.status(500).json({ message: 'Database error.' });
     }
-
-    if (currentTime > otpExpiration) {
-      return res.status(400).json({ message: 'OTP has expired.' });
-    }
-
-    return res.status(200).json({ message: 'OTP verified successfully.' });
-  } catch (err) {
-    console.error('Database error during OTP validation:', err);
-    return res.status(500).json({ message: 'Database error.' });
-  }
 });
 
-// Route to reset the password after OTP verification
-app.post("/api/reset-password", async (req, res) => { // 'async' is already there, good!
-  const { newPassword, confirmPassword } = req.body;
+// CORRECTED Route to reset the password after OTP verification
+app.post("/api/reset-password", async (req, res) => {
+    // The request should now contain email, otp, and the new password, NOT a JWT token
+    const { email, otp, newPassword, confirmPassword } = req.body;
 
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+    console.log("Attempting password reset for email:", email);
 
-  console.log("Received token:", token);
-  console.log("Using JWT_SECRET:", process.env.JWT_SECRET);
-
-  if (!token) {
-    console.log("No token provided.");
-    return res.status(401).json({ message: "Authorization token is required" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    console.log("Token decoded, userId:", userId);
-
-    if (!newPassword || !confirmPassword) {
-      console.log("Missing passwords.");
-      return res.status(400).json({ message: "Both new password and confirm password are required." });
+    if (!email || !otp || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "All fields are required." });
     }
 
     if (newPassword !== confirmPassword) {
-      console.log("Passwords do not match.");
-      return res.status(400).json({ message: "Passwords do not match." });
+        return res.status(400).json({ message: "Passwords do not match." });
     }
 
     if (newPassword.length < 6) {
-      console.log("Password is too short.");
-      return res.status(400).json({ message: "Password must be at least 6 characters long." });
+        return res.status(400).json({ message: "Password must be at least 6 characters long." });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    // Step 1: Verify the provided email and OTP
+    const userQuery = 'SELECT id, reset_otp, otp_expires FROM users WHERE email = ?';
+    try {
+        const [results] = await db.query(userQuery, [email]);
+        if (results.length === 0) {
+            return res.status(404).json({ message: "User not found." });
+        }
 
-    const updateQuery = 'UPDATE users SET password_hash = ?, reset_otp = NULL, otp_expires = NULL WHERE id = ?'; // Clear OTP fields after successful reset
+        const user = results[0];
+        const currentTime = new Date();
+        const otpExpiration = new Date(user.otp_expires);
 
-    // Corrected: Await db.query
-    const [result] = await db.query(updateQuery, [hashedPassword, userId]);
+        // Check if the OTP is valid and not expired
+        if (user.reset_otp !== otp || currentTime > otpExpiration) {
+            return res.status(400).json({ message: "Invalid or expired OTP." });
+        }
 
-    if (result.affectedRows === 0) {
-      console.log("User not found.");
-      return res.status(404).json({ message: "User not found." });
+        // Step 2: Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Step 3: Update the password and clear the OTP fields
+        const updateQuery = 'UPDATE users SET password_hash = ?, reset_otp = NULL, otp_expires = NULL WHERE id = ?';
+        const [result] = await db.query(updateQuery, [hashedPassword, user.id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        console.log("Password updated successfully for user ID:", user.id);
+        return res.status(200).json({ message: "Password reset successful!" });
+    } catch (err) {
+        console.error("Password reset failed:", err);
+        return res.status(500).json({ message: "An error occurred. Please try again." });
     }
-
-    console.log("Password updated successfully.");
-    return res.status(200).json({ message: "Password reset successful!" });
-  } catch (err) {
-    console.error("JWT verification or password reset failed:", err);
-    return res.status(401).json({ message: "Unauthorized. Invalid or expired token." });
-  }
 });
-
 
 app.get('/api/admin/establishments', async (req, res) => {
     // In a real application, the user_id would come from an authenticated session

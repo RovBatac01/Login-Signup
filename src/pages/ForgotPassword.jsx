@@ -21,6 +21,7 @@ const ForgotPassword = () => {
 
   const { theme } = useContext(ThemeContext);
 
+  // 🔹 Step 1: Send OTP
   const handleSubmitEmail = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -29,35 +30,25 @@ const ForgotPassword = () => {
     try {
       const response = await fetch('https://login-signup-3470.onrender.com/api/forgot-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message);
 
-      setStatus({
-        type: 'success',
-        message: data.message
-      });
-
+      setStatus({ type: 'success', message: data.message });
       setOtpSent(true);
       setShowOtpModal(true);
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Failed to send OTP. Please try again.'
-      });
+      setStatus({ type: 'error', message: error.message || 'Failed to send OTP. Please try again.' });
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 🔹 Step 2: Validate OTP
   const handleSubmitOtp = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -66,34 +57,25 @@ const ForgotPassword = () => {
     try {
       const response = await fetch('https://login-signup-3470.onrender.com/api/validate-otp', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message);
 
-      setStatus({
-        type: 'success',
-        message: 'OTP verified successfully. Proceed to reset your password.'
-      });
-
+      setStatus({ type: 'success', message: 'OTP verified successfully. Proceed to reset your password.' });
       setShowOtpModal(false);
       setOtp('');
       setShowResetModal(true);
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Invalid OTP. Please try again.'
-      });
+      setStatus({ type: 'error', message: error.message || 'Invalid OTP. Please try again.' });
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 🔹 Step 3: Reset Password
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -108,15 +90,11 @@ const ForgotPassword = () => {
     try {
       const response = await fetch('https://login-signup-3470.onrender.com/api/reset-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ newPassword, confirmPassword }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp, newPassword, confirmPassword }),
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message);
 
       setStatus({ type: 'success', message: 'Password reset successful! You can now log in.' });
@@ -124,11 +102,34 @@ const ForgotPassword = () => {
       alert('Password reset successful! Redirecting to login...');
       window.location.href = '/login';
     } catch (error) {
-      setStatus({ type: 'error', message: 'Password reset failed. Please try again.' });
+      setStatus({ type: 'error', message: error.message || 'Password reset failed. Please try again.' });
     } finally {
       setIsLoading(false);
       setNewPassword('');
       setConfirmPassword('');
+    }
+  };
+
+  // 🔹 Resend OTP
+  const handleResendOtp = async () => {
+    setIsLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      const response = await fetch('https://login-signup-3470.onrender.com/api/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+
+      setStatus({ type: 'success', message: 'A new OTP has been sent to your email.' });
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message || 'Failed to resend OTP. Please try again.' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -172,11 +173,11 @@ const ForgotPassword = () => {
                 Don't have an account? <a href="/signup" className="forgot-password-link">Signup</a>
               </p>
             </div>
-
           </Card.Body>
         </Container>
       </div>
 
+      {/* OTP Modal */}
       <Modal show={showOtpModal} onHide={() => setShowOtpModal(false)} centered className={`otp-verification-modal ${theme}`}>
         <Modal.Header className="otp-modal-header">
           <Modal.Title className="otp-modal-title">OTP Verification</Modal.Title>
@@ -208,12 +209,13 @@ const ForgotPassword = () => {
               </div>
             )}
             <div className="resend-otp-section mt-3 text-center">
-              <p>Didn't receive code? <a href="#" className="resend-otp-link">Resend</a></p>
+              <p>Didn't receive code? <button type="button" onClick={handleResendOtp} className="resend-otp-link btn btn-link">Resend</button></p>
             </div>
           </form>
         </Modal.Body>
       </Modal>
 
+      {/* Reset Password Modal */}
       <Modal show={showResetModal} onHide={() => setShowResetModal(false)} centered className={`reset-password-modal ${theme}`}>
         <Modal.Header closeButton className="reset-modal-header">
           <Modal.Title className="reset-modal-title">Reset Password</Modal.Title>
