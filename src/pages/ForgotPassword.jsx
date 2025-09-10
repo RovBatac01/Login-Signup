@@ -24,7 +24,7 @@ const ForgotPassword = () => {
   // 🔹 Step 1: Send OTP
   const handleSubmitEmail = async (e) => {
     e.preventDefault();
-    setIsLoading(true);cors
+    setIsLoading(true);
     setStatus({ type: '', message: '' });
 
     try {
