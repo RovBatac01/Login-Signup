@@ -2143,7 +2143,7 @@ app.post('/api/request-device-access', authMiddleware, async (req, res) => {
 // Endpoint to fetch events for a specific date (if needed for specific date view)
 
 // Example: GET /api/events?date=2024-03-15
-app.get('/events', async (req, res) => {
+app.get('/api/events', async (req, res) => {
   const { date } = req.query; // date should be in 'YYYY-MM-DD' format
 
   if (!date) {

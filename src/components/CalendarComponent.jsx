@@ -59,8 +59,8 @@ export default function Calendar() {
     setError(null);
     try {
       // FIXED: Change to /events (remove the -all suffix and api/ prefix)
-      console.log("Fetching events from:", `${API_BASE_URL}/events`);
-      const response = await fetch(`${API_BASE_URL}/events`);
+      console.log("Fetching events from:", `${API_BASE_URL}/api/events`);
+      const response = await fetch(`${API_BASE_URL}/api/events`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
