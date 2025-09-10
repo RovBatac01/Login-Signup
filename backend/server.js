@@ -1006,12 +1006,6 @@ app.put("/api/users/:id", async (req, res) => {
   }
 });
 
-// Function to send OTP email (placeholder)
-const sendOtpEmail = async (email, otp, type) => {
-  console.log(`Sending a ${type} OTP: ${otp} to ${email}`);
-  // In a real app, this would use a service like Nodemailer
-};
-
 // Route to handle forgot password request
 app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
