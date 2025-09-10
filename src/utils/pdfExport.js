@@ -1,5 +1,4 @@
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 
 /**
@@ -195,7 +194,7 @@ export const exportToPdf = (data, filter, establishmentName = "All Establishment
       ]);
 
       // Add the table
-      doc.autoTable({
+      autoTable(doc, {
         startY: yPos,
         head: [tableColumn],
         body: tableRows,
@@ -357,7 +356,7 @@ function addWaterQualityGuide(doc) {
     // Create interpretation table
     const tableRows = param.interpretations.map(interp => [interp.range, interp.meaning]);
     
-    doc.autoTable({
+    autoTable(doc, {
       startY: yPos,
       head: [['Range', 'Interpretation']],
       body: tableRows,
