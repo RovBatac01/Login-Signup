@@ -3687,9 +3687,6 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
 // =======================================================
-// 1. SMS SENDER (Globe Labs API with test access token)
-// =======================================================
-// =======================================================
 // 1. SMS SENDER (Globe Labs API)
 // =======================================================
 async function sendSMS(recipientNumber, message) {
@@ -3711,7 +3708,25 @@ async function sendSMS(recipientNumber, message) {
 }
 
 // =======================================================
-// 2. CHECK IF VALUE VIOLATES THRESHOLD
+// 2. PHONE NUMBER FORMATTER
+// =======================================================
+function formatPhoneNumber(phone) {
+  if (!phone) return null;
+
+  // Clean up common issues: remove +, spaces, dashes
+  phone = phone.replace(/[\s\-\+]/g, "");
+
+  if (phone.startsWith("0")) {
+    return "63" + phone.substring(1); // 09XXXXXXXXX → 639XXXXXXXXX
+  }
+  if (phone.startsWith("63")) {
+    return phone; // already correct
+  }
+  return null; // invalid format
+}
+
+// =======================================================
+// 3. CHECK IF VALUE VIOLATES THRESHOLD
 // =======================================================
 function isThresholdViolated(value, config) {
   if (config.condition === "lessThan") {
@@ -3724,7 +3739,7 @@ function isThresholdViolated(value, config) {
 }
 
 // =======================================================
-// 3. NOTIFY ADMINS & SUPER ADMINS ONLY
+// 4. NOTIFY ADMINS & SUPER ADMINS ONLY
 // =======================================================
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
@@ -3749,22 +3764,20 @@ async function notifyAdmins(sensorType, value, unit) {
   const message = `⚠️ ALERT: ${sensorType} value is ${value}${unit}, outside safe threshold!`;
 
   for (const admin of admins) {
-    let recipient = admin.phone;
-    if (recipient.startsWith("0")) {
-      recipient = "63" + recipient.substring(1); // format 09XXXXXXXXX → 639XXXXXXXXX
-    }
+    const recipient = formatPhoneNumber(admin.phone);
 
-    if (!recipient.startsWith("63")) {
-      console.warn(`⚠️ Invalid phone format, skipping: ${recipient}`);
+    if (!recipient) {
+      console.warn(`⚠️ Invalid phone format, skipping: ${admin.phone}`);
       continue;
     }
 
+    console.log(`📨 Sending alert to: ${recipient}`);
     await sendSMS(recipient, message);
   }
 }
 
 // =======================================================
-// 4. MAIN SENSOR DATA ROUTE
+// 5. MAIN SENSOR DATA ROUTE
 // =======================================================
 app.post("/api/sensor-data", async (req, res) => {
   try {
