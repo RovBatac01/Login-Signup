@@ -3693,9 +3693,7 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
-// ============================
 // Helper: format Philippine numbers
-// ============================
 function formatPHNumber(number) {
   if (!number) return null;
   if (number.startsWith("0")) return "+63" + number.slice(1);
@@ -3703,43 +3701,45 @@ function formatPHNumber(number) {
   return "+63" + number; // fallback
 }
 
-// ============================
 // Get admin phone numbers
-// ============================
 async function getAdmins() {
   const connection = await pool.getConnection();
   const [rows] = await connection.execute(
     "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
   );
-  await connection.release();
+  connection.release();
   return rows;
 }
 
-// ============================
-// Send SMS or WhatsApp
-// ============================
-async function sendAlert(to, message, useWhatsApp = false) {
+// Send SMS
+async function sendSMS(to, message) {
   try {
-    const from = useWhatsApp ? `whatsapp:${whatsappNumber}` : twilioPhone;
-    const toNumber = useWhatsApp ? `whatsapp:${to}` : to;
-
     const msg = await twilioClient.messages.create({
       body: message,
-      from: from,
-      to: toNumber,
+      from: twilioPhone,
+      to: to,
     });
-
-    console.log(
-      `📩 Message sent to ${to} (${useWhatsApp ? "WhatsApp" : "SMS"}): ${msg.sid}`
-    );
+    console.log(`📩 SMS sent to ${to}: ${msg.sid}`);
   } catch (err) {
-    console.error("❌ Message sending failed:", err.message);
+    console.error("❌ SMS sending failed:", err.message);
   }
 }
 
-// ============================
+// Send WhatsApp
+async function sendWhatsApp(to, message) {
+  try {
+    const msg = await twilioClient.messages.create({
+      body: message,
+      from: `whatsapp:${whatsappNumber}`,
+      to: `whatsapp:${to}`,
+    });
+    console.log(`📩 WhatsApp sent to ${to}: ${msg.sid}`);
+  } catch (err) {
+    console.error("❌ WhatsApp sending failed:", err.message);
+  }
+}
+
 // Check threshold violation
-// ============================
 function isThresholdViolated(value, config) {
   if (config.condition === "lessThan") return value < config.threshold;
   if (config.condition === "outsideRange")
@@ -3747,13 +3747,11 @@ function isThresholdViolated(value, config) {
   return false;
 }
 
-// ============================
 // Notify admins
-// ============================
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
-
   const admins = await getAdmins();
+
   if (!admins.length) {
     console.log("⚠️ No admins found with phone numbers");
     return;
@@ -3763,19 +3761,18 @@ async function notifyAdmins(sensorType, value, unit) {
 
   for (const admin of admins) {
     if (!admin.phone) continue;
-
     const formattedPhone = formatPHNumber(admin.phone);
 
-    // Send SMS with cooldown
+    // SMS with cooldown
     if (!lastSent[sensorType] || now - lastSent[sensorType] >= 5 * 60 * 1000) {
-      await sendAlert(formattedPhone, message, false);
+      await sendSMS(formattedPhone, message);
       lastSent[sensorType] = now;
     } else {
       console.log(`⏳ SMS skipped for ${sensorType}, still cooling down`);
     }
 
-    // Send WhatsApp without cooldown
-    await sendAlert(formattedPhone, message, true);
+    // WhatsApp always
+    await sendWhatsApp(formattedPhone, message);
   }
 }
 
