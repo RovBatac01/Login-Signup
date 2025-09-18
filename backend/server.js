@@ -3707,11 +3707,11 @@ function formatPHNumber(number) {
 // Get admin phone numbers
 // ============================
 async function getAdmins() {
-  const connection = await mysql.createConnection(dbConfig);
+  const connection = await pool.getConnection();
   const [rows] = await connection.execute(
     "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
   );
-  await connection.end();
+  await connection.release();
   return rows;
 }
 
