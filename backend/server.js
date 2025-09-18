@@ -32,6 +32,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const GLOBE_APP_ID = process.env.GLOBE_APP_ID;
 const GLOBE_APP_SECRET = process.env.GLOBE_APP_SECRET;
+const GLOBE_TEST_ACCESS_TOKEN = process.env.GLOBE_TEST_ACCESS_TOKEN;
+
+const lastSent = {}; // { sensorType: timestamp }
 
 const authenticateUser = require('./middleware/authenticateUser');
 
@@ -3683,78 +3686,27 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
-app.get("/globe/authorize", (req, res) => {
-  const url = `https://developer.globelabs.com.ph/oauth/authorize?app_id=${GLOBE_APP_ID}&redirect_uri=${encodeURIComponent(
-    GLOBE_REDIRECT_URI
-  )}`;
-  res.redirect(url);
-});
-
-// ==============================================
-// STEP 2: Handle callback & exchange code for token
-// ==============================================
-app.get("/globe/callback", async (req, res) => {
-  const { code } = req.query;
-
-  if (!code) {
-    return res.status(400).send("❌ No authorization code returned.");
-  }
-
-  try {
-    const response = await axios.post(
-      "https://developer.globelabs.com.ph/oauth/access_token",
-      null,
-      {
-        params: {
-          app_id: GLOBE_APP_ID,
-          app_secret: GLOBE_APP_SECRET,
-          code,
-        },
-      }
-    );
-
-    const { access_token, subscriber_number } = response.data;
-
-    // ✅ Store token in DB for this user
-    await db.query(
-      "UPDATE users SET access_token = ? WHERE phone = ?",
-      [access_token, subscriber_number]
-    );
-
-    console.log("✅ Access token stored:", access_token);
-
-    res.send(
-      `✅ Globe Authorization Success! You can now send SMS. <br>Phone: ${subscriber_number}`
-    );
-  } catch (err) {
-    console.error("❌ Error exchanging token:", err.response?.data || err.message);
-    res.status(500).send("Error during token exchange.");
-  }
-});
-
-const lastSent = {}; // { sensorType: timestamp }
-
+// =======================================================
+// 1. SMS SENDER (Globe Labs API with test access token)
+// =======================================================
 // =======================================================
 // 1. SMS SENDER (Globe Labs API)
 // =======================================================
-async function sendSMS(accessToken, subscriberNumber, message) {
+async function sendSMS(recipientNumber, message) {
   try {
-    const url = `https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/${subscriberNumber}/requests?access_token=${accessToken}`;
+    const url = `https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/${GLOBE_APP_ID}/requests?access_token=${GLOBE_TEST_ACCESS_TOKEN}`;
 
     await axios.post(url, {
       outboundSMSMessageRequest: {
-        senderAddress: subscriberNumber, // required by Globe
+        senderAddress: GLOBE_APP_ID,
         outboundSMSTextMessage: { message },
-        address: [subscriberNumber], // recipient
+        address: [recipientNumber], // must be in 63XXXXXXXXXX format
       },
     });
 
-    console.log(`📩 SMS sent to ${subscriberNumber}: ${message}`);
+    console.log(`📩 SMS sent to ${recipientNumber}: ${message}`);
   } catch (err) {
-    console.error(
-      "❌ SMS sending failed:",
-      err.response?.data || err.message
-    );
+    console.error("❌ SMS failed:", err.response?.data || err.message);
   }
 }
 
@@ -3772,12 +3724,12 @@ function isThresholdViolated(value, config) {
 }
 
 // =======================================================
-// 3. NOTIFY ADMINS & SUPER ADMINS
+// 3. NOTIFY ADMINS & SUPER ADMINS ONLY
 // =======================================================
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
 
-  // Cooldown: 5 minutes
+  // Cooldown: 5 minutes per sensor type
   if (lastSent[sensorType] && now - lastSent[sensorType] < 5 * 60 * 1000) {
     console.log(`⏳ Skipping SMS for ${sensorType}, still cooling down`);
     return;
@@ -3786,27 +3738,28 @@ async function notifyAdmins(sensorType, value, unit) {
 
   // Fetch admins + super admins
   const [admins] = await db.query(
-    "SELECT phone AS subscriber_number, access_token FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL AND access_token IS NOT NULL"
+    "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
   );
 
   if (admins.length === 0) {
-    console.log("⚠️ No admins found with valid phone + token");
+    console.log("⚠️ No admins found with valid phone number");
     return;
   }
 
   const message = `⚠️ ALERT: ${sensorType} value is ${value}${unit}, outside safe threshold!`;
 
   for (const admin of admins) {
-    const { subscriber_number, access_token } = admin;
+    let recipient = admin.phone;
+    if (recipient.startsWith("0")) {
+      recipient = "63" + recipient.substring(1); // format 09XXXXXXXXX → 639XXXXXXXXX
+    }
 
-    if (!access_token || !subscriber_number) {
-      console.warn(
-        `⚠️ Skipping admin, missing token/number: ${JSON.stringify(admin)}`
-      );
+    if (!recipient.startsWith("63")) {
+      console.warn(`⚠️ Invalid phone format, skipping: ${recipient}`);
       continue;
     }
 
-    await sendSMS(access_token, subscriber_number, message);
+    await sendSMS(recipient, message);
   }
 }
 
@@ -3838,18 +3791,7 @@ app.post("/api/sensor-data", async (req, res) => {
       temperature_celsius,
     } = jsonData;
 
-    // 🔹 Insert + emit (your existing insertAndEmit function)
-    await Promise.all([
-      insertAndEmit("turbidity_readings", "turbidity_value", turbidity_value, "updateTurbidityData", notifications.turbidity),
-      insertAndEmit("phlevel_readings", "ph_value", ph_value, "updatePHData", notifications.ph),
-      insertAndEmit("tds_readings", "tds_value", tds_value, "updateTDSData", notifications.tds),
-      insertAndEmit("salinity_readings", "salinity_value", salinity_value, "updateSalinityData", notifications.salinity),
-      insertAndEmit("ec_readings", "ec_value_mS", ec_value_mS, "updateECData", notifications.ec),
-      insertAndEmit("ec_compensated_readings", "ec_compensated_mS", ec_compensated_mS, "updateECCompensatedData", notifications.ec),
-      insertAndEmit("temperature_readings", "temperature_celsius", temperature_celsius, "updateTemperatureData", notifications.temperature),
-    ]);
-
-    // 🔹 Check thresholds & send SMS alerts
+    // 🔹 Check thresholds & notify admins
     if (isThresholdViolated(turbidity_value, notifications.turbidity)) {
       await notifyAdmins("turbidity", turbidity_value, notifications.turbidity.unit);
     }
