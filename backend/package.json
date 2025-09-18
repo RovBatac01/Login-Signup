@@ -12,13 +12,13 @@
   "description": "",
   "dependencies": {
     "@shadcn/ui": "^0.0.4",
-    "axios": "^1.7.9",
+    "axios": "^1.12.2",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "bootstrap": "^5.3.6",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "file-saver": "^2.0.5",
@@ -37,6 +37,7 @@
     "sequelize": "^6.37.7",
     "serialport": "^13.0.0",
     "socket.io": "^4.8.1",
+    "twilio": "^5.10.0",
     "uuid": "^11.1.0",
     "xlsx": "^0.18.5"
   }
