@@ -39,6 +39,7 @@ const lastSent = {}; // { sensorType: timestamp }
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhone = process.env.TWILIO_PHONE_NUMBER;// Replace with your Twilio number
+const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 
 const twilioClient = twilio(accountSid, authToken);
 
@@ -3695,34 +3696,45 @@ const sensorTableMap = {
 // ============================
 // 1. Helper: format Philippine numbers
 // ============================
+// Format Philippine number to +63XXXXXXXXX
 function formatPHNumber(number) {
   if (!number) return null;
-  if (number.startsWith("0")) {
-    return "+63" + number.slice(1);
-  }
+  if (number.startsWith("0")) return "+63" + number.slice(1);
   if (number.startsWith("+")) return number;
   return "+63" + number; // fallback
 }
 
-// ============================
-// 2. SMS sender function
-// ============================
-async function sendSMS(to, message) {
+// Get admin phone numbers
+async function getAdmins() {
+  const connection = await mysql.createConnection(dbConfig);
+  const [rows] = await connection.execute(
+    "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
+  );
+  await connection.end();
+  return rows;
+}
+
+// Send SMS or WhatsApp
+async function sendAlert(to, message, useWhatsApp = false) {
   try {
-    await twilioClient.messages.create({
+    const from = useWhatsApp ? whatsappNumber : smsNumber;
+    const toNumber = useWhatsApp ? `whatsapp:${to}` : to;
+
+    const msg = await twilioClient.messages.create({
       body: message,
-      from: twilioPhone,
-      to: to,
+      from: from,
+      to: toNumber,
     });
-    console.log(`📩 SMS sent to ${to}: ${message}`);
+
+    console.log(
+      `📩 Message sent to ${to} (${useWhatsApp ? "WhatsApp" : "SMS"}): ${msg.sid}`
+    );
   } catch (err) {
-    console.error("❌ SMS sending failed:", err.message);
+    console.error("❌ Message sending failed:", err.message);
   }
 }
 
-// ============================
-// 3. Check if value violates threshold
-// ============================
+// Check threshold violation
 function isThresholdViolated(value, config) {
   if (config.condition === "lessThan") return value < config.threshold;
   if (config.condition === "outsideRange")
@@ -3730,23 +3742,11 @@ function isThresholdViolated(value, config) {
   return false;
 }
 
-// ============================
-// 4. Notify admins
-// ============================
+// Notify admins
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
 
-  // Cooldown: 5 minutes
-  if (lastSent[sensorType] && now - lastSent[sensorType] < 5 * 60 * 1000) {
-    console.log(`⏳ Skipping SMS for ${sensorType}, cooling down`);
-    return;
-  }
-  lastSent[sensorType] = now;
-
-  const [admins] = await db.query(
-    "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
-  );
-
+  const admins = await getAdmins();
   if (!admins.length) {
     console.log("⚠️ No admins found with phone numbers");
     return;
@@ -3757,8 +3757,18 @@ async function notifyAdmins(sensorType, value, unit) {
   for (const admin of admins) {
     if (!admin.phone) continue;
 
-    const formattedNumber = formatPHNumber(admin.phone);
-    await sendSMS(formattedNumber, message);
+    const formattedPhone = formatPHNumber(admin.phone);
+
+    // SMS with cooldown
+    if (!lastSent[sensorType] || now - lastSent[sensorType] >= 5 * 60 * 1000) {
+      await sendAlert(formattedPhone, message, false); // SMS
+      lastSent[sensorType] = now;
+    } else {
+      console.log(`⏳ Skipping SMS for ${sensorType}, cooling down`);
+    }
+
+    // WhatsApp with no cooldown
+    await sendAlert(formattedPhone, message, true);  // WhatsApp
   }
 }
 
