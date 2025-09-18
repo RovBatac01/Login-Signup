@@ -3694,9 +3694,8 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
 // ============================
-// 1. Helper: format Philippine numbers
+// Helper: format Philippine numbers
 // ============================
-// Format Philippine number to +63XXXXXXXXX
 function formatPHNumber(number) {
   if (!number) return null;
   if (number.startsWith("0")) return "+63" + number.slice(1);
@@ -3704,7 +3703,9 @@ function formatPHNumber(number) {
   return "+63" + number; // fallback
 }
 
+// ============================
 // Get admin phone numbers
+// ============================
 async function getAdmins() {
   const connection = await mysql.createConnection(dbConfig);
   const [rows] = await connection.execute(
@@ -3714,10 +3715,12 @@ async function getAdmins() {
   return rows;
 }
 
+// ============================
 // Send SMS or WhatsApp
+// ============================
 async function sendAlert(to, message, useWhatsApp = false) {
   try {
-    const from = useWhatsApp ? whatsappNumber : smsNumber;
+    const from = useWhatsApp ? `whatsapp:${whatsappNumber}` : twilioPhone;
     const toNumber = useWhatsApp ? `whatsapp:${to}` : to;
 
     const msg = await twilioClient.messages.create({
@@ -3734,7 +3737,9 @@ async function sendAlert(to, message, useWhatsApp = false) {
   }
 }
 
+// ============================
 // Check threshold violation
+// ============================
 function isThresholdViolated(value, config) {
   if (config.condition === "lessThan") return value < config.threshold;
   if (config.condition === "outsideRange")
@@ -3742,11 +3747,11 @@ function isThresholdViolated(value, config) {
   return false;
 }
 
+// ============================
 // Notify admins
+// ============================
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
-  if (lastSent[sensorType] && now - lastSent[sensorType] < 5 * 60 * 1000) return;
-  lastSent[sensorType] = now;
 
   const admins = await getAdmins();
   if (!admins.length) {
@@ -3761,8 +3766,16 @@ async function notifyAdmins(sensorType, value, unit) {
 
     const formattedPhone = formatPHNumber(admin.phone);
 
-    await sendAlert(formattedPhone, message, false); // SMS
-    await sendAlert(formattedPhone, message, true);  // WhatsApp
+    // Send SMS with cooldown
+    if (!lastSent[sensorType] || now - lastSent[sensorType] >= 5 * 60 * 1000) {
+      await sendAlert(formattedPhone, message, false);
+      lastSent[sensorType] = now;
+    } else {
+      console.log(`⏳ SMS skipped for ${sensorType}, still cooling down`);
+    }
+
+    // Send WhatsApp without cooldown
+    await sendAlert(formattedPhone, message, true);
   }
 }
 
