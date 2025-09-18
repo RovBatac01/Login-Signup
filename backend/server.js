@@ -3745,6 +3745,8 @@ function isThresholdViolated(value, config) {
 // Notify admins
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
+  if (lastSent[sensorType] && now - lastSent[sensorType] < 5 * 60 * 1000) return;
+  lastSent[sensorType] = now;
 
   const admins = await getAdmins();
   if (!admins.length) {
@@ -3759,15 +3761,7 @@ async function notifyAdmins(sensorType, value, unit) {
 
     const formattedPhone = formatPHNumber(admin.phone);
 
-    // SMS with cooldown
-    if (!lastSent[sensorType] || now - lastSent[sensorType] >= 5 * 60 * 1000) {
-      await sendAlert(formattedPhone, message, false); // SMS
-      lastSent[sensorType] = now;
-    } else {
-      console.log(`⏳ Skipping SMS for ${sensorType}, cooling down`);
-    }
-
-    // WhatsApp with no cooldown
+    await sendAlert(formattedPhone, message, false); // SMS
     await sendAlert(formattedPhone, message, true);  // WhatsApp
   }
 }
