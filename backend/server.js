@@ -3693,7 +3693,19 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
 // ============================
-// 1. SMS sender function
+// 1. Helper: format Philippine numbers
+// ============================
+function formatPHNumber(number) {
+  if (!number) return null;
+  if (number.startsWith("0")) {
+    return "+63" + number.slice(1);
+  }
+  if (number.startsWith("+")) return number;
+  return "+63" + number; // fallback
+}
+
+// ============================
+// 2. SMS sender function
 // ============================
 async function sendSMS(to, message) {
   try {
@@ -3709,7 +3721,7 @@ async function sendSMS(to, message) {
 }
 
 // ============================
-// 2. Check if value violates threshold
+// 3. Check if value violates threshold
 // ============================
 function isThresholdViolated(value, config) {
   if (config.condition === "lessThan") return value < config.threshold;
@@ -3719,7 +3731,7 @@ function isThresholdViolated(value, config) {
 }
 
 // ============================
-// 3. Notify admins
+// 4. Notify admins
 // ============================
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
@@ -3744,12 +3756,14 @@ async function notifyAdmins(sensorType, value, unit) {
 
   for (const admin of admins) {
     if (!admin.phone) continue;
-    await sendSMS(admin.phone, message);
+
+    const formattedNumber = formatPHNumber(admin.phone);
+    await sendSMS(formattedNumber, message);
   }
 }
 
 // ============================
-// 4. Sensor data endpoint
+// 5. Sensor data endpoint
 // ============================
 app.post("/api/sensor-data", async (req, res) => {
   try {
@@ -3775,7 +3789,7 @@ app.post("/api/sensor-data", async (req, res) => {
       temperature_celsius,
     } = data;
 
-    // Insert + emit (replace with your function)
+    // 🔹 Insert & emit (replace with your actual insertAndEmit)
     await Promise.all([
       insertAndEmit("turbidity_readings", "turbidity_value", turbidity_value, "updateTurbidityData", notifications.turbidity),
       insertAndEmit("phlevel_readings", "ph_value", ph_value, "updatePHData", notifications.ph),
@@ -3786,7 +3800,7 @@ app.post("/api/sensor-data", async (req, res) => {
       insertAndEmit("temperature_readings", "temperature_celsius", temperature_celsius, "updateTemperatureData", notifications.temperature),
     ]);
 
-    // Check thresholds & notify
+    // 🔹 Check thresholds & notify
     if (isThresholdViolated(turbidity_value, notifications.turbidity))
       await notifyAdmins("turbidity", turbidity_value, notifications.turbidity.unit);
     if (isThresholdViolated(ph_value, notifications.ph))
