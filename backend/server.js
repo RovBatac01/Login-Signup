@@ -30,6 +30,9 @@ const otpGenerator = require('otp-generator');
 const JWT_SECRET = process.env.JWT_SECRET;
 // const users = [];
 
+const GLOBE_APP_ID = process.env.GLOBE_APP_ID;
+const GLOBE_APP_SECRET = process.env.GLOBE_APP_SECRET;
+
 const authenticateUser = require('./middleware/authenticateUser');
 
 const authorizeRoles = (allowedRoles) => {
@@ -3680,22 +3683,151 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
+app.get("/globe/authorize", (req, res) => {
+  const url = `https://developer.globelabs.com.ph/oauth/authorize?app_id=${GLOBE_APP_ID}&redirect_uri=${encodeURIComponent(
+    GLOBE_REDIRECT_URI
+  )}`;
+  res.redirect(url);
+});
+
+// ==============================================
+// STEP 2: Handle callback & exchange code for token
+// ==============================================
+app.get("/globe/callback", async (req, res) => {
+  const { code } = req.query;
+
+  if (!code) {
+    return res.status(400).send("❌ No authorization code returned.");
+  }
+
+  try {
+    const response = await axios.post(
+      "https://developer.globelabs.com.ph/oauth/access_token",
+      null,
+      {
+        params: {
+          app_id: GLOBE_APP_ID,
+          app_secret: GLOBE_APP_SECRET,
+          code,
+        },
+      }
+    );
+
+    const { access_token, subscriber_number } = response.data;
+
+    // ✅ Store token in DB for this user
+    await db.query(
+      "UPDATE users SET access_token = ? WHERE phone = ?",
+      [access_token, subscriber_number]
+    );
+
+    console.log("✅ Access token stored:", access_token);
+
+    res.send(
+      `✅ Globe Authorization Success! You can now send SMS. <br>Phone: ${subscriber_number}`
+    );
+  } catch (err) {
+    console.error("❌ Error exchanging token:", err.response?.data || err.message);
+    res.status(500).send("Error during token exchange.");
+  }
+});
+
+const lastSent = {}; // { sensorType: timestamp }
+
+// =======================================================
+// 1. SMS SENDER (Globe Labs API)
+// =======================================================
+async function sendSMS(accessToken, subscriberNumber, message) {
+  try {
+    const url = `https://devapi.globelabs.com.ph/smsmessaging/v1/outbound/${subscriberNumber}/requests?access_token=${accessToken}`;
+
+    await axios.post(url, {
+      outboundSMSMessageRequest: {
+        senderAddress: subscriberNumber, // required by Globe
+        outboundSMSTextMessage: { message },
+        address: [subscriberNumber], // recipient
+      },
+    });
+
+    console.log(`📩 SMS sent to ${subscriberNumber}: ${message}`);
+  } catch (err) {
+    console.error(
+      "❌ SMS sending failed:",
+      err.response?.data || err.message
+    );
+  }
+}
+
+// =======================================================
+// 2. CHECK IF VALUE VIOLATES THRESHOLD
+// =======================================================
+function isThresholdViolated(value, config) {
+  if (config.condition === "lessThan") {
+    return value < config.threshold;
+  }
+  if (config.condition === "outsideRange") {
+    return value < config.threshold[0] || value > config.threshold[1];
+  }
+  return false;
+}
+
+// =======================================================
+// 3. NOTIFY ADMINS & SUPER ADMINS
+// =======================================================
+async function notifyAdmins(sensorType, value, unit) {
+  const now = Date.now();
+
+  // Cooldown: 5 minutes
+  if (lastSent[sensorType] && now - lastSent[sensorType] < 5 * 60 * 1000) {
+    console.log(`⏳ Skipping SMS for ${sensorType}, still cooling down`);
+    return;
+  }
+  lastSent[sensorType] = now;
+
+  // Fetch admins + super admins
+  const [admins] = await db.query(
+    "SELECT phone AS subscriber_number, access_token FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL AND access_token IS NOT NULL"
+  );
+
+  if (admins.length === 0) {
+    console.log("⚠️ No admins found with valid phone + token");
+    return;
+  }
+
+  const message = `⚠️ ALERT: ${sensorType} value is ${value}${unit}, outside safe threshold!`;
+
+  for (const admin of admins) {
+    const { subscriber_number, access_token } = admin;
+
+    if (!access_token || !subscriber_number) {
+      console.warn(
+        `⚠️ Skipping admin, missing token/number: ${JSON.stringify(admin)}`
+      );
+      continue;
+    }
+
+    await sendSMS(access_token, subscriber_number, message);
+  }
+}
+
+// =======================================================
+// 4. MAIN SENSOR DATA ROUTE
+// =======================================================
 app.post("/api/sensor-data", async (req, res) => {
   try {
     const jsonData = req.body;
     console.log("📡 Received data from local bridge:", jsonData);
 
-    // Define notification configurations for each sensor
+    // Define thresholds for alerts
     const notifications = {
-      turbidity: { sensorType: "turbidity", threshold: 30, condition: "lessThan", unit: "Percent" },
+      turbidity: { sensorType: "turbidity", threshold: 30, condition: "lessThan", unit: "%" },
       ph: { sensorType: "ph", threshold: [0.5, 8.5], condition: "outsideRange", unit: "pH" },
-      tds: { sensorType: "tds", threshold: 30, condition: "lessThan", unit: "Percent" },
-      salinity: { sensorType: "salinity", threshold: 30, condition: "lessThan", unit: "Percent" },
-      ec: { sensorType: "ec", threshold: 30, condition: "lessThan", unit: "Percent" },
+      tds: { sensorType: "tds", threshold: 30, condition: "lessThan", unit: "%" },
+      salinity: { sensorType: "salinity", threshold: 30, condition: "lessThan", unit: "%" },
+      ec: { sensorType: "ec", threshold: 30, condition: "lessThan", unit: "%" },
       temperature: { sensorType: "temperature", threshold: [1, 50], condition: "outsideRange", unit: "°C" },
     };
-    
-    // Call the function to handle data insertion and Socket.IO emissions
+
     const {
       turbidity_value,
       ph_value,
@@ -3706,7 +3838,7 @@ app.post("/api/sensor-data", async (req, res) => {
       temperature_celsius,
     } = jsonData;
 
-    // Use Promise.all to run all database insertions in parallel
+    // 🔹 Insert + emit (your existing insertAndEmit function)
     await Promise.all([
       insertAndEmit("turbidity_readings", "turbidity_value", turbidity_value, "updateTurbidityData", notifications.turbidity),
       insertAndEmit("phlevel_readings", "ph_value", ph_value, "updatePHData", notifications.ph),
@@ -3717,14 +3849,32 @@ app.post("/api/sensor-data", async (req, res) => {
       insertAndEmit("temperature_readings", "temperature_celsius", temperature_celsius, "updateTemperatureData", notifications.temperature),
     ]);
 
-    res.status(200).send("Data received and processed successfully.");
+    // 🔹 Check thresholds & send SMS alerts
+    if (isThresholdViolated(turbidity_value, notifications.turbidity)) {
+      await notifyAdmins("turbidity", turbidity_value, notifications.turbidity.unit);
+    }
+    if (isThresholdViolated(ph_value, notifications.ph)) {
+      await notifyAdmins("ph", ph_value, notifications.ph.unit);
+    }
+    if (isThresholdViolated(tds_value, notifications.tds)) {
+      await notifyAdmins("tds", tds_value, notifications.tds.unit);
+    }
+    if (isThresholdViolated(salinity_value, notifications.salinity)) {
+      await notifyAdmins("salinity", salinity_value, notifications.salinity.unit);
+    }
+    if (isThresholdViolated(ec_value_mS, notifications.ec)) {
+      await notifyAdmins("ec", ec_value_mS, notifications.ec.unit);
+    }
+    if (isThresholdViolated(temperature_celsius, notifications.temperature)) {
+      await notifyAdmins("temperature", temperature_celsius, notifications.temperature.unit);
+    }
 
+    res.status(200).send("✅ Data received, processed, and alerts checked.");
   } catch (err) {
-    console.error("Error processing data:", err.message);
+    console.error("❌ Error processing data:", err.message);
     res.status(500).send("Internal Server Error");
   }
 });
-
 
 // -----------------------------------------------------------------
 // === HELPER FUNCTIONS ===
