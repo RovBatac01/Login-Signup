@@ -191,17 +191,16 @@ const io = new Server(server, {
   }
 });
 
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 // Middleware
 app.use(cors({
   origin: "*",
-  credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // --- Debugging Middleware ---
 // This will log every incoming request to the server, which can help diagnose routing issues.
