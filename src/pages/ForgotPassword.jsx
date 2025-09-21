@@ -69,7 +69,7 @@ const ForgotPassword = () => {
 
       // ✅ save reset token from backend response
       setResetToken(data.token);
-      localStorage.setItem("resetToken", data.token);
+      localStorage.setItem("resetToken", data.resetToken);
 
       setStatus({ type: 'success', message: 'OTP verified successfully. Proceed to reset your password.' });
       setShowOtpModal(false);
