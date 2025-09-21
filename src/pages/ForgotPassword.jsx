@@ -31,7 +31,9 @@ const ForgotPassword = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ email }),
       });
 
@@ -44,6 +46,7 @@ const ForgotPassword = () => {
         message: data.message
       });
 
+      setOtpSent(true);
       setShowOtpModal(true);
     } catch (error) {
       setStatus({
@@ -72,8 +75,6 @@ const ForgotPassword = () => {
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.message);
-      
-      setResetToken(data.resetToken);
 
       setStatus({
         type: 'success',
@@ -109,7 +110,7 @@ const ForgotPassword = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${resetToken}`,
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ newPassword, confirmPassword }),
       });
@@ -120,7 +121,8 @@ const ForgotPassword = () => {
 
       setStatus({ type: 'success', message: 'Password reset successful! You can now log in.' });
       setShowResetModal(false);
-      setShowSuccessModal(true);
+      alert('Password reset successful! Redirecting to login...');
+      window.location.href = '/login';
     } catch (error) {
       setStatus({ type: 'error', message: 'Password reset failed. Please try again.' });
     } finally {
