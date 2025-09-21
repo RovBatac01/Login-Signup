@@ -1060,38 +1060,45 @@ app.post('/api/forgot-password', async (req, res) => { // 'async' is already the
 });
 
 // validate otp (Fixed typo from 'validtae itp' to 'validate otp')
-app.post('/api/validate-otp', async (req, res) => { // Added 'async'
-  const { email, otp } = req.body;
+app.post('/api/validate-otp', async (req, res) => {
+    const { email, otp } = req.body;
 
-  if (!email || !otp) {
-    return res.status(400).json({ message: 'Email and OTP are required.' });
-  }
-
-  const querySql = `SELECT reset_otp, otp_expires FROM users WHERE email = ?`; // Changed 'query' to 'querySql' for clarity
-  try { // Added try-catch
-    const [results] = await db.query(querySql, [email]); // Corrected: Await db.query
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'User not found.' });
+    if (!email || !otp) {
+        return res.status(400).json({ message: 'Email and OTP are required.' });
     }
 
-    const user = results[0];
-    const currentTime = new Date();
-    const otpExpiration = new Date(user.otp_expires);
+    const querySql = `SELECT id, reset_otp, otp_expires FROM users WHERE email = ?`;
+    try {
+        const [results] = await db.query(querySql, [email]);
 
-    if (user.reset_otp !== otp) {
-      return res.status(400).json({ message: 'Invalid OTP.' });
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = results[0];
+        const currentTime = new Date();
+        const otpExpiration = new Date(user.otp_expires);
+
+        if (user.reset_otp !== otp) {
+            return res.status(400).json({ message: 'Invalid OTP.' });
+        }
+
+        if (currentTime > otpExpiration) {
+            return res.status(400).json({ message: 'OTP has expired.' });
+        }
+
+        // --- IMPORTANT CHANGE HERE ---
+        // OTP is valid, now generate a temporary JWT token for password reset
+        const resetToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '10m' });
+
+        return res.status(200).json({
+            message: 'OTP verified successfully.',
+            resetToken: resetToken, // Send the token back to the client
+        });
+    } catch (err) {
+        console.error('Database error during OTP validation:', err);
+        return res.status(500).json({ message: 'Database error.' });
     }
-
-    if (currentTime > otpExpiration) {
-      return res.status(400).json({ message: 'OTP has expired.' });
-    }
-
-    return res.status(200).json({ message: 'OTP verified successfully.' });
-  } catch (err) {
-    console.error('Database error during OTP validation:', err);
-    return res.status(500).json({ message: 'Database error.' });
-  }
 });
 
 // Route to reset the password after OTP verification
