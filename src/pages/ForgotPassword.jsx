@@ -19,6 +19,8 @@ const ForgotPassword = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [resetToken, setResetToken] = useState(null); // ⬅️ store token
+
   const { theme } = useContext(ThemeContext);
 
   const handleSubmitEmail = async (e) => {
@@ -31,28 +33,18 @@ const ForgotPassword = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        credentials: 'include',
         body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message);
 
-      setStatus({
-        type: 'success',
-        message: data.message
-      });
-
+      setStatus({ type: 'success', message: data.message });
       setOtpSent(true);
       setShowOtpModal(true);
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Failed to send OTP. Please try again.'
-      });
+      setStatus({ type: 'error', message: 'Failed to send OTP. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -73,22 +65,18 @@ const ForgotPassword = () => {
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message);
 
-      setStatus({
-        type: 'success',
-        message: 'OTP verified successfully. Proceed to reset your password.'
-      });
+      // ✅ save reset token from backend response
+      setResetToken(data.token);
+      localStorage.setItem("resetToken", data.token);
 
+      setStatus({ type: 'success', message: 'OTP verified successfully. Proceed to reset your password.' });
       setShowOtpModal(false);
       setOtp('');
       setShowResetModal(true);
     } catch (error) {
-      setStatus({
-        type: 'error',
-        message: 'Invalid OTP. Please try again.'
-      });
+      setStatus({ type: 'error', message: 'Invalid OTP. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -106,16 +94,17 @@ const ForgotPassword = () => {
     }
 
     try {
-      const response = await fetch('https://login-signup-3470.onrender.com/api/reset-password', {
+      const token = resetToken || localStorage.getItem("resetToken");
+
+      const response = await fetch('https://login-signup-3470.onrender.com/api/reset-password-notloggedin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ newPassword, confirmPassword }),
+        body: JSON.stringify({ token, newPassword, confirmPassword }), // ⬅️ include token
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message);
 
       setStatus({ type: 'success', message: 'Password reset successful! You can now log in.' });

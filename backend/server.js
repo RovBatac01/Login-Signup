@@ -1157,6 +1157,47 @@ app.post("/api/reset-password", async (req, res) => { // 'async' is already ther
   }
 });
 
+app.post("/api/reset-password-notloggedin", async (req, res) => {
+  const { token, newPassword, confirmPassword } = req.body;
+
+  if (!token) {
+    return res.status(401).json({ message: "Reset token is required" });
+  }
+
+  try {
+    // Verify the reset token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    // Validate password input
+    if (!newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "Both new password and confirm password are required." });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "Password must be at least 6 characters long." });
+    }
+
+    // Hash and update password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const updateQuery = 'UPDATE users SET password_hash = ?, reset_otp = NULL, otp_expires = NULL WHERE id = ?';
+    const [result] = await db.query(updateQuery, [hashedPassword, userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({ message: "Password reset successful!" });
+  } catch (err) {
+    console.error("JWT verification or password reset failed:", err);
+    return res.status(401).json({ message: "Unauthorized. Invalid or expired token." });
+  }
+});
 
 app.get('/api/admin/establishments', async (req, res) => {
     // In a real application, the user_id would come from an authenticated session
