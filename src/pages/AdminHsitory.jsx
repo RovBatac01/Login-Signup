@@ -226,6 +226,105 @@ const AdminHistory = () => {
         }
     };
 
+    // Function to fetch sensor data for PDF export
+    const fetchSensorData = async () => {
+        setMessage('');
+        setMessageType('');
+
+        // Ensure establishmentId is available
+        if (!establishmentId) {
+            setMessage('Cannot export: Establishment ID is missing.');
+            setMessageType('error');
+            return null;
+        }
+
+        try {
+            const filterToEndpoint = {
+                "realtime": "realtime",
+                "24h": "24h",
+                "7d": "7d-avg",
+                "30d": "30d-avg",
+            };
+
+            const backendFilter = filterToEndpoint[filter];
+            if (!backendFilter) {
+                setMessage('Invalid filter selected for export.');
+                setMessageType('error');
+                return null;
+            }
+
+            let dataToExport = {};
+
+            // Fetch data ONLY for the filtered sensors that are associated with the establishment
+            for (const sensor of sensorDefinitions) {
+                const endpoint = `https://login-signup-3470.onrender.com/data${sensor.apiPath}/${backendFilter}?establishmentId=${establishmentId}`;
+                console.log(`Fetching data for ${sensor.name} from: ${endpoint}`);
+                
+                const response = await fetch(endpoint);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${sensor.name} data: ${response.statusText}`);
+                }
+                const data = await response.json();
+
+                const formattedSensorData = data.map(item => ({
+                    Timestamp: new Date(item.timestamp).toLocaleString(),
+                    Value: parseFloat(item.value),
+                    Unit: getSensorUnit(sensor.name),
+                    sensorName: sensor.name
+                }));
+                
+                dataToExport[sensor.name] = formattedSensorData;
+            }
+
+            const hasData = Object.values(dataToExport).some(arr => arr.length > 0);
+            if (!hasData) {
+                setMessage('No data available for export based on the selected filter and establishment.');
+                setMessageType('error');
+                return null;
+            }
+
+            return dataToExport;
+
+        } catch (error) {
+            console.error("Error fetching sensor data:", error);
+            setMessage(`Error fetching data: ${error.message}`);
+            setMessageType('error');
+            return null;
+        }
+    };
+
+    // Export to PDF function
+    const exportToPDF = async () => {
+        setExportingPdf(true);
+        setMessage('');
+        setMessageType('');
+        
+        try {
+            const dataToExport = await fetchSensorData();
+            if (!dataToExport) {
+                setExportingPdf(false);
+                return;
+            }
+
+            // Generate PDF using our utility function
+            const establishmentName = currentUser?.establishmentName || "Unknown Establishment";
+            const pdfBlob = exportToPdf(dataToExport, filter, establishmentName);
+            
+            // Save the PDF
+            savePdf(pdfBlob, filter, establishmentName);
+            console.log("PDF file exported successfully.");
+            setMessage('PDF file exported successfully!');
+            setMessageType('success');
+
+        } catch (error) {
+            console.error("Error exporting PDF:", error);
+            setMessage(`Error exporting PDF: ${error.message}`);
+            setMessageType('error');
+        } finally {
+            setExportingPdf(false);
+        }
+    };
+
     if (isLoadingSensors) {
         return (
             <div className={`aqua-history-page ${theme}`}>
@@ -241,33 +340,6 @@ const AdminHistory = () => {
             </div>
         );
     }
-
-        // Export to PDF function
-        const exportToPDF = async () => {
-            setExportingPdf(true);
-            
-            try {
-                const dataToExport = await fetchSensorData();
-                if (!dataToExport) {
-                    setExportingPdf(false);
-                    return;
-                }
-    
-                // Generate PDF using our utility function
-                const establishmentName = user?.establishmentName || "All Establishments";
-                const pdfBlob = exportToPdf(dataToExport, filter, establishmentName);
-                
-                // Save the PDF
-                savePdf(pdfBlob, filter, establishmentName);
-                console.log("PDF file exported successfully.");
-    
-            } catch (error) {
-                console.error("Error exporting PDF:", error);
-                alert(`Error exporting PDF: ${error.message}. Check browser console for details.`);
-            } finally {
-                setExportingPdf(false);
-            }
-        };
 
     return (
         <div className={`aqua-history-page ${theme}`}>
