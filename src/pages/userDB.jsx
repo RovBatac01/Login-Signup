@@ -508,14 +508,17 @@ const Userdb = () => {
             );
             
             if (shouldForceClose) {
-                console.log("� EMERGENCY FIX: Force closing modal NOW");
+                console.log("🚨 EMERGENCY FIX: Force closing modal NOW");
                 setShowAccessModal(false);
                 setIsPolling(false);
                 
-                // Clear all flags aggressively
-                localStorage.clear(); // Nuclear option - clear everything
-                localStorage.setItem('token', getToken()); // Restore token
-                localStorage.setItem('user', JSON.stringify(currentUser)); // Restore user
+                // Clear only modal-related flags, NOT authentication data
+                localStorage.removeItem('showAccessModalOnLoad');
+                localStorage.removeItem('needsDeviceAccess');
+                localStorage.removeItem('isGoogleLogin');
+                
+                // DO NOT clear localStorage completely as it removes authentication
+                console.log("🚨 EMERGENCY FIX: Cleared modal flags only, preserving auth data");
             }
         }
     }, []); // Run only once on mount

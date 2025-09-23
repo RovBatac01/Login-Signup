@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -29,9 +29,11 @@ import "./styles/theme.css";
 // Protected Route Wrapper
 const ProtectedRoute = ({ element, allowedRoles }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     // NEW: Use AuthContext to get authentication state
     const { currentUser, userRole, authToken, isVerified } = useContext(AuthContext);
     const localStorageUserRole = localStorage.getItem("userRole");
+    const localStorageToken = localStorage.getItem("token");
     let localStorageCurrentUser = null;
     const userString = localStorage.getItem('user'); 
 
@@ -44,34 +46,47 @@ const ProtectedRoute = ({ element, allowedRoles }) => {
     }
     const isUserVerified = localStorageCurrentUser ? localStorageCurrentUser.isVerified === true : false;
 
-
     useEffect(() => {
-        if (window.location.pathname === "/userDB" && localStorageUserRole === "User" && !isUserVerified) {
+        // Only set the modal flag for unverified users trying to access userDB
+        const currentPath = location.pathname;
+        if (currentPath === "/userDB" && localStorageUserRole === "User" && !isUserVerified) {
             localStorage.setItem('showAccessModalOnLoad', 'true');
             console.log("ProtectedRoute: Set showAccessModalOnLoad for unverified User navigating to /userDB.");
         } else {
             localStorage.removeItem('showAccessModalOnLoad');
             console.log("ProtectedRoute: Cleared showAccessModalOnLoad.");
         }
-    }, [localStorageUserRole, isUserVerified, window.location.pathname]);
+    }, [location.pathname, localStorageUserRole, isUserVerified]);
 
-    // Primary check for authentication using localStorageUserRole
-    if (!localStorageUserRole) {
-        console.log("ProtectedRoute: No userRole found, redirecting to /login");
+    // Check if user is authenticated
+    if (!localStorageUserRole || !localStorageToken) {
+        console.log("ProtectedRoute: No userRole or token found, redirecting to /login");
+        console.log("ProtectedRoute: userRole:", localStorageUserRole);
+        console.log("ProtectedRoute: token exists:", !!localStorageToken);
         return <Navigate to="/login" replace />;
     }
 
+    // Log the current check for debugging
+    console.log(`ProtectedRoute: Checking access for path: ${location.pathname}`);
+    console.log(`ProtectedRoute: User role: ${localStorageUserRole}`);
+    console.log(`ProtectedRoute: Allowed roles: ${allowedRoles.join(', ')}`);
+    console.log(`ProtectedRoute: Role allowed: ${allowedRoles.includes(localStorageUserRole)}`);
+
+    // Check if user role is allowed for this route
     if (!allowedRoles.includes(localStorageUserRole)) {
         console.log(`ProtectedRoute: User role '${localStorageUserRole}' not allowed for this route. Allowed: ${allowedRoles.join(', ')}`);
 
+        // Redirect to appropriate dashboard based on role
         if (localStorageUserRole === "User") {
             console.log("ProtectedRoute: User role trying to access restricted page, redirecting to /userDB.");
             return <Navigate to="/userDB" replace />;
         } else if (localStorageUserRole === "Admin") {
             console.log("ProtectedRoute: Admin role trying to access restricted page, redirecting to /adminDB.");
             return <Navigate to="/adminDB" replace />;
-        }
-        else {
+        } else if (localStorageUserRole === "Super Admin") {
+            console.log("ProtectedRoute: Super Admin role trying to access restricted page, redirecting to /dashboard.");
+            return <Navigate to="/dashboard" replace />;
+        } else {
             console.log("ProtectedRoute: Unrecognized role trying to access a restricted page, redirecting to /login.");
             return <Navigate to="/login" replace />;
         }
