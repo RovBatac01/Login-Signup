@@ -182,29 +182,19 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
-const allowedOrigins = ["http://localhost:5173", "https://your-deployed-frontend.com"];
-
-// 2. Add all your middleware for parsing and security
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Your CORS configuration must be defined after express app is initialized.
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true, // This is essential for handling credentials securely
+    origin: "*",               // allow all origins
+    credentials: true,         // allow cookies/auth headers (won't work with * for credentials)
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// 3. Create the single HTTP server that will handle both Express and Socket.IO
-const server = http.createServer(app);
-
-// 4. Initialize your Socket.IO server and attach it to the HTTP server
+// Socket.IO CORS
 const io = new Server(server, {
     cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"]
+        origin: "*",           // allow all origins
+        methods: ["GET", "POST"],
+        credentials: true      // note: credentials with * origin is ignored
     }
 });
 
