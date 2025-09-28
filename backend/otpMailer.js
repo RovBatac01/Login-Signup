@@ -22,7 +22,7 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
             pass: process.env.EMAIL_PASS,
         },
         // Optionally increase timeout if connection is slow, not blocked
-        // connectionTimeout: 10000, // 10 seconds
+        connectionTimeout: 30000, // 10 seconds
     });
 
 // Function to send OTP email
