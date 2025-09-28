@@ -28,20 +28,7 @@ const port = 5000;
 const saltRounds = 10;
 const otpGenerator = require('otp-generator');
 const JWT_SECRET = process.env.JWT_SECRET;
-const twilio = require("twilio");
 // const users = [];
-
-const lastSent = {}; // { sensorType: timestamp }
-
-// ============================
-// Twilio credentials
-// ============================
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhone = process.env.TWILIO_PHONE_NUMBER;// Replace with your Twilio number
-const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER;
-
-const twilioClient = twilio(accountSid, authToken);
 
 const authenticateUser = require('./middleware/authenticateUser');
 
@@ -182,31 +169,25 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
-const allowedOrigins = ["http://localhost:5173", "https://your-deployed-frontend.com"];
+// Create the single HTTP server that will handle both Express and Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Allow all origins for the frontend and bridge app
+    methods: ["GET", "POST"]
+  }
+});
 
-// 2. Add all your middleware for parsing and security
+// Middleware
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Your CORS configuration must be defined after express app is initialized.
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-// 3. Create the single HTTP server that will handle both Express and Socket.IO
-const server = http.createServer(app);
-
-// 4. Initialize your Socket.IO server and attach it to the HTTP server
-const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"]
-    }
-});
 
 // --- Debugging Middleware ---
 // This will log every incoming request to the server, which can help diagnose routing issues.
@@ -1060,45 +1041,38 @@ app.post('/api/forgot-password', async (req, res) => { // 'async' is already the
 });
 
 // validate otp (Fixed typo from 'validtae itp' to 'validate otp')
-app.post('/api/validate-otp', async (req, res) => {
-    const { email, otp } = req.body;
+app.post('/api/validate-otp', async (req, res) => { // Added 'async'
+  const { email, otp } = req.body;
 
-    if (!email || !otp) {
-        return res.status(400).json({ message: 'Email and OTP are required.' });
+  if (!email || !otp) {
+    return res.status(400).json({ message: 'Email and OTP are required.' });
+  }
+
+  const querySql = `SELECT reset_otp, otp_expires FROM users WHERE email = ?`; // Changed 'query' to 'querySql' for clarity
+  try { // Added try-catch
+    const [results] = await db.query(querySql, [email]); // Corrected: Await db.query
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'User not found.' });
     }
 
-    const querySql = `SELECT id, reset_otp, otp_expires FROM users WHERE email = ?`;
-    try {
-        const [results] = await db.query(querySql, [email]);
+    const user = results[0];
+    const currentTime = new Date();
+    const otpExpiration = new Date(user.otp_expires);
 
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'User not found.' });
-        }
-
-        const user = results[0];
-        const currentTime = new Date();
-        const otpExpiration = new Date(user.otp_expires);
-
-        if (user.reset_otp !== otp) {
-            return res.status(400).json({ message: 'Invalid OTP.' });
-        }
-
-        if (currentTime > otpExpiration) {
-            return res.status(400).json({ message: 'OTP has expired.' });
-        }
-
-        // --- IMPORTANT CHANGE HERE ---
-        // OTP is valid, now generate a temporary JWT token for password reset
-        const resetToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '10m' });
-
-        return res.status(200).json({
-            message: 'OTP verified successfully.',
-            resetToken: resetToken, // Send the token back to the client
-        });
-    } catch (err) {
-        console.error('Database error during OTP validation:', err);
-        return res.status(500).json({ message: 'Database error.' });
+    if (user.reset_otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP.' });
     }
+
+    if (currentTime > otpExpiration) {
+      return res.status(400).json({ message: 'OTP has expired.' });
+    }
+
+    return res.status(200).json({ message: 'OTP verified successfully.' });
+  } catch (err) {
+    console.error('Database error during OTP validation:', err);
+    return res.status(500).json({ message: 'Database error.' });
+  }
 });
 
 // Route to reset the password after OTP verification
@@ -1157,47 +1131,6 @@ app.post("/api/reset-password", async (req, res) => { // 'async' is already ther
   }
 });
 
-app.post("/api/reset-password-notloggedin", async (req, res) => {
-  const { token, newPassword, confirmPassword } = req.body;
-
-  if (!token) {
-    return res.status(401).json({ message: "Reset token is required" });
-  }
-
-  try {
-    // Verify the reset token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-
-    // Validate password input
-    if (!newPassword || !confirmPassword) {
-      return res.status(400).json({ message: "Both new password and confirm password are required." });
-    }
-
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match." });
-    }
-
-    if (newPassword.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters long." });
-    }
-
-    // Hash and update password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    const updateQuery = 'UPDATE users SET password_hash = ?, reset_otp = NULL, otp_expires = NULL WHERE id = ?';
-    const [result] = await db.query(updateQuery, [hashedPassword, userId]);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    return res.status(200).json({ message: "Password reset successful!" });
-  } catch (err) {
-    console.error("JWT verification or password reset failed:", err);
-    return res.status(401).json({ message: "Unauthorized. Invalid or expired token." });
-  }
-});
 
 app.get('/api/admin/establishments', async (req, res) => {
     // In a real application, the user_id would come from an authenticated session
@@ -3747,106 +3680,22 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
-// Helper: format Philippine numbers
-function formatPHNumber(number) {
-  if (!number) return null;
-  if (number.startsWith("0")) return "+63" + number.slice(1);
-  if (number.startsWith("+")) return number;
-  return "+63" + number; // fallback
-}
-
-// Get admin phone numbers
-async function getAdmins() {
-  const connection = await pool.getConnection();
-  const [rows] = await connection.execute(
-    "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
-  );
-  connection.release();
-  return rows;
-}
-
-// Send SMS
-async function sendSMS(to, message) {
-  try {
-    const msg = await twilioClient.messages.create({
-      body: message,
-      from: twilioPhone,
-      to: to,
-    });
-    console.log(`📩 SMS sent to ${to}: ${msg.sid}`);
-  } catch (err) {
-    console.error("❌ SMS sending failed:", err.message);
-  }
-}
-
-// Send WhatsApp
-async function sendWhatsApp(to, message) {
-  try {
-    const msg = await twilioClient.messages.create({
-      body: message,
-      from: `whatsapp:${whatsappNumber}`,
-      to: `whatsapp:${to}`,
-    });
-    console.log(`📩 WhatsApp sent to ${to}: ${msg.sid}`);
-  } catch (err) {
-    console.error("❌ WhatsApp sending failed:", err.message);
-  }
-}
-
-// Check threshold violation
-function isThresholdViolated(value, config) {
-  if (config.condition === "lessThan") return value < config.threshold;
-  if (config.condition === "outsideRange")
-    return value < config.threshold[0] || value > config.threshold[1];
-  return false;
-}
-
-// Notify admins
-async function notifyAdmins(sensorType, value, unit) {
-  const now = Date.now();
-  const admins = await getAdmins();
-
-  if (!admins.length) {
-    console.log("⚠️ No admins found with phone numbers");
-    return;
-  }
-
-  const message = `⚠️ ALERT: ${sensorType} value is ${value}${unit}, outside safe threshold!`;
-
-  for (const admin of admins) {
-    if (!admin.phone) continue;
-    const formattedPhone = formatPHNumber(admin.phone);
-
-    // SMS with cooldown
-    if (!lastSent[sensorType] || now - lastSent[sensorType] >= 5 * 60 * 1000) {
-      await sendSMS(formattedPhone, message);
-      lastSent[sensorType] = now;
-    } else {
-      console.log(`⏳ SMS skipped for ${sensorType}, still cooling down`);
-    }
-
-    // WhatsApp always
-    await sendWhatsApp(formattedPhone, message);
-  }
-}
-
-// ============================
-// 5. Sensor data endpoint
-// ============================
 app.post("/api/sensor-data", async (req, res) => {
   try {
-    const data = req.body;
-    console.log("📡 Received data:", data);
+    const jsonData = req.body;
+    console.log("📡 Received data from local bridge:", jsonData);
 
+    // Define notification configurations for each sensor
     const notifications = {
-      turbidity: { sensorType: "turbidity", threshold: 30, condition: "lessThan", unit: "%" },
+      turbidity: { sensorType: "turbidity", threshold: 30, condition: "lessThan", unit: "Percent" },
       ph: { sensorType: "ph", threshold: [0.5, 8.5], condition: "outsideRange", unit: "pH" },
-      tds: { sensorType: "tds", threshold: 30, condition: "lessThan", unit: "%" },
-      salinity: { sensorType: "salinity", threshold: 30, condition: "lessThan", unit: "%" },
-      ec: { sensorType: "ec", threshold: 30, condition: "lessThan", unit: "%" },
+      tds: { sensorType: "tds", threshold: 30, condition: "lessThan", unit: "Percent" },
+      salinity: { sensorType: "salinity", threshold: 30, condition: "lessThan", unit: "Percent" },
+      ec: { sensorType: "ec", threshold: 30, condition: "lessThan", unit: "Percent" },
       temperature: { sensorType: "temperature", threshold: [1, 50], condition: "outsideRange", unit: "°C" },
     };
-
+    
+    // Call the function to handle data insertion and Socket.IO emissions
     const {
       turbidity_value,
       ph_value,
@@ -3855,9 +3704,9 @@ app.post("/api/sensor-data", async (req, res) => {
       ec_value_mS,
       ec_compensated_mS,
       temperature_celsius,
-    } = data;
+    } = jsonData;
 
-    // 🔹 Insert & emit (replace with your actual insertAndEmit)
+    // Use Promise.all to run all database insertions in parallel
     await Promise.all([
       insertAndEmit("turbidity_readings", "turbidity_value", turbidity_value, "updateTurbidityData", notifications.turbidity),
       insertAndEmit("phlevel_readings", "ph_value", ph_value, "updatePHData", notifications.ph),
@@ -3868,26 +3717,14 @@ app.post("/api/sensor-data", async (req, res) => {
       insertAndEmit("temperature_readings", "temperature_celsius", temperature_celsius, "updateTemperatureData", notifications.temperature),
     ]);
 
-    // 🔹 Check thresholds & notify
-    if (isThresholdViolated(turbidity_value, notifications.turbidity))
-      await notifyAdmins("turbidity", turbidity_value, notifications.turbidity.unit);
-    if (isThresholdViolated(ph_value, notifications.ph))
-      await notifyAdmins("ph", ph_value, notifications.ph.unit);
-    if (isThresholdViolated(tds_value, notifications.tds))
-      await notifyAdmins("tds", tds_value, notifications.tds.unit);
-    if (isThresholdViolated(salinity_value, notifications.salinity))
-      await notifyAdmins("salinity", salinity_value, notifications.salinity.unit);
-    if (isThresholdViolated(ec_value_mS, notifications.ec))
-      await notifyAdmins("ec", ec_value_mS, notifications.ec.unit);
-    if (isThresholdViolated(temperature_celsius, notifications.temperature))
-      await notifyAdmins("temperature", temperature_celsius, notifications.temperature.unit);
+    res.status(200).send("Data received and processed successfully.");
 
-    res.status(200).send("✅ Data received, processed, alerts checked.");
   } catch (err) {
-    console.error("❌ Error processing data:", err.message);
+    console.error("Error processing data:", err.message);
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 // -----------------------------------------------------------------
 // === HELPER FUNCTIONS ===
