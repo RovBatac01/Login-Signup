@@ -182,7 +182,7 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
-const allowedOrigins = ["http://localhost:5173", "https://your-deployed-frontend.com"];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5000" ];
 
 // 2. Add all your middleware for parsing and security
 app.use(bodyParser.json());
@@ -3747,53 +3747,38 @@ const sensorTableMap = {
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
  // CLEAN VERSION NG BACKEND FOR GAUGE METER AND HISTORICAL DATA RAWR RAWR RAWR RAWR RAWR
 
-// Helper: format Philippine numbers
-function formatPHNumber(number) {
-  if (!number) return null;
-  if (number.startsWith("0")) return "+63" + number.slice(1);
-  if (number.startsWith("+")) return number;
-  return "+63" + number; // fallback
+
+
+// --- Notify all Admins ---
+async function notifyAdmins(sensorType, value, unit) {
+  const now = Date.now();
+  const admins = await getAdmins();
+
+  if (!admins.length) {
+    console.log("⚠️ No admins found with phone numbers");
+    return;
+  }
+
+  const message = `⚠️ ALERT: ${sensorType} value is ${value}${unit}, outside safe threshold!`;
+
+  for (const admin of admins) {
+    if (!admin.phone) continue;
+    const formattedPhone = formatPHNumber(admin.phone);
+
+    if (!lastSent[sensorType] || now - lastSent[sensorType] >= 5 * 60 * 1000) {
+      await sendSMS(formattedPhone, message);
+      lastSent[sensorType] = now;
+    } else {
+      console.log(`⏳ SMS skipped for ${sensorType}, still cooling down`);
+    }
+  }
 }
 
-// Get admin phone numbers
-async function getAdmins() {
-  const connection = await pool.getConnection();
-  const [rows] = await connection.execute(
-    "SELECT phone FROM users WHERE role IN ('Admin','Super Admin') AND phone IS NOT NULL"
-  );
-  connection.release();
-  return rows;
-}
+// --- REMOVED: Send WhatsApp ---
+// PhilSMS is primarily for SMS. If you need WhatsApp, you'll need to 
+// integrate a separate API (like Twilio or another provider).
 
-// Send SMS - COMMENTED OUT (Twilio not installed)
-// async function sendSMS(to, message) {
-//   try {
-//     const msg = await twilioClient.messages.create({
-//       body: message,
-//       from: twilioPhone,
-//       to: to,
-//     });
-//     console.log(`📩 SMS sent to ${to}: ${msg.sid}`);
-//   } catch (err) {
-//     console.error("❌ SMS sending failed:", err.message);
-//   }
-// }
-
-// Send WhatsApp - COMMENTED OUT (Twilio not installed)
-// async function sendWhatsApp(to, message) {
-//   try {
-//     const msg = await twilioClient.messages.create({
-//       body: message,
-//       from: `whatsapp:${whatsappNumber}`,
-//       to: `whatsapp:${to}`,
-//     });
-//     console.log(`📩 WhatsApp sent to ${to}: ${msg.sid}`);
-//   } catch (err) {
-//     console.error("❌ WhatsApp sending failed:", err.message);
-//   }
-// }
-
-// Check threshold violation
+// Check threshold violation (Keep as-is)
 function isThresholdViolated(value, config) {
   if (config.condition === "lessThan") return value < config.threshold;
   if (config.condition === "outsideRange")
@@ -3801,7 +3786,7 @@ function isThresholdViolated(value, config) {
   return false;
 }
 
-// Notify admins
+// Notify admins (Minor change: WhatsApp logic removed)
 async function notifyAdmins(sensorType, value, unit) {
   const now = Date.now();
   const admins = await getAdmins();
@@ -3824,9 +3809,6 @@ async function notifyAdmins(sensorType, value, unit) {
     } else {
       console.log(`⏳ SMS skipped for ${sensorType}, still cooling down`);
     }
-
-    // WhatsApp always
-    await sendWhatsApp(formattedPhone, message);
   }
 }
 
