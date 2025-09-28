@@ -12,13 +12,15 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
   process.exit(1);
 }
 
-// Create the transporter
+// Create the transporter using Gmail SMTP explicitly
 const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Use App Password (not Gmail password)
-  },
+    host: "smtp.gmail.com",        // Gmail SMTP host
+    port: 465,                     // Try 465 (SSL) or 587 (TLS)
+    secure: true,                  // true for 465, false for 587
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS, // App password
+    },
 });
 
 // Function to send OTP email
