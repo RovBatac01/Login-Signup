@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./.env" });
+require("dotenv").config({ path: "../.env" });
 
 const db = require("./config/db");
 const pool = require ("./config/db");
@@ -28,20 +28,20 @@ const port = 5000;
 const saltRounds = 10;
 const otpGenerator = require('otp-generator');
 const JWT_SECRET = process.env.JWT_SECRET;
-const twilio = require("twilio");
+// const twilio = require("twilio");
 // const users = [];
 
 const lastSent = {}; // { sensorType: timestamp }
 
 // ============================
-// Twilio credentials
+// Twilio credentials - COMMENTED OUT
 // ============================
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhone = process.env.TWILIO_PHONE_NUMBER;// Replace with your Twilio number
-const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER;
+// const accountSid = process.env.TWILIO_ACCOUNT_SID;
+// const authToken = process.env.TWILIO_AUTH_TOKEN;
+// const twilioPhone = process.env.TWILIO_PHONE_NUMBER;// Replace with your Twilio number
+// const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 
-const twilioClient = twilio(accountSid, authToken);
+// const twilioClient = twilio(accountSid, authToken);
 
 const authenticateUser = require('./middleware/authenticateUser');
 
@@ -3765,33 +3765,33 @@ async function getAdmins() {
   return rows;
 }
 
-// Send SMS
-async function sendSMS(to, message) {
-  try {
-    const msg = await twilioClient.messages.create({
-      body: message,
-      from: twilioPhone,
-      to: to,
-    });
-    console.log(`📩 SMS sent to ${to}: ${msg.sid}`);
-  } catch (err) {
-    console.error("❌ SMS sending failed:", err.message);
-  }
-}
+// Send SMS - COMMENTED OUT (Twilio not installed)
+// async function sendSMS(to, message) {
+//   try {
+//     const msg = await twilioClient.messages.create({
+//       body: message,
+//       from: twilioPhone,
+//       to: to,
+//     });
+//     console.log(`📩 SMS sent to ${to}: ${msg.sid}`);
+//   } catch (err) {
+//     console.error("❌ SMS sending failed:", err.message);
+//   }
+// }
 
-// Send WhatsApp
-async function sendWhatsApp(to, message) {
-  try {
-    const msg = await twilioClient.messages.create({
-      body: message,
-      from: `whatsapp:${whatsappNumber}`,
-      to: `whatsapp:${to}`,
-    });
-    console.log(`📩 WhatsApp sent to ${to}: ${msg.sid}`);
-  } catch (err) {
-    console.error("❌ WhatsApp sending failed:", err.message);
-  }
-}
+// Send WhatsApp - COMMENTED OUT (Twilio not installed)
+// async function sendWhatsApp(to, message) {
+//   try {
+//     const msg = await twilioClient.messages.create({
+//       body: message,
+//       from: `whatsapp:${whatsappNumber}`,
+//       to: `whatsapp:${to}`,
+//     });
+//     console.log(`📩 WhatsApp sent to ${to}: ${msg.sid}`);
+//   } catch (err) {
+//     console.error("❌ WhatsApp sending failed:", err.message);
+//   }
+// }
 
 // Check threshold violation
 function isThresholdViolated(value, config) {

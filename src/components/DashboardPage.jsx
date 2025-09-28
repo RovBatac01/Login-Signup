@@ -94,7 +94,7 @@ const DashboardPage = () => {
     const fetchOtherData = async () => {
       // Fetch total establishments
       try {
-        const estResponse = await fetch('hhttp://localhost:5000/api/total-establishments');
+        const estResponse = await fetch('http://localhost:5000/api/total-establishments');
         if (!estResponse.ok) {
           const errorData = await estResponse.json().catch(() => ({ message: 'Unknown error' }));
           throw new Error(`HTTP error! Status: ${estResponse.status}. Message: ${errorData.error || 'Failed to fetch'}`);

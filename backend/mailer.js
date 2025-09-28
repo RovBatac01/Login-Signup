@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from parent directory
+dotenv.config({ path: "../.env" });
 
 // Ensure email credentials exist
 if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
