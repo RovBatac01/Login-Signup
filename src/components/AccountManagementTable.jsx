@@ -44,7 +44,7 @@ const UserAdminTable = () => {
     const fetchAccounts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("https://login-signup-3470.onrender.com/api/users");
+        const response = await axios.get("http://localhost:5000/api/users");
         setAccounts(response.data);
       } catch (err) {
         setError("Failed to fetch users.");
@@ -58,7 +58,7 @@ const UserAdminTable = () => {
   const handleAddAdmin = async (newAdmin) => {
     try {
       const response = await axios.post(
-        "https://login-signup-3470.onrender.com/api/users",
+        "http://localhost:5000/api/users",
         newAdmin
       );
       if (response.status === 201) {
@@ -74,7 +74,7 @@ const UserAdminTable = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`https://login-signup-3470.onrender.com/api/users/${id}`);
+      await axios.delete(`http://localhost:5000/api/users/${id}`);
       setAccounts((prev) => prev.filter((acc) => acc.id !== id));
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -92,7 +92,7 @@ const UserAdminTable = () => {
     try {
       setEditError(null);
       await axios.put(
-        `https://login-signup-3470.onrender.com/api/users/${editingUser.id}`,
+        `http://localhost:5000/api/users/${editingUser.id}`,
         editFormData
       );
       setAccounts((prev) =>

@@ -29,7 +29,7 @@ const ForgotPassword = () => {
     setStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch('https://login-signup-3470.onrender.com/api/forgot-password', {
+      const response = await fetch('http://localhost:5000/api/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
     setStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch('https://login-signup-3470.onrender.com/api/validate-otp', {
+      const response = await fetch('http://localhost:5000/api/validate-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
     try {
       const token = resetToken || localStorage.getItem("resetToken");
 
-      const response = await fetch('https://login-signup-3470.onrender.com/api/reset-password-notloggedin', {
+      const response = await fetch('http://localhost:5000/api/reset-password-notloggedin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

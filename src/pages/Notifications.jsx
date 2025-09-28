@@ -124,7 +124,7 @@ const NotificationsPage = () => {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const { theme } = useContext(ThemeContext);
 
-    const API_BASE_URL = "https://login-signup-3470.onrender.com";
+    const API_BASE_URL = "http://localhost:5000";
 
     // --- Filter Options ---
     const filterOptions = [

@@ -64,7 +64,7 @@ const History = () => {
         // Fetch data for each sensor
         for (const sensor of sensorDefinitions) {
             // Append establishmentId as a query parameter only if it exists
-            let endpoint = `https://login-signup-3470.onrender.com/data${sensor.apiPath}/${backendFilter}`;
+            let endpoint = `http://localhost:5000/data${sensor.apiPath}/${backendFilter}`;
             if (establishmentId) {
                 endpoint += `?establishmentId=${establishmentId}`;
             }

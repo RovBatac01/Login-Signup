@@ -44,7 +44,7 @@ const AdminDb = () => {
         throw new Error("Authentication token not found. Please log in.");
       }
 
-      const response = await fetch(`https://login-signup-3470.onrender.com/api/admin/assigned-establishments`, {
+      const response = await fetch(`http://localhost:5000/api/admin/assigned-establishments`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +115,7 @@ const AdminDb = () => {
         throw new Error("Authentication token missing for delete operation.");
       }
 
-      const response = await fetch(`https://login-signup-3470.onrender.com/api/establishments/${establishmentId}`, {
+      const response = await fetch(`http://localhost:5000/api/establishments/${establishmentId}`, {
         method: "DELETE",
         headers: {
           'Authorization': `Bearer ${token}`

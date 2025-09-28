@@ -90,7 +90,7 @@ const LoginForm = ({ onLoginSuccess, onLoginFailure, termsChecked, setTermsCheck
     }
 
     try {
-      const response = await axios.post("https://login-signup-3470.onrender.com/login", formData, {
+      const response = await axios.post("http://localhost:5000/login", formData, {
         headers: { "Content-Type": "application/json" }
       });
 

@@ -37,7 +37,7 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
       setEstablishmentError("");
       try {
         // --- FIX APPLIED HERE: Added '/api' prefix to the URL ---
-        const response = await axios.get("https://login-signup-3470.onrender.com/api/admin/establishments-for-creation");
+        const response = await axios.get("http://localhost:5000/api/admin/establishments-for-creation");
         setEstablishments(response.data);
       } catch (error) {
         console.error("Error fetching establishments:", error.response?.data || error);
@@ -106,7 +106,7 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
     }
 
     try {
-      const response = await axios.post("https://login-signup-3470.onrender.com/admin/verify-otp", {
+      const response = await axios.post("http://localhost:5000/admin/verify-otp", {
         email: emailForOtp,
         code: otp,
       });
@@ -175,7 +175,7 @@ const AdminCreationForm = ({ onClose, onAddAdmin }) => {
 
     if (!isOtpSent) {
       try {
-        const response = await axios.post("https://login-signup-3470.onrender.com/admin", {
+        const response = await axios.post("http://localhost:5000/admin", {
           username: adminData.username,
           email: adminData.email,
           password: adminData.password,

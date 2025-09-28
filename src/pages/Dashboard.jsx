@@ -43,7 +43,7 @@ const Dashboard = () => {
     try {
       // IMPORTANT: Ensure your backend's /api/establishments endpoint
       // now fetches and includes ALL associated sensors for each establishment.
-      const response = await fetch('https://login-signup-3470.onrender.com/api/establishments');
+      const response = await fetch('http://localhost:5000/api/establishments');
       console.log('Frontend - HTTP Response Status:', response.status);
       if (!response.ok) {
         const errorText = await response.text();
@@ -71,7 +71,7 @@ const Dashboard = () => {
       }
 
       // MODIFIED: Change the endpoint to fetch all sensors
-      const response = await fetch('https://login-signup-3470.onrender.com/api/sensors', { // Assuming /api/sensors gives all
+      const response = await fetch('http://localhost:5000/api/sensors', { // Assuming /api/sensors gives all
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -92,7 +92,7 @@ const Dashboard = () => {
 
   const addEstablishmentToDatabase = async (name, sensors, deviceId) => {
     try {
-      const response = await fetch('https://login-signup-3470.onrender.com/api/establishments', {
+      const response = await fetch('http://localhost:5000/api/establishments', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,7 +121,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch(`https://login-signup-3470.onrender.com/api/establishments/${establishmentId}`, {
+      const response = await fetch(`http://localhost:5000/api/establishments/${establishmentId}`, {
         method: "DELETE",
       });
 

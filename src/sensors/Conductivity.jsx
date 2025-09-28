@@ -19,20 +19,20 @@ const ConductivityMonitor = ({ theme, filter }) => { // Accept 'filter' prop
     // Determine the API endpoint based on the filter
     switch (currentFilter) {
       case "realtime":
-        endpoint = "https://login-signup-3470.onrender.com/data/ec-compensated/realtime"; // Backend endpoint for compensated EC
+        endpoint = "http://localhost:5000/data/ec-compensated/realtime"; // Backend endpoint for compensated EC
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "https://login-signup-3470.onrender.com/data/ec-compensated/24h"; // Backend endpoint for compensated EC
+        endpoint = "http://localhost:5000/data/ec-compensated/24h"; // Backend endpoint for compensated EC
         break;
       case "7d-avg": // Corresponds to '7d-avg' on backend
-        endpoint = "https://login-signup-3470.onrender.com/data/ec-compensated/7d-avg"; // Backend endpoint for compensated EC
+        endpoint = "http://localhost:5000/data/ec-compensated/7d-avg"; // Backend endpoint for compensated EC
         break;
       case "30d-avg": // Corresponds to '30d-avg' on backend
-        endpoint = "https://login-signup-3470.onrender.com/data/ec-compensated/30d-avg"; // Backend endpoint for compensated EC
+        endpoint = "http://localhost:5000/data/ec-compensated/30d-avg"; // Backend endpoint for compensated EC
         break;
       default:
-        endpoint = "https://login-signup-3470.onrender.com/data/ec-compensated/24h"; // Fallback
+        endpoint = "http://localhost:5000/data/ec-compensated/24h"; // Fallback
         break;
     }
 
@@ -64,7 +64,7 @@ const ConductivityMonitor = ({ theme, filter }) => { // Accept 'filter' prop
     } else {
       // Handle real-time data: Connect/reconnect socket and fetch initial real-time data
       if (!socket) { // Only create a new socket if one doesn't exist
-        const newSocket = io("https://login-signup-3470.onrender.com");
+        const newSocket = io("http://localhost:5000");
         setSocket(newSocket);
 
         // Listen for specific compensated EC updates (assuming backend emits 'updateECCompensatedData')

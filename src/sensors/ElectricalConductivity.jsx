@@ -18,22 +18,22 @@ const ElectricalConductivity = ({ theme, filter }) => {
 
     switch (currentFilter) {
       case "realtime":
-        endpoint = "https://login-signup-3470.onrender.com/data/ec/realtime";
+        endpoint = "http://localhost:5000/data/ec/realtime";
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "https://login-signup-3470.onrender.com/data/ec/24h";
+        endpoint = "http://localhost:5000/data/ec/24h";
         break;
       case "7d-avg":
         // FIX: Changed endpoint to match backend's "7d-avg"
-        endpoint = "https://login-signup-3470.onrender.com/data/ec/7d-avg";
+        endpoint = "http://localhost:5000/data/ec/7d-avg";
         break;
       case "30d-avg":
         // FIX: Changed endpoint to match backend's "30d-avg"
-        endpoint = "https://login-signup-3470.onrender.com/data/ec/30d-avg";
+        endpoint = "http://localhost:5000/data/ec/30d-avg";
         break;
       default:
-        endpoint = "https://login-signup-3470.onrender.com/data/ec/24h";
+        endpoint = "http://localhost:5000/data/ec/24h";
         break;
     }
 
@@ -62,7 +62,7 @@ const ElectricalConductivity = ({ theme, filter }) => {
       }
     } else {
       if (!socket) {
-        const newSocket = io("https://login-signup-3470.onrender.com");
+        const newSocket = io("http://localhost:5000");
         setSocket(newSocket);
 
         newSocket.on("updateECData", (newData) => {

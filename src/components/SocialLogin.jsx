@@ -25,7 +25,7 @@ const SocialLogin = () => {
       };
 
       // Send the user data to your backend and expect a token back
-      const response = await axios.post("https://login-signup-3470.onrender.com/save-user", userData);
+      const response = await axios.post("http://localhost:5000/save-user", userData);
       console.log("Response data from backend:", response.data);
       console.log("🔍 DETAILED DEBUG - Full response.data:", JSON.stringify(response.data, null, 2));
 

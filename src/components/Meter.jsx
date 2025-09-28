@@ -6,7 +6,7 @@ import "../styles/meter.css";
 import { ThemeContext } from "../context/ThemeContext"; // Import ThemeContext
 
 // ✅ Connect to WebSocket
-const socket = io("https://login-signup-3470.onrender.com");
+const socket = io("http://localhost:5000");
 
 const GaugeMeter = () => {
   const { theme } = useContext(ThemeContext); // Use ThemeContext for theme
@@ -14,7 +14,7 @@ const GaugeMeter = () => {
 
   useEffect(() => {
     // ✅ Fetch initial data from the backend
-    axios.get("https://login-signup-3470.onrender.com/data").then((response) => {
+    axios.get("http://localhost:5000/data").then((response) => {
       if (response.data.length > 0) {
         console.log("📡 Initial Data:", response.data[0].turbidity_value);
         setValue(response.data[0].turbidity_value);

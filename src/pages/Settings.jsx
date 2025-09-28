@@ -16,7 +16,7 @@ import '../styles/Pages Css/Settings-improved.css';
 
 // Define your backend API base URL
 // Ensure this matches the port your Node.js backend is running on (default: 5000)
-const API_BASE_URL = 'https://login-signup-3470.onrender.com/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const SettingsPage = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);

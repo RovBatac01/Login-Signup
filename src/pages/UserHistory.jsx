@@ -102,7 +102,7 @@ const UserHistory = () => {
 
                 // Fetch list of sensors for the device
                 // This assumes an endpoint like /api/devices/:deviceId/sensors exists
-                const response = await fetch(`https://login-signup-3470.onrender.com/api/devices/${id}/sensors`, {
+                const response = await fetch(`http://localhost:5000/api/devices/${id}/sensors`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -193,7 +193,7 @@ const UserHistory = () => {
                 // IMPORTANT: For User History, your API paths might need to include deviceId
                 // Example: /data/turbidity/24h?deviceId=YOUR_DEVICE_ID
                 // Adjust your data fetching API calls if they also need deviceId in the path or query
-                const endpoint = `https://login-signup-3470.onrender.com/data${sensor.apiPath}/${backendFilter}?deviceId=${deviceId}`;
+                const endpoint = `http://localhost:5000/data${sensor.apiPath}/${backendFilter}?deviceId=${deviceId}`;
                 console.log(`Fetching data for ${sensor.name} from: ${endpoint}`);
                 const response = await fetch(endpoint);
                 if (!response.ok) {

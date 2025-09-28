@@ -77,7 +77,7 @@ const AquaSense = () => {
 
     try {
       // Replace with your actual backend API URL
-      const response = await fetch("https://login-signup-3470.onrender.com/api/contact", {
+      const response = await fetch("http://localhost:5000/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

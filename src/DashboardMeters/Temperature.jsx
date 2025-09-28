@@ -24,7 +24,7 @@ const Temperature = () => {
     // Fetch latest temperature value on mount (fallback)
     const fetchLatestTemperature = async () => {
       try {
-        const response = await fetch("https://login-signup-3470.onrender.com/api/sensors/latest");
+        const response = await fetch("http://localhost:5000/api/sensors/latest");
         if (!response.ok) throw new Error("No data found");
         const latestData = await response.json();
         setTemperature(latestData.temperature_value);

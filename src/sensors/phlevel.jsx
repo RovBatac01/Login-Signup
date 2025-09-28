@@ -19,20 +19,20 @@ const PHLevelMonitor = ({ theme, filter }) => { // Accept 'filter' prop, remove 
     // Determine the API endpoint based on the filter
     switch (currentFilter) {
       case "realtime":
-        endpoint = "https://login-signup-3470.onrender.com/data/phlevel/realtime";
+        endpoint = "http://localhost:5000/data/phlevel/realtime";
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "https://login-signup-3470.onrender.com/data/phlevel/24h";
+        endpoint = "http://localhost:5000/data/phlevel/24h";
         break;
       case "7d-avg": // Corresponds to '7d-avg' on backend
-        endpoint = "https://login-signup-3470.onrender.com/data/phlevel/7d-avg";
+        endpoint = "http://localhost:5000/data/phlevel/7d-avg";
         break;
       case "30d-avg": // Corresponds to '30d-avg' on backend
-        endpoint = "https://login-signup-3470.onrender.com/data/phlevel/30d-avg";
+        endpoint = "http://localhost:5000/data/phlevel/30d-avg";
         break;
       default:
-        endpoint = "https://login-signup-3470.onrender.com/data/phlevel/24h"; // Fallback if filter is unexpected
+        endpoint = "http://localhost:5000/data/phlevel/24h"; // Fallback if filter is unexpected
         break;
     }
 
@@ -64,7 +64,7 @@ const PHLevelMonitor = ({ theme, filter }) => { // Accept 'filter' prop, remove 
     } else {
       // Handle real-time data: Connect/reconnect socket and fetch initial real-time data
       if (!socket) { // Only create a new socket if one doesn't exist
-        const newSocket = io("https://login-signup-3470.onrender.com");
+        const newSocket = io("http://localhost:5000");
         setSocket(newSocket);
 
         // Listen for specific pH level updates (assuming backend emits 'updatePHData')
