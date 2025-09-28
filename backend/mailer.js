@@ -10,12 +10,14 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     process.exit(1);
 }
 
-// Create the transporter
+// Create the transporter using Gmail SMTP explicitly
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",        // Gmail SMTP host
+    port: 465,                     // Try 465 (SSL) or 587 (TLS)
+    secure: true,                  // true for 465, false for 587
     auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // Use App Password (not Gmail password)
+        pass: process.env.EMAIL_PASS, // App password
     },
 });
 
@@ -32,7 +34,7 @@ transporter.verify((error) => {
 const sendEmail = async (to, subject, text) => {
     try {
         const mailOptions = {
-            from: `"Aquasense" <${process.env.EMAIL_USER}>`, // Set a sender name
+            from: `"Aquasense" <${process.env.EMAIL_USER}>`, // Sender name
             to,
             subject,
             text,
@@ -40,7 +42,7 @@ const sendEmail = async (to, subject, text) => {
 
         let info = await transporter.sendMail(mailOptions);
         console.log(`✅ Email sent to ${to}: ${info.response}`);
-        return info; // Return response for debugging
+        return info;
     } catch (error) {
         console.error("❌ Error sending email:", error);
         throw error;
