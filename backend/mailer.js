@@ -11,14 +11,18 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 }
 
 // Create the transporter
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // Use App Password (not Gmail password)
-    },
-});
-
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com", // Specify host instead of service for finer control
+        port: 587,
+        secure: false, // Use STARTTLS
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+        // Optionally increase timeout if connection is slow, not blocked
+        // connectionTimeout: 10000, // 10 seconds
+    });
+    
 // Verify connection
 transporter.verify((error) => {
     if (error) {
