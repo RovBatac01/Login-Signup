@@ -859,28 +859,45 @@ app.post('/admin', async (req, res) => {
         });
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-        // 5. Get device_id for admin based on their assigned establishment
+        // 5. Get device_id and establishment_id for admin based on their assigned establishment
         let deviceId = null;
+        let establishmentId = null;
+        console.log(`🔍 DEBUG: role = ${role}, establishmentIds = ${JSON.stringify(establishmentIds)}`);
+        
         if (role === 'Admin' && establishmentIds && establishmentIds.length > 0) {
-            // For Admin, get device_id from their first assigned establishment
+            // For Admin, get device_id and establishment_id from their first assigned establishment
+            establishmentId = parseInt(establishmentIds[0]); // Ensure it's an integer
+            console.log(`🔍 DEBUG: establishmentId parsed as: ${establishmentId}, type: ${typeof establishmentId}`);
+            
             const [estabResult] = await connection.execute(
                 "SELECT device_id FROM estab WHERE id = ?", 
-                [establishmentIds[0]]
+                [establishmentId]
             );
+            console.log(`🔍 DEBUG: estabResult = ${JSON.stringify(estabResult)}`);
+            
             if (estabResult.length > 0) {
                 deviceId = estabResult[0].device_id;
-                console.log(`🔧 Admin will be assigned device_id: ${deviceId} from establishment ${establishmentIds[0]}`);
+                console.log(`🔧 Admin will be assigned device_id: ${deviceId} and establishment_id: ${establishmentId}`);
+            } else {
+                console.error(`❌ No establishment found with ID: ${establishmentId}`);
             }
         }
-        // Super Admin doesn't need a specific device_id, they can access all
+        // Super Admin doesn't need a specific device_id or establishment_id, they can access all
 
-        // 6. Insert user with device_id
+        // 6. Insert user with device_id and establishment_id
+        console.log(`🔍 DEBUG: About to insert user with values:`);
+        console.log(`   username: ${username}`);
+        console.log(`   email: ${email}`);
+        console.log(`   role: ${role}`);
+        console.log(`   deviceId: ${deviceId} (type: ${typeof deviceId})`);
+        console.log(`   establishmentId: ${establishmentId} (type: ${typeof establishmentId})`);
+        
         const [insertResult] = await connection.execute(
-            "INSERT INTO users (username, email, password_hash, role, email_verified, verification_code, otp_expires, device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [username, email, hashedPassword, role, 0, otpCode, otpExpiresAt, deviceId]
+            "INSERT INTO users (username, email, password_hash, role, email_verified, verification_code, otp_expires, device_id, establishment_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [username, email, hashedPassword, role, 0, otpCode, otpExpiresAt, deviceId, establishmentId]
         );
         const userId = insertResult.insertId;
-        console.log(`✅ Admin user created with ID: ${userId}, device_id: ${deviceId}`);
+        console.log(`✅ Admin user created with ID: ${userId}, device_id: ${deviceId}, establishment_id: ${establishmentId}`);
 
         // 7. Assign establishments
         if (role === 'Super Admin') {
