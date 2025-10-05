@@ -859,14 +859,30 @@ app.post('/admin', async (req, res) => {
         });
         const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-        // 5. Insert user
+        // 5. Get device_id for admin based on their assigned establishment
+        let deviceId = null;
+        if (role === 'Admin' && establishmentIds && establishmentIds.length > 0) {
+            // For Admin, get device_id from their first assigned establishment
+            const [estabResult] = await connection.execute(
+                "SELECT device_id FROM estab WHERE id = ?", 
+                [establishmentIds[0]]
+            );
+            if (estabResult.length > 0) {
+                deviceId = estabResult[0].device_id;
+                console.log(`🔧 Admin will be assigned device_id: ${deviceId} from establishment ${establishmentIds[0]}`);
+            }
+        }
+        // Super Admin doesn't need a specific device_id, they can access all
+
+        // 6. Insert user with device_id
         const [insertResult] = await connection.execute(
-            "INSERT INTO users (username, email, password_hash, role, email_verified, verification_code, otp_expires) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [username, email, hashedPassword, role, 0, otpCode, otpExpiresAt]
+            "INSERT INTO users (username, email, password_hash, role, email_verified, verification_code, otp_expires, device_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [username, email, hashedPassword, role, 0, otpCode, otpExpiresAt, deviceId]
         );
         const userId = insertResult.insertId;
+        console.log(`✅ Admin user created with ID: ${userId}, device_id: ${deviceId}`);
 
-        // 6. Assign establishments
+        // 7. Assign establishments
         if (role === 'Super Admin') {
             // Assign ALL establishments
             const [allEstabs] = await connection.execute("SELECT id FROM estab");
@@ -886,7 +902,7 @@ app.post('/admin', async (req, res) => {
             }
         }
 
-        // 7. Send OTP email
+        // 8. Send OTP email
         const subject = role === 'Super Admin' 
             ? "Verify Your Super Admin Account Email" 
             : "Verify Your Admin Account Email";
@@ -934,21 +950,26 @@ app.get("/api/users", async (req, res) => {
 // delete
 app.delete("/api/users/:id", async (req, res) => {
   const { id } = req.params;
+  console.log(`🗑️ DELETE request received for user ID: ${id}`);
 
   try {
     const userId = parseInt(id, 10);
     if (isNaN(userId)) {
+      console.log(`❌ Invalid user ID: ${id}`);
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
     // Corrected: Use await db.query directly, remove .promise()
+    console.log(`🔍 Checking user role for ID: ${userId}`);
     const [user] = await db.query("SELECT role FROM users WHERE id = ?", [userId]);
 
     if (user.length === 0) {
+      console.log(`❌ User not found with ID: ${userId}`);
       return res.status(404).json({ error: "User not found" });
     }
 
     const userRole = user[0].role;
+    console.log(`👤 User role: ${userRole}`);
 
     if (userRole === "Super Admin") {
       // Corrected: Use await db.query directly, remove .promise()
@@ -963,17 +984,49 @@ app.delete("/api/users/:id", async (req, res) => {
       }
     }
 
-    // Corrected: Use await db.query directly, remove .promise()
+    // Delete related records first to avoid foreign key constraint issues
+    console.log(`🧹 Cleaning up related records for user ID: ${userId}`);
+    
+    // Delete from admin_establishments if exists
+    try {
+      await db.query("DELETE FROM admin_establishments WHERE user_id = ?", [userId]);
+      console.log(`🧹 Cleaned admin_establishments for user ID: ${userId}`);
+    } catch (cleanupErr) {
+      console.log(`ℹ️ No admin_establishments to clean for user ID: ${userId}`);
+    }
+    
+    // Delete from notifications if exists
+    try {
+      await db.query("DELETE FROM notif WHERE user_id = ?", [userId]);
+      console.log(`🧹 Cleaned notifications for user ID: ${userId}`);
+    } catch (cleanupErr) {
+      console.log(`ℹ️ No notifications to clean for user ID: ${userId}`);
+    }
+
+    // Delete from user_activity if exists (this was causing the foreign key error)
+    try {
+      await db.query("DELETE FROM user_activity WHERE user_id = ?", [userId]);
+      console.log(`🧹 Cleaned user_activity for user ID: ${userId}`);
+    } catch (cleanupErr) {
+      console.log(`ℹ️ No user_activity to clean for user ID: ${userId}`);
+    }
+
+    // Now delete the user
+    console.log(`🗑️ Attempting to delete user with ID: ${userId}`);
     const [result] = await db.query("DELETE FROM users WHERE id = ?", [userId]);
 
     if (result.affectedRows === 0) {
+      console.log(`❌ No user deleted - user not found with ID: ${userId}`);
       return res.status(404).json({ error: "User not found" });
     }
 
+    console.log(`✅ User deleted successfully - ID: ${userId}, affected rows: ${result.affectedRows}`);
     res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
     console.error("❌ Error deleting user:", err);
-    res.status(500).json({ error: "Failed to delete user" });
+    console.error("❌ Error details:", err.message);
+    console.error("❌ Error code:", err.code);
+    res.status(500).json({ error: "Failed to delete user", details: err.message });
   }
 });
 
