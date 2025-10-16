@@ -1321,38 +1321,43 @@ app.get('/api/establishments', async (req, res) => {
             SELECT
                 e.id AS establishmentId,
                 e.estab_name AS establishmentName,
-                e.device_id AS deviceId, -- Still including establishment's own device_id
+                e.device_id AS deviceId,
+                e.created_at AS createdAt,
                 s.id AS sensorId,
                 s.sensor_name AS sensorName
             FROM
                 estab e
             LEFT JOIN
-                estab_sensors es ON e.id = es.estab_id -- Join through the junction table
+                estab_sensors es ON e.id = es.estab_id
             LEFT JOIN
-                sensors s ON es.sensor_id = s.id -- Then join to the sensors table
+                sensors s ON es.sensor_id = s.id
             ORDER BY
-                e.estab_name ASC, s.sensor_name ASC;
+                e.created_at DESC, e.estab_name ASC, s.sensor_name ASC;
         `);
 
         const establishmentsMap = new Map();
 
         rows.forEach(row => {
-            const { establishmentId, establishmentName, deviceId, sensorId, sensorName } = row;
+            const { establishmentId, establishmentName, deviceId, createdAt, sensorId, sensorName } = row;
 
             if (!establishmentsMap.has(establishmentId)) {
                 establishmentsMap.set(establishmentId, {
                     id: establishmentId,
                     name: establishmentName,
-                    device_id: deviceId, // Include establishment's device_id
+                    device_id: deviceId,
+                    created_at: createdAt,
+                    sensor_count: 0, // Initialize sensor count
                     sensors: []
                 });
             }
 
-            if (sensorId !== null) { // Check if a sensor exists for this link (for establishments with no sensors)
+            if (sensorId !== null) {
                 establishmentsMap.get(establishmentId).sensors.push({
                     id: sensorId,
                     name: sensorName
                 });
+                // Increment sensor count
+                establishmentsMap.get(establishmentId).sensor_count++;
             }
         });
 
@@ -1427,6 +1432,7 @@ app.post('/api/establishments', async (req, res) => {
 
         // 4. Link selected sensors to the new establishment in the 'estab_sensors' junction table.
         // This is the core change for many-to-many.
+        let validSensorIds = []; // Define outside the if block so it's accessible later
         if (selectedSensorIds.length > 0) {
             // Optional: Validate if sensor IDs exist. If not, the FOREIGN KEY constraint will catch it.
             // For robustness, you might want to check if they exist before inserting.
@@ -1436,7 +1442,7 @@ app.post('/api/establishments', async (req, res) => {
                 `SELECT id FROM sensors WHERE id IN (${sensorIdPlaceholders})`,
                 selectedSensorIds
             );
-            const validSensorIds = existingSensors.map(s => s.id);
+            validSensorIds = existingSensors.map(s => s.id);
 
             if (validSensorIds.length !== selectedSensorIds.length) {
                 const invalidSensors = selectedSensorIds.filter(id => !validSensorIds.includes(id));
@@ -1464,7 +1470,9 @@ app.post('/api/establishments', async (req, res) => {
             message: 'Establishment added successfully',
             id: newEstablishmentId,
             name: name.trim(),
-            device_id: device_id
+            device_id: device_id,
+            sensor_count: validSensorIds.length,
+            sensors: validSensorIds.map(id => ({ id }))
         });
 
     } catch (error) {
