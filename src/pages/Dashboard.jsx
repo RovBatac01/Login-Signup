@@ -249,62 +249,108 @@ const Dashboard = () => {
             {/* Establishment Management Section */}
             <div className={styles.establishmentSection}>
               <div className={styles.sectionHeader}>
-                <h3>Establishments</h3>
+                <div className={styles.sectionTitleWithCount}>
+                  <h3>Establishments</h3>
+                  <span className={styles.countBadge}>{establishments.length}</span>
+                </div>
                 {!showAddForm && (
                   <button onClick={handleAddButtonClick} className={styles.addEstablishmentButton}>
-                    + Add New Establishment
+                    <i className="fas fa-plus"></i> Add New
                   </button>
                 )}
               </div>
+              
               {showAddForm && (
                 <div className={styles.addEstablishmentForm}>
-                  <input
-                    type="text"
-                    placeholder="Enter establishment name"
-                    value={newEstablishmentName}
-                    onChange={handleInputChange}
-                  />
-                  <div className="option-sensors">
-                    <h4>Select Sensors:</h4>
-                    {allSensors.map((sensor) => (
-                      <div key={sensor.id} className={styles.sensorCheckboxItem}>
-                        <input
-                          type="checkbox"
-                          id={`sensor-${sensor.id}`}
-                          value={sensor.id}
-                            checked={selectedSensors.includes(sensor.id)}
-                            onChange={() => handleSensorCheckboxChange(sensor.id)}
-                          />
-                          <label htmlFor={`sensor-${sensor.id}`}>
-                            {sensor.sensor_name}
-                            {/* Removed (Assigned) / (Available) distinction based on device_id */}
-                            {/* If you want to show if it's assigned to *any* other estab,
-                              you'd need the backend to provide this info for each sensor */}
-                          </label>
+                  <div className={styles.formHeader}>
+                    <h4><i className="fas fa-building"></i> Create New Establishment</h4>
+                  </div>
+                  
+                  <div className={styles.formGroup}>
+                    <label htmlFor="establishment-name">Establishment Name</label>
+                    <input
+                      id="establishment-name"
+                      type="text"
+                      placeholder="Enter establishment name (e.g., Kitchen Sink, Lab Station)"
+                      value={newEstablishmentName}
+                      onChange={handleInputChange}
+                      className={styles.formInput}
+                    />
+                  </div>
+                  
+                  <div className={styles.formGroup}>
+                    <label>
+                      <i className="fas fa-microchip"></i> Select Sensors 
+                      <span className={styles.selectedCount}>
+                        ({selectedSensors.length} selected)
+                      </span>
+                    </label>
+                    <div className={styles.sensorCheckboxGrid}>
+                      {allSensors.length > 0 ? (
+                        allSensors.map((sensor) => (
+                          <div key={sensor.id} className={styles.sensorCheckboxItem}>
+                            <input
+                              type="checkbox"
+                              id={`sensor-${sensor.id}`}
+                              value={sensor.id}
+                              checked={selectedSensors.includes(sensor.id)}
+                              onChange={() => handleSensorCheckboxChange(sensor.id)}
+                              className={styles.checkboxInput}
+                            />
+                            <label htmlFor={`sensor-${sensor.id}`} className={styles.checkboxLabel}>
+                              <span className={styles.sensorIcon}>
+                                <i className="fas fa-dot-circle"></i>
+                              </span>
+                              <span className={styles.sensorName}>{sensor.sensor_name}</span>
+                            </label>
+                          </div>
+                        ))
+                      ) : (
+                        <div className={styles.noSensorsMessage}>
+                          <i className="fas fa-exclamation-circle"></i>
+                          <p>No sensors available. Please add sensors first.</p>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  {/* MODIFIED: Use allSensors here */}
-                  {allSensors.length === 0 && (
-                    <div className={styles.noSensorsMessage}>No sensors available to add.</div>
-                  )}
+                  </div>
+                  
                   <div className={styles.formButtons}>
-                    <button onClick={handleAddEstablishment} className={styles.addButton}>Add</button>
-                    <button onClick={handleCancelAdd} className={styles.cancelButton}>Cancel</button>
+                    <button 
+                      onClick={handleAddEstablishment} 
+                      className={styles.addButton}
+                      disabled={!newEstablishmentName.trim() || selectedSensors.length === 0}
+                    >
+                      <i className="fas fa-check"></i> Create Establishment
+                    </button>
+                    <button onClick={handleCancelAdd} className={styles.cancelButton}>
+                      <i className="fas fa-times"></i> Cancel
+                    </button>
                   </div>
                 </div>
               )}
 
               {/* Search Bar */}
-              <div className={styles.searchBarContainer}>
-                <input
-                  type="text"
-                  placeholder="Search establishments..."
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  className={styles.searchBar}
-                />
-              </div>
+              {!showAddForm && (
+                <div className={styles.searchBarContainer}>
+                  <div className={styles.searchInputWrapper}>
+                    <input
+                      type="text"
+                      placeholder="Search establishments..."
+                      value={searchQuery}
+                      onChange={handleSearchChange}
+                      className={styles.searchBar}
+                    />
+                    {searchQuery && (
+                      <button 
+                        onClick={() => setSearchQuery('')}
+                        className={styles.clearSearch}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className={styles.establishmentsList}>
                 {loading ? (
