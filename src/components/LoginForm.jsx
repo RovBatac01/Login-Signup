@@ -11,45 +11,57 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 // New component for the Terms and Conditions Modal
 const TermsAndConditionsModal = ({ show, handleClose }) => {
+  const { theme } = useTheme();
+  
   return (
-    // Add 'className="terms-modal"' to the Modal component
-    <Modal show={show} onHide={handleClose} centered className="terms-modal">
-      <Modal.Header closeButton>
-        <Modal.Title>Terms and Conditions - Data Privacy</Modal.Title>
+    <Modal show={show} onHide={handleClose} centered className="terms-modal" size="lg">
+      <Modal.Header closeButton className="terms-modal-header">
+        <Modal.Title className="terms-modal-title">
+          Terms and Conditions
+        </Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <h4>Sanitary Office of City Health Office of General Trias - Data Privacy Policy</h4>
-        <p>
-          By agreeing to these terms and conditions, you acknowledge and consent that the **Sanitary Office of City Health Office of General Trias** will have access to certain personal data you provide during the use of this application. This data is collected and processed solely for the purpose of efficient public health management, sanitation monitoring, and related governmental functions within General Trias.
-        </p>
-        <p>The data collected may include, but is not limited to:</p>
-        <ul>
-          <li><strong>Personal Identifiable Information:</strong> Name, address, contact details (phone number, email address), and other demographic information.</li>
-          <li><strong>Health-Related Data:</strong> Information pertaining to sanitation practices, health inspections, and relevant health records necessary for public health interventions.</li>
-          <li><strong>Usage Data:</strong> Information about how you interact with the application, such as login times and features accessed, to improve service delivery.</li>
-        </ul>
-        <p>
-          Your data will be used to:
-        </p>
-        <ul>
-          <li>Facilitate inspections and monitoring by the Sanitary Office.</li>
-          <li>Communicate important health advisories and updates.</li>
-          <li>Generate reports and statistics for public health planning (data will be anonymized where possible for reporting).</li>
-          <li>Respond to inquiries and provide support related to sanitation and public health services.</li>
-        </ul>
-        <p>
-          The Sanitary Office of City Health Office of General Trias is committed to protecting your privacy and ensuring the security of your data in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173) of the Philippines. Your data will not be shared with third parties for commercial purposes. Access to your data will be limited to authorized personnel only, who are bound by confidentiality agreements.
-        </p>
-        <p>
-          You have the right to access, correct, and object to the processing of your personal data, subject to legal limitations. For any concerns regarding your data privacy, please contact the Sanitary Office of City Health Office of General Trias.
-        </p>
-        <p>
-          By proceeding, you signify your understanding and acceptance of these terms.
-        </p>
+      <Modal.Body className="terms-modal-body">
+        <div className="terms-content">
+          <h5>Sanitary Office of City Health Office of General Trias - Data Privacy Policy</h5>
+          
+          <p>
+            By agreeing to these terms and conditions, you acknowledge and consent that the <strong>Sanitary Office of City Health Office of General Trias</strong> will have access to certain personal data you provide during the use of this application. This data is collected and processed solely for the purpose of efficient public health management, sanitation monitoring, and related governmental functions within General Trias.
+          </p>
+
+          <h6>Data Collected</h6>
+          <p>The data collected may include, but is not limited to:</p>
+          <ul>
+            <li><strong>Personal Identifiable Information:</strong> Name, address, contact details (phone number, email address), and other demographic information.</li>
+            <li><strong>Health-Related Data:</strong> Information pertaining to sanitation practices, health inspections, and relevant health records necessary for public health interventions.</li>
+            <li><strong>Usage Data:</strong> Information about how you interact with the application, such as login times and features accessed, to improve service delivery.</li>
+          </ul>
+
+          <h6>How Your Data Will Be Used</h6>
+          <ul>
+            <li>Facilitate inspections and monitoring by the Sanitary Office.</li>
+            <li>Communicate important health advisories and updates.</li>
+            <li>Generate reports and statistics for public health planning (data will be anonymized where possible for reporting).</li>
+            <li>Respond to inquiries and provide support related to sanitation and public health services.</li>
+          </ul>
+
+          <h6>Data Protection & Privacy</h6>
+          <p>
+            The Sanitary Office of City Health Office of General Trias is committed to protecting your privacy and ensuring the security of your data in accordance with the <strong>Data Privacy Act of 2012 (Republic Act No. 10173)</strong> of the Philippines. Your data will not be shared with third parties for commercial purposes. Access to your data will be limited to authorized personnel only, who are bound by confidentiality agreements.
+          </p>
+
+          <h6>Your Rights</h6>
+          <p>
+            You have the right to access, correct, and object to the processing of your personal data, subject to legal limitations. For any concerns regarding your data privacy, please contact the Sanitary Office of City Health Office of General Trias.
+          </p>
+
+          <p className="terms-acceptance">
+            By proceeding, you signify your understanding and acceptance of these terms.
+          </p>
+        </div>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
+      <Modal.Footer className="terms-modal-footer">
+        <Button variant="primary" onClick={handleClose} className="terms-close-btn">
+          I Understand
         </Button>
       </Modal.Footer>
     </Modal>
@@ -143,13 +155,11 @@ const LoginForm = ({ onLoginSuccess, onLoginFailure, termsChecked, setTermsCheck
           checked={termsChecked}
           onChange={(e) => setTermsChecked(e.target.checked)}
           required
+          className="terms-checkbox"
           label={
-            <span className={`form-check-label ${theme}`}>
+            <span className={`terms-label ${theme}`}>
               I agree to the{" "}
-              <span
-                onClick={handleShowTermsModal}
-                style={{ cursor: 'pointer', textDecoration: 'underline', color: theme === 'dark' ? '#007bff' : '#0d6efd' }}
-              >
+              <span onClick={handleShowTermsModal} className="terms-link">
                 Terms and Conditions
               </span>
             </span>
