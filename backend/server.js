@@ -3900,6 +3900,7 @@ app.post("/api/sensor-data", async (req, res) => {
 
     const notifications = {
       turbidity: { sensorType: "turbidity", threshold: 30, condition: "lessThan", unit: "%" },
+      turbidity2: { sensorType: "turbidity2", threshold: 30, condition: "lessThan", unit: "%" },
       ph: { sensorType: "ph", threshold: [0.5, 8.5], condition: "outsideRange", unit: "pH" },
       tds: { sensorType: "tds", threshold: 30, condition: "lessThan", unit: "%" },
       salinity: { sensorType: "salinity", threshold: 30, condition: "lessThan", unit: "%" },
@@ -3909,6 +3910,7 @@ app.post("/api/sensor-data", async (req, res) => {
 
     const {
       turbidity_value,
+      turbidity2_value,
       ph_value,
       tds_value,
       salinity_value,
@@ -3920,6 +3922,8 @@ app.post("/api/sensor-data", async (req, res) => {
     // 🔹 Insert & emit (replace with your actual insertAndEmit)
     await Promise.all([
       insertAndEmit("turbidity_readings", "turbidity_value", turbidity_value, "updateTurbidityData", notifications.turbidity),
+      // secondary turbidity sensor
+      insertAndEmit("turbidity2_readings", "turbidity2_value", turbidity2_value, "updateTurbidity2Data", notifications.turbidity2),
       insertAndEmit("phlevel_readings", "ph_value", ph_value, "updatePHData", notifications.ph),
       insertAndEmit("tds_readings", "tds_value", tds_value, "updateTDSData", notifications.tds),
       insertAndEmit("salinity_readings", "salinity_value", salinity_value, "updateSalinityData", notifications.salinity),
@@ -3931,6 +3935,8 @@ app.post("/api/sensor-data", async (req, res) => {
     // 🔹 Check thresholds & notify
     if (isThresholdViolated(turbidity_value, notifications.turbidity))
       await notifyAdmins("turbidity", turbidity_value, notifications.turbidity.unit);
+    if (isThresholdViolated(turbidity2_value, notifications.turbidity2))
+      await notifyAdmins("turbidity2", turbidity2_value, notifications.turbidity2.unit);
     if (isThresholdViolated(ph_value, notifications.ph))
       await notifyAdmins("ph", ph_value, notifications.ph.unit);
     if (isThresholdViolated(tds_value, notifications.tds))
@@ -4003,6 +4009,7 @@ async function insertNotification(
 
   switch (sensorType) {
     case "turbidity":
+    case "turbidity2":
     case "tds":
     case "salinity":
     case "ec":
@@ -4075,6 +4082,7 @@ app.get("/api/sensors/latest", async (req, res) => {
   const query = `
         SELECT
             (SELECT turbidity_value FROM turbidity_readings ORDER BY timestamp DESC LIMIT 1) AS turbidity_value,
+            (SELECT turbidity2_value FROM turbidity2_readings ORDER BY timestamp DESC LIMIT 1) AS turbidity2_value,
             (SELECT ph_value FROM phlevel_readings ORDER BY timestamp DESC LIMIT 1) AS ph_value,
             (SELECT tds_value FROM tds_readings ORDER BY timestamp DESC LIMIT 1) AS tds_value,
             (SELECT salinity_value FROM salinity_readings ORDER BY timestamp DESC LIMIT 1) AS salinity_value,
@@ -4151,6 +4159,11 @@ app.get("/data/turbidity/realtime", (req, res) => getHistoricalData('turbidity_r
 app.get("/data/turbidity/24h", (req, res) => getHistoricalData('turbidity_readings', 'turbidity_value', '24h', res));
 app.get("/data/turbidity/7d-avg", (req, res) => getHistoricalData('turbidity_readings', 'turbidity_value', '7d-avg', res));
 app.get("/data/turbidity/30d-avg", (req, res) => getHistoricalData('turbidity_readings', 'turbidity_value', '30d-avg', res));
+
+app.get("/data/turbidity2/realtime", (req, res) => getHistoricalData('turbidity2_readings', 'turbidity2_value', 'realtime', res));
+app.get("/data/turbidity2/24h", (req, res) => getHistoricalData('turbidity2_readings', 'turbidity2_value', '24h', res));
+app.get("/data/turbidity2/7d-avg", (req, res) => getHistoricalData('turbidity2_readings', 'turbidity2_value', '7d-avg', res));
+app.get("/data/turbidity2/30d-avg", (req, res) => getHistoricalData('turbidity2_readings', 'turbidity2_value', '30d-avg', res));
 
 app.get("/data/phlevel/realtime", (req, res) => getHistoricalData('phlevel_readings', 'ph_value', 'realtime', res));
 app.get("/data/phlevel/24h", (req, res) => getHistoricalData('phlevel_readings', 'ph_value', '24h', res));
