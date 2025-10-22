@@ -5,6 +5,7 @@ import "../styles/Pages Css/AdminHistory.css";
 import Temp from "../sensors/temp";
 import PhLevel from "../sensors/phlevel"; // Make sure the component name matches the import
 import Turbidity from "../sensors/turbudity";
+import PortableTurbidity from "../sensors/turbidity2";
 import Tds from "../sensors/Tds";
 import Sal from "../sensors/sal";
 import Conductivity from "../sensors/Conductivity";
@@ -38,6 +39,7 @@ const UserHistory = () => {
     // Define all possible sensors (like allSensorDefinitions in AdminHistory)
     const allSensorDefinitions = [
         { name: "Turbidity", tableName: "turbidity_readings", valueColumn: "turbidity_value", apiPath: "/turbidity", component: Turbidity, cssClass: "aqua-turbidity-container" },
+        { name: "Portable Turbidity", tableName: "turbidity2_readings", valueColumn: "turbidity2_value", apiPath: "/turbidity2", component: PortableTurbidity, cssClass: "aqua-turbidity-container" },
         // IMPORTANT: Ensure this name matches what your backend returns EXACTLY for the pH sensor
         // Based on Userdb.jsx, it's likely "ph Level" (lowercase 'p', lowercase 'h')
         { name: "ph Level", tableName: "phlevel_readings", valueColumn: "ph_value", apiPath: "/phlevel", component: PhLevel, cssClass: "aqua-ph-level-container" },
@@ -274,6 +276,7 @@ const UserHistory = () => {
     const getSensorUnit = (sensorName) => {
         switch (sensorName) {
             case "Turbidity": return "NTU";
+            case "Portable Turbidity": return "NTU";
             // Match the casing used in allSensorDefinitions for consistency
             case "ph Level": return "pH";
             case "Total Dissolved Solids": return "ppm"; // Changed from "TDS" to match full name

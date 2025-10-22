@@ -5,6 +5,7 @@ import "../styles/Pages Css/AdminHistory.css";
 import Temp from "../sensors/temp";
 import PhLevel from "../sensors/phlevel";
 import Turbidity from "../sensors/turbudity";
+import PortableTurbidity from "../sensors/turbidity2";
 import Tds from "../sensors/Tds";
 import Sal from "../sensors/sal";
 import Conductivity from "../sensors/Conductivity";
@@ -39,6 +40,7 @@ const AdminHistory = () => {
     // Define all possible sensors
     const allSensorDefinitions = [
         { name: "Turbidity", tableName: "turbidity_readings", valueColumn: "turbidity_value", apiPath: "/turbidity", component: Turbidity, cssClass: "aqua-turbidity-container" },
+        { name: "Portable Turbidity", tableName: "turbidity2_readings", valueColumn: "turbidity2_value", apiPath: "/turbidity2", component: PortableTurbidity, cssClass: "aqua-turbidity-container" },
         { name: "ph Level", tableName: "phlevel_readings", valueColumn: "ph_value", apiPath: "/phlevel", component: PhLevel, cssClass: "aqua-ph-level-container" },
         { name: "Total Dissolved Solids", tableName: "tds_readings", valueColumn: "tds_value", apiPath: "/tds", component: Tds, cssClass: "aqua-tds-container" },
         { name: "Salinity", tableName: "salinity_readings", valueColumn: "salinity_value", apiPath: "/salinity", component: Sal, cssClass: "aqua-salinity-container" },
@@ -216,6 +218,7 @@ const AdminHistory = () => {
     const getSensorUnit = (sensorName) => {
         switch (sensorName) {
             case "Turbidity": return "NTU";
+            case "Portable Turbidity": return "NTU";
             case "pH Level": return "pH";
             case "Total Dissolved Solids": return "ppm"; // Changed from "TDS" to "Total Dissolved Solids" to match definition
             case "Salinity": return "ppt";
