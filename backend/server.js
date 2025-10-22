@@ -24,14 +24,14 @@ const authRoutes = require("./models/route");
 const sessionHistoryRoutes = require("./routes/sessionHistory");
 const SessionHistory = require("./models/sessionHistory");
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 8080;
 const saltRounds = 10;
 const otpGenerator = require('otp-generator');
 const JWT_SECRET = process.env.JWT_SECRET;
 // const twilio = require("twilio");
 // const users = [];
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5000" ];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5000", "https://login-signup-production-e1ef.up.railway.app"];
 
 // 2. Add all your middleware for parsing and security
 app.use(bodyParser.json());
@@ -42,12 +42,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: allowedOrigins,
     credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 // ✅ Handle all preflight OPTIONS requests globally
 app.options('*', cors());
+
+// --- Debugging Middleware ---
+// This will log every incoming request to the server, which can help diagnose routing issues.
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
+// Add session history routes
+app.use("/api/session-history", sessionHistoryRoutes);
 
 // 3. Create the single HTTP server that will handle both Express and Socket.IO
 const server = http.createServer(app);
@@ -60,15 +70,9 @@ const io = new Server(server, {
     }
 });
 
-// --- Debugging Middleware ---
-// This will log every incoming request to the server, which can help diagnose routing issues.
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
-    next();
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Backend running on port ${PORT} (all interfaces)`);
 });
-
-// Add session history routes
-app.use("/api/session-history", sessionHistoryRoutes);
 
 // --- Test Root Endpoint ---
 app.get("/", (req, res) => {
@@ -4223,7 +4227,3 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // -----------------------------------------------------------------
 // === START THE SERVER ===
 // -----------------------------------------------------------------
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
-});
