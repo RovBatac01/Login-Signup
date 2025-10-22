@@ -24,7 +24,7 @@ import io from 'socket.io-client';
 import socket from '../DashboardMeters/socket'; // Make sure this path is correct
 
 // API base URL - make sure this matches your backend
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://login-signup-production-e1ef.up.railway.app";
 
 // Simple AlertDialog component to replace browser alerts
 const AlertDialog = ({ isOpen, message, onClose }) => {

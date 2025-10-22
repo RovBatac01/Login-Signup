@@ -102,7 +102,7 @@ const LoginForm = ({ onLoginSuccess, onLoginFailure, termsChecked, setTermsCheck
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/login", formData, {
+      const response = await axios.post("https://login-signup-production-e1ef.up.railway.app/login", formData, {
         headers: { "Content-Type": "application/json" }
       });
 

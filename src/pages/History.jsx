@@ -48,7 +48,7 @@ const History = () => {
         const fetchEstablishments = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/establishments', {
+                const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/establishments', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -253,7 +253,7 @@ const History = () => {
         // Fetch data only for sensors that the establishment has
         for (const sensor of establishmentSensors) {
             // Append establishmentId as a query parameter
-            let endpoint = `http://localhost:5000/data${sensor.apiPath}/${backendFilter}?establishmentId=${selectedEstablishment.id}`;
+            let endpoint = `https://login-signup-production-e1ef.up.railway.app/data${sensor.apiPath}/${backendFilter}?establishmentId=${selectedEstablishment.id}`;
             console.log(`Fetching data for ${sensor.name} from: ${endpoint}`);
 
             const response = await fetch(endpoint);

@@ -19,20 +19,20 @@ const DOMonitor = ({ theme, filter }) => { // Component name remains DOMonitor
     // Determine the API endpoint based on the filter for Salinity
     switch (currentFilter) {
       case "realtime":
-        endpoint = "http://localhost:5000/data/salinity/realtime";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/salinity/realtime";
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "http://localhost:5000/data/salinity/24h";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/salinity/24h";
         break;
       case "7d-avg": // Corresponds to '7d-avg' on backend
-        endpoint = "http://localhost:5000/data/salinity/7d-avg";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/salinity/7d-avg";
         break;
       case "30d-avg": // Corresponds to '30d-avg' on backend
-        endpoint = "http://localhost:5000/data/salinity/30d-avg";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/salinity/30d-avg";
         break;
       default:
-        endpoint = "http://localhost:5000/data/salinity/24h"; // Fallback
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/salinity/24h"; // Fallback
         break;
     }
 
@@ -64,7 +64,7 @@ const DOMonitor = ({ theme, filter }) => { // Component name remains DOMonitor
     } else {
       // Handle real-time data: Connect/reconnect socket and fetch initial real-time data
       if (!socket) { // Only create a new socket if one doesn't exist
-        const newSocket = io("http://localhost:5000");
+        const newSocket = io("https://login-signup-production-e1ef.up.railway.app");
         setSocket(newSocket);
 
         // Listen for specific salinity updates (assuming backend emits 'updateSalinityData')

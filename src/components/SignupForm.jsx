@@ -62,11 +62,11 @@ const SignupForm = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/users", formData);
+            const response = await axios.post("https://login-signup-production-e1ef.up.railway.app/users", formData);
             setMessage("✅ " + response.data.message);
             setShowModal(true);
 
-            await axios.post("http://localhost:5000/send-email", {
+            await axios.post("https://login-signup-production-e1ef.up.railway.app/send-email", {
                 email: formData.email,
                 subject: "Verify Your Email",
                 message: `Your verification code is: [OTP_PLACEHOLDER]`,
@@ -98,7 +98,7 @@ const SignupForm = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:5000/verify-code", {
+            const response = await axios.post("https://login-signup-production-e1ef.up.railway.app/verify-code", {
                 email: formData.email,
                 code: verificationCode
             });
@@ -119,7 +119,7 @@ const SignupForm = () => {
 
     const sendSuperAdminNotification = async (username, email, userId) => {
         try {
-            await axios.post("http://localhost:5000/api/notifications/superadmin", {
+            await axios.post("https://login-signup-production-e1ef.up.railway.app/api/notifications/superadmin", {
                 type: "new_user",
                 title: "New User Registered",
                 message: `New user "${username}" (${email}) has successfully signed up and verified their email.`,

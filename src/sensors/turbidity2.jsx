@@ -19,20 +19,20 @@ const TurbidityMonitor = ({ theme, filter }) => {
     // Determine the API endpoint based on the filter
     switch (currentFilter) {
       case "realtime":
-        endpoint = "http://localhost:5000/data/turbidity2/realtime";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/turbidity2/realtime";
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "http://localhost:5000/data/turbidity2/24h";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/turbidity2/24h";
         break;
       case "7d-avg": // Frontend requests "7d", Backend expects "7d-avg" endpoint
-        endpoint = "http://localhost:5000/data/turbidity2/7d-avg";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/turbidity2/7d-avg";
         break;
       case "30d": // Frontend requests "30d", Backend expects "30d-avg" endpoint
-        endpoint = "http://localhost:5000/data/turbidity2/30d-avg";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/turbidity2/30d-avg";
         break;
       default:
-        endpoint = "http://localhost:5000/data/turbidity2/24h"; // Fallback if filter is unexpected
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/turbidity2/24h"; // Fallback if filter is unexpected
         break;
     }
 
@@ -65,7 +65,7 @@ const TurbidityMonitor = ({ theme, filter }) => {
     } else {
       // Handle real-time data: Connect/reconnect socket and fetch initial real-time data
       if (!socket) { // Only create a new socket if one doesn't exist
-        const newSocket = io("http://localhost:5000");
+        const newSocket = io("https://login-signup-production-e1ef.up.railway.app");
         setSocket(newSocket);
 
         newSocket.on("updateTurbidity2Data", (newData) => { // Listen for specific turbidity2 updates

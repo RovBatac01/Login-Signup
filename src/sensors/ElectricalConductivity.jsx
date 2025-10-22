@@ -18,22 +18,22 @@ const ElectricalConductivity = ({ theme, filter }) => {
 
     switch (currentFilter) {
       case "realtime":
-        endpoint = "http://localhost:5000/data/ec/realtime";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec/realtime";
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "http://localhost:5000/data/ec/24h";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec/24h";
         break;
       case "7d-avg":
         // FIX: Changed endpoint to match backend's "7d-avg"
-        endpoint = "http://localhost:5000/data/ec/7d-avg";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec/7d-avg";
         break;
       case "30d-avg":
         // FIX: Changed endpoint to match backend's "30d-avg"
-        endpoint = "http://localhost:5000/data/ec/30d-avg";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec/30d-avg";
         break;
       default:
-        endpoint = "http://localhost:5000/data/ec/24h";
+        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec/24h";
         break;
     }
 
@@ -62,7 +62,7 @@ const ElectricalConductivity = ({ theme, filter }) => {
       }
     } else {
       if (!socket) {
-        const newSocket = io("http://localhost:5000");
+        const newSocket = io("https://login-signup-production-e1ef.up.railway.app");
         setSocket(newSocket);
 
         newSocket.on("updateECData", (newData) => {

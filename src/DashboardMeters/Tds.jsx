@@ -24,7 +24,7 @@ const Tds = () => {
     // Fetch latest TDS value on mount (fallback)
     const fetchLatestTds = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/sensors/latest");
+        const response = await fetch("https://login-signup-production-e1ef.up.railway.app/api/sensors/latest");
         if (!response.ok) throw new Error("No data found");
         const latestData = await response.json();
         setTdsValue(latestData.tds_value);

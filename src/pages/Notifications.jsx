@@ -124,7 +124,7 @@ const NotificationsPage = () => {
     const [selectedFilter, setSelectedFilter] = useState('all');
     const { theme } = useContext(ThemeContext);
 
-    const API_BASE_URL = "http://localhost:5000";
+    const API_BASE_URL = "https://login-signup-production-e1ef.up.railway.app";
 
     // --- Filter Options ---
     const filterOptions = [

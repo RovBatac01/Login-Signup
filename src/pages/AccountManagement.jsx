@@ -12,7 +12,7 @@ import axios from "axios";
 
 // Determine API base URL based on environment
 const API_BASE_URL = import.meta.env.PROD 
-  ? "https://login-signup-3470.onrender.com" 
+  ? "https://login-signup-production-e1ef.up.railway.app" 
   : "http://localhost:5000";
 
 const AccountManagement = () => {
