@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/common/backgroundLayout.css';
+import '../styles/common/BackgroundLayout.css';
 
 const BackgroundLayout = ({ children, variant = 'purple' }) => {
   return (
