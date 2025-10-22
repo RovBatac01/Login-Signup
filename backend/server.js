@@ -34,12 +34,6 @@ const allowedOrigins = [
   "https://login-signup-production-e1ef.up.railway.app"
 ];
 
-// ✅ Middleware setup
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
 // ✅ CORS setup (very important)
 app.use(cors({
   origin: function (origin, callback) {
@@ -58,6 +52,12 @@ app.use(cors({
 
 // ✅ Ensure OPTIONS preflight always succeeds
 app.options("*", cors());
+
+// ✅ Middleware setup
+app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // ✅ Debug incoming requests
 app.use((req, res, next) => {
