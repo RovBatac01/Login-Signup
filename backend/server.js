@@ -4220,7 +4220,7 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // -----------------------------------------------------------------
 // === START THE SERVER ===
 // -----------------------------------------------------------------
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
 });
