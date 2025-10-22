@@ -1,7 +1,5 @@
 require("dotenv").config({ path: "../.env" });
 
-const db = require("./config/db");
-const pool = require ("./config/db");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -10,67 +8,79 @@ const bcrypt = require("bcrypt");
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
-const secretKey = process.env.JWT_SECRET;
-const router = express.Router();
 const nodemailer = require("nodemailer");
-const sendOtpEmail = require('./otpMailer');
 const crypto = require("crypto");
+const cookieParser = require("cookie-parser");
+const otpGenerator = require("otp-generator");
+
+const db = require("./config/db");
+const sendOtpEmail = require("./otpMailer");
 const sendEmail = require("./mailer");
 const { User } = require("./models/user");
-const { SerialPort } = require("serialport");
-const { ReadlineParser } = require("@serialport/parser-readline");
-const cookieParser = require("cookie-parser");
 const authRoutes = require("./models/route");
 const sessionHistoryRoutes = require("./routes/sessionHistory");
 const SessionHistory = require("./models/sessionHistory");
+
 const app = express();
 const PORT = process.env.PORT || 8080;
-const saltRounds = 10;
-const otpGenerator = require('otp-generator');
 const JWT_SECRET = process.env.JWT_SECRET;
-// const twilio = require("twilio");
-// const users = [];
+const saltRounds = 10;
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5000", "https://login-signup-production-e1ef.up.railway.app"];
+// ✅ Allow only trusted origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5000",
+  "https://aquasensesolutions.onrender.com",
+  "https://login-signup-production-e1ef.up.railway.app"
+];
 
-// 2. Add all your middleware for parsing and security
+// ✅ Middleware setup
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-// Your CORS configuration must be defined after express app is initialized.
+// ✅ CORS setup (very important)
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `CORS policy blocked access from origin: ${origin}`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ Handle all preflight OPTIONS requests globally
-app.options('*', cors());
+// ✅ Ensure OPTIONS preflight always succeeds
+app.options("*", cors());
 
-// --- Debugging Middleware ---
-// This will log every incoming request to the server, which can help diagnose routing issues.
+// ✅ Debug incoming requests
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
-    next();
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  next();
 });
 
-// Add session history routes
+// ✅ API routes
 app.use("/api/session-history", sessionHistoryRoutes);
+app.use("/api/auth", authRoutes); // add your /login, /register, etc.
 
-// 3. Create the single HTTP server that will handle both Express and Socket.IO
+// ✅ Create and run the HTTP + Socket.IO server
 const server = http.createServer(app);
 
-// 4. Initialize your Socket.IO server and attach it to the HTTP server
 const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"]
-    }
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"]
+  }
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+// ✅ Server listen
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Backend running on port ${PORT} (all interfaces)`);
 });
 
