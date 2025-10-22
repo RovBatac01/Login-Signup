@@ -11,6 +11,7 @@ import Conductivity from "../DashboardMeters/Conductivity";
 import Salinity from "../DashboardMeters/Salinity";
 import Temperature from "../DashboardMeters/Temperature";
 import Turbidity from "../DashboardMeters/Turbidity";
+import PortableTurbidity from "../DashboardMeters/PortableTurbidity";
 import ElectricalCon from "../DashboardMeters/ElectricalCon";
 import AccessRestrictedModal from "../components/AccessRestrictedModal";
 import { useNavigate, Link } from "react-router-dom";
@@ -453,6 +454,7 @@ const Userdb = () => {
     // Sensor component mapping - these keys MUST EXACTLY match the 'sensor_name' from your backend API response
     const sensorComponentsMap = {
         'Turbidity': Turbidity,
+        'Portable Turbidity': PortableTurbidity,
         'Temperature': Temperature,
         'Salinity': Salinity,
         'Conductivity': Conductivity,

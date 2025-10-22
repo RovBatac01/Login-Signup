@@ -653,6 +653,26 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get('/api/users', async (req, res) => {
+  try {
+    const [users] = await pool.execute(`
+      SELECT 
+        id,
+        username,
+        email,
+        role,
+        establishment_id,
+        created_at
+      FROM users
+      ORDER BY created_at DESC
+    `);
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 // Get current user data - for refreshing user info on frontend
 app.get('/api/user/me', authenticateToken, async (req, res) => {
   try {
@@ -3404,6 +3424,8 @@ app.get('/api/establishment/:establishmentId/sensors', async (req, res) => {
 // --- Mappings for sensor data fetching ---
 const sensorTableMap = {
     "turbidity": { tableName: "turbidity_readings", valueColumn: "turbidity_value" },
+    "turbidity2": { tableName: "turbidity2_readings", valueColumn: "turbidity2_value" },
+    "portable-turbidity": { tableName: "turbidity2_readings", valueColumn: "turbidity2_value" },
     // Corrected key: "phlevel" to match frontend apiPath "/phlevel"
     "phlevel": { tableName: "phlevel_readings", valueColumn: "ph_value" },
     // Corrected key: "tds" to match frontend apiPath "/tds"

@@ -136,7 +136,7 @@ const TurbidityMonitor = ({ theme, filter }) => {
 
   return (
     <div className={`turbidity-monitor-container ${theme}`}>
-      <h2 style={{ color: textColor }}>Water Turbidity 2 Level</h2>
+      <h2 style={{ color: textColor }}>Portable Turbidity Level</h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={turbidityData}>
           <XAxis

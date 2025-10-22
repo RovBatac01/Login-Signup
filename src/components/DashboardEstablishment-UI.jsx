@@ -6,6 +6,7 @@ import { ThemeContext } from '../context/ThemeContext';
 
 // Import all sensor components
 import Turbidity from "../DashboardMeters/Turbidity";
+import PortableTurbidity from "../DashboardMeters/PortableTurbidity";
 import Ph from "../DashboardMeters/Ph";
 import Tds from "../DashboardMeters/Tds";
 import Conductivity from "../DashboardMeters/Conductivity";
@@ -20,6 +21,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 export const sensorComponentMap = {
   // Main mappings
   "Turbidity": Turbidity,
+  "Portable Turbidity": PortableTurbidity,
   "ph Level": Ph,
   "Total Dissolved Solids": Tds,
   "Conductivity": Conductivity,
@@ -29,6 +31,7 @@ export const sensorComponentMap = {
 
   // Alternative names
   "Turbidity Sensor": Turbidity,
+  "Portable Turbidity Sensor": PortableTurbidity,
   "pH Sensor": Ph,
   "TDS Sensor": Tds,
   "Conductivity Sensor": Conductivity,
@@ -110,8 +113,6 @@ const EstablishmentSensors = ({ establishment, onDelete, onShowModal }) => {
               <div className="estab-sensor-list">
                 {safeSensors.length > 0 ? (
                   safeSensors.map((sensor) => {
-                    console.log(`Processing sensor: ID=${sensor.id}, Name="${sensor.name}"`);
-
                     const SensorComponent = sensorComponentMap[sensor.name];
                     if (SensorComponent) {
                       return (

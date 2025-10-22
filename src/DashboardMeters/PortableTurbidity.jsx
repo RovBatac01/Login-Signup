@@ -5,7 +5,7 @@ import { ThemeContext } from "../context/ThemeContext";
 import socket from "./socket";
 import { Activity, WifiOff, Wifi } from "lucide-react"; // Import icons
 
-const Turbidity2 = () => {
+const PortableTurbidity = () => {
   const { theme } = useContext(ThemeContext);
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [turbidityValue, setTurbidityValue] = useState(0);
@@ -255,7 +255,7 @@ const Turbidity2 = () => {
       <div style={meterStyles.header}>
         <div style={meterStyles.title}>
           <Activity size={18} color={getPathColor()} />
-          Turbidity 2
+          Portable Turbidity
         </div>
         <div style={meterStyles.statusIndicator}>
           {isConnected ? (
@@ -331,4 +331,4 @@ const Turbidity2 = () => {
   );
 };
 
-export default Turbidity;
+export default PortableTurbidity;

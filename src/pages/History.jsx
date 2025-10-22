@@ -5,6 +5,7 @@ import "../styles/Pages Css/History.css"; // Adjusted path
 import Temp from "../sensors/temp"; // Adjusted path
 import PhLevel from "../sensors/phlevel"; // Adjusted path
 import Turbidity from "../sensors/turbudity"; // Adjusted path
+import PortableTurbidity from "../sensors/turbidity2"; // Portable Turbidity sensor
 import Tds from "../sensors/Tds"; // Adjusted path
 import Sal from "../sensors/sal"; // Adjusted path
 import Conductivity from "../sensors/Conductivity"; // Adjusted path
@@ -35,6 +36,7 @@ const History = () => {
         { name: "Temperature", tableName: "temperature_readings", valueColumn: "temperature_celsius", apiPath: "/temperature", component: Temp, cssClass: "aqua-water-temperature-container" },
         { name: "pH Level", tableName: "phlevel_readings", valueColumn: "ph_value", apiPath: "/phlevel", component: PhLevel, cssClass: "aqua-ph-level-container" },
         { name: "Turbidity", tableName: "turbidity_readings", valueColumn: "turbidity_value", apiPath: "/turbidity", component: Turbidity, cssClass: "aqua-turbidity-container" },
+        { name: "Portable Turbidity", tableName: "turbidity2_readings", valueColumn: "turbidity2_value", apiPath: "/turbidity2", component: PortableTurbidity, cssClass: "aqua-turbidity-container" },
         { name: "TDS", tableName: "tds_readings", valueColumn: "tds_value", apiPath: "/tds", component: Tds, cssClass: "aqua-tds-container" },
         { name: "Salinity", tableName: "salinity_readings", valueColumn: "salinity_value", apiPath: "/salinity", component: Sal, cssClass: "aqua-salinity-container" },
         { name: "Conductivity", tableName: "ec_readings", valueColumn: "ec_value_mS", apiPath: "/ec", component: Conductivity, cssClass: "aqua-conductivity-container" },
@@ -110,6 +112,7 @@ const History = () => {
                 // ORDER MATTERS: Check more specific terms BEFORE generic ones
                 const sensorMappings = {
                     'electrical conductivity': ['electrical conductivity', 'electrical conductivity (compensated)', 'ec compensated', 'ec'],
+                    'portable turbidity': ['portable turbidity', 'portable turbidity sensor', 'turbidity2', 'turbidity 2'],
                     'temperature': ['temperature', 'temperature sensor a', 'temp sensor'],
                     'ph level': ['ph', 'ph level', 'ph sensor', 'phlevel'],
                     'turbidity': ['turbidity', 'turbidity sensor'],
@@ -125,6 +128,20 @@ const History = () => {
                         // Check if dbName matches any of the aliases for this sensor type
                         const matches = aliases.some(alias => {
                             const normalizedAlias = normalize(alias);
+                            
+                            // For "turbidity", explicitly exclude "portable turbidity"
+                            if (sensorKey === 'turbidity') {
+                                if (dbName.includes('portable')) {
+                                    return false; // Don't match "Portable Turbidity" to "Turbidity"
+                                }
+                            }
+                            
+                            // For "portable turbidity", must contain "portable"
+                            if (sensorKey === 'portable turbidity') {
+                                if (!dbName.includes('portable') && !dbName.includes('turbidity2') && !dbName.includes('turbidity 2')) {
+                                    return false; // Don't match plain "Turbidity" to "Portable Turbidity"
+                                }
+                            }
                             
                             // For "conductivity", explicitly exclude "electrical conductivity"
                             if (sensorKey === 'conductivity') {
@@ -329,6 +346,7 @@ const History = () => {
     const getSensorUnit = (sensorName) => {
         switch (sensorName) {
             case "Turbidity": return "NTU";
+            case "Portable Turbidity": return "NTU";
             case "pH Level": return "pH";
             case "TDS": return "ppm";
             case "Salinity": return "ppt";
