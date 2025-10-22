@@ -4,7 +4,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
-//import Landing from "./pages/landing";
+//import Landing from "./pages/Landing";
 import LandingImproved from "./pages/LandingImproved"; 
 import Dashboard from "./pages/Dashboard";
 import AccountManagement from "./pages/AccountManagement";
