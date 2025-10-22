@@ -67,7 +67,6 @@ app.use((req, res, next) => {
 
 // ✅ API routes
 app.use("/api/session-history", sessionHistoryRoutes);
-app.use("/api/auth", authRoutes); // add your /login, /register, etc.
 
 // ✅ Create and run the HTTP + Socket.IO server
 const server = http.createServer(app);
