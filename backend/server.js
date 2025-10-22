@@ -31,6 +31,91 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // const twilio = require("twilio");
 // const users = [];
 
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5000" ];
+
+// 2. Add all your middleware for parsing and security
+app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Your CORS configuration must be defined after express app is initialized.
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true, // This is essential for handling credentials securely
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// ✅ Handle all preflight OPTIONS requests globally
+app.options('*', cors());
+
+// 3. Create the single HTTP server that will handle both Express and Socket.IO
+const server = http.createServer(app);
+
+// 4. Initialize your Socket.IO server and attach it to the HTTP server
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST"]
+    }
+});
+
+// --- Debugging Middleware ---
+// This will log every incoming request to the server, which can help diagnose routing issues.
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
+// Add session history routes
+app.use("/api/session-history", sessionHistoryRoutes);
+
+// --- Test Root Endpoint ---
+app.get("/", (req, res) => {
+  res.status(200).send("Backend is running!");
+});
+// Example middleware to verify the token
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1]; // Get the token from the 'Authorization' header
+
+  if (!token) {
+    return res.status(403).json({ message: "Access denied. No token provided." });
+  }
+
+  console.log('🔐 Signing with JWT_SECRET:', process.env.JWT_SECRET);
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid token." });
+    }
+
+    // Attach the decoded user data to the request object
+    req.user = decoded;
+    next(); // Call next middleware or handler
+  });
+};
+
+// --- NEW Middleware for Super Admin Authorization ---
+const authorizeSuperAdmin = (req, res, next) => {
+    // req.user is set by verifyToken middleware
+    if (req.user && req.user.role === 'Super Admin') {
+        next(); // User is a Super Admin, proceed
+    } else {
+        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
+        return res.status(403).json({ message: "Access Denied: Requires Super Admin role" });
+    }
+};
+
+const authorizeAdmin = (req, res, next) => { // <--- CONSIDER RENAMING THIS FUNCTION
+    // req.user is set by verifyToken middleware
+    if (req.user && (req.user.role === 'Admin' || req.user.role === 'Super Admin')) { // <--- MODIFIED CONDITION
+        next(); // User is an Admin or Super Admin, proceed
+    } else {
+        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
+        // <--- Consider updating the message to reflect the new allowed roles
+        return res.status(403).json({ message: "Access Denied: Requires Admin or Super Admin role" });
+    }
+};
+
 const lastSent = {}; // { sensorType: timestamp }
 
 // ============================
@@ -179,88 +264,6 @@ const authenticateAdminRoute = (req, res, next) => {
         return res.status(403).json({ message: `Invalid or expired token: ${error.message}` });
     } finally {
         console.log('--- AUTHENTICATION MIDDLEWARE END ---\n');
-    }
-};
-
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5000" ];
-
-// 2. Add all your middleware for parsing and security
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Your CORS configuration must be defined after express app is initialized.
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-// 3. Create the single HTTP server that will handle both Express and Socket.IO
-const server = http.createServer(app);
-
-// 4. Initialize your Socket.IO server and attach it to the HTTP server
-const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"]
-    }
-});
-
-// --- Debugging Middleware ---
-// This will log every incoming request to the server, which can help diagnose routing issues.
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
-    next();
-});
-
-// Add session history routes
-app.use("/api/session-history", sessionHistoryRoutes);
-
-// --- Test Root Endpoint ---
-app.get("/", (req, res) => {
-  res.status(200).send("Backend is running!");
-});
-// Example middleware to verify the token
-const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1]; // Get the token from the 'Authorization' header
-
-  if (!token) {
-    return res.status(403).json({ message: "Access denied. No token provided." });
-  }
-
-  console.log('🔐 Signing with JWT_SECRET:', process.env.JWT_SECRET);
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Invalid token." });
-    }
-
-    // Attach the decoded user data to the request object
-    req.user = decoded;
-    next(); // Call next middleware or handler
-  });
-};
-
-// --- NEW Middleware for Super Admin Authorization ---
-const authorizeSuperAdmin = (req, res, next) => {
-    // req.user is set by verifyToken middleware
-    if (req.user && req.user.role === 'Super Admin') {
-        next(); // User is a Super Admin, proceed
-    } else {
-        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
-        return res.status(403).json({ message: "Access Denied: Requires Super Admin role" });
-    }
-};
-
-const authorizeAdmin = (req, res, next) => { // <--- CONSIDER RENAMING THIS FUNCTION
-    // req.user is set by verifyToken middleware
-    if (req.user && (req.user.role === 'Admin' || req.user.role === 'Super Admin')) { // <--- MODIFIED CONDITION
-        next(); // User is an Admin or Super Admin, proceed
-    } else {
-        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
-        // <--- Consider updating the message to reflect the new allowed roles
-        return res.status(403).json({ message: "Access Denied: Requires Admin or Super Admin role" });
     }
 };
 
