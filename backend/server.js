@@ -1,5 +1,7 @@
 require("dotenv").config({ path: "../.env" });
 
+const db = require("./config/db");
+const pool = require ("./config/db");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -8,123 +10,26 @@ const bcrypt = require("bcrypt");
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
+const secretKey = process.env.JWT_SECRET;
+const router = express.Router();
 const nodemailer = require("nodemailer");
+const sendOtpEmail = require('./otpMailer');
 const crypto = require("crypto");
-const cookieParser = require("cookie-parser");
-const otpGenerator = require("otp-generator");
-
-const db = require("./config/db");
-const sendOtpEmail = require("./otpMailer");
 const sendEmail = require("./mailer");
 const { User } = require("./models/user");
+const { SerialPort } = require("serialport");
+const { ReadlineParser } = require("@serialport/parser-readline");
+const cookieParser = require("cookie-parser");
 const authRoutes = require("./models/route");
 const sessionHistoryRoutes = require("./routes/sessionHistory");
 const SessionHistory = require("./models/sessionHistory");
-
 const app = express();
-const PORT = process.env.PORT || 8080;
-const JWT_SECRET = process.env.JWT_SECRET;
+const port = 5000;
 const saltRounds = 10;
-
-// ✅ Allow only trusted origins
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5000",
-  "https://aquasensesolutions.onrender.com",
-  "https://login-signup-production-e1ef.up.railway.app"
-];
-
-// ✅ Middleware setup
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser requests like Postman
-    if (allowedOrigins.indexOf(origin) === -1) {
-      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
-    }
-    return callback(null, true);
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
-
-// --- Preflight OPTIONS handler (global) ---
-app.options("*", cors());
-
-// ✅ Debug incoming requests
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
-
-// ✅ API routes
-app.use("/api/session-history", sessionHistoryRoutes);
-
-// ✅ Create and run the HTTP + Socket.IO server
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"]
-  }
-});
-
-// ✅ Server listen
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Backend running on port ${PORT} (all interfaces)`);
-});
-
-// --- Test Root Endpoint ---
-app.get("/", (req, res) => {
-  res.status(200).send("Backend is running!");
-});
-// Example middleware to verify the token
-const verifyToken = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1]; // Get the token from the 'Authorization' header
-
-  if (!token) {
-    return res.status(403).json({ message: "Access denied. No token provided." });
-  }
-
-  console.log('🔐 Signing with JWT_SECRET:', process.env.JWT_SECRET);
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: "Invalid token." });
-    }
-
-    // Attach the decoded user data to the request object
-    req.user = decoded;
-    next(); // Call next middleware or handler
-  });
-};
-
-// --- NEW Middleware for Super Admin Authorization ---
-const authorizeSuperAdmin = (req, res, next) => {
-    // req.user is set by verifyToken middleware
-    if (req.user && req.user.role === 'Super Admin') {
-        next(); // User is a Super Admin, proceed
-    } else {
-        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
-        return res.status(403).json({ message: "Access Denied: Requires Super Admin role" });
-    }
-};
-
-const authorizeAdmin = (req, res, next) => { // <--- CONSIDER RENAMING THIS FUNCTION
-    // req.user is set by verifyToken middleware
-    if (req.user && (req.user.role === 'Admin' || req.user.role === 'Super Admin')) { // <--- MODIFIED CONDITION
-        next(); // User is an Admin or Super Admin, proceed
-    } else {
-        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
-        // <--- Consider updating the message to reflect the new allowed roles
-        return res.status(403).json({ message: "Access Denied: Requires Admin or Super Admin role" });
-    }
-};
+const otpGenerator = require('otp-generator');
+const JWT_SECRET = process.env.JWT_SECRET;
+// const twilio = require("twilio");
+// const users = [];
 
 const lastSent = {}; // { sensorType: timestamp }
 
@@ -274,6 +179,88 @@ const authenticateAdminRoute = (req, res, next) => {
         return res.status(403).json({ message: `Invalid or expired token: ${error.message}` });
     } finally {
         console.log('--- AUTHENTICATION MIDDLEWARE END ---\n');
+    }
+};
+
+const allowedOrigins = ["https://aquasensesolutions.onrender.com", "https://login-signup-production-e1ef.up.railway.app" ];
+
+// 2. Add all your middleware for parsing and security
+app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Your CORS configuration must be defined after express app is initialized.
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true, // This is essential for handling credentials securely
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+// 3. Create the single HTTP server that will handle both Express and Socket.IO
+const server = http.createServer(app);
+
+// 4. Initialize your Socket.IO server and attach it to the HTTP server
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigins,
+        methods: ["GET", "POST"]
+    }
+});
+
+// --- Debugging Middleware ---
+// This will log every incoming request to the server, which can help diagnose routing issues.
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
+// Add session history routes
+app.use("/api/session-history", sessionHistoryRoutes);
+
+// --- Test Root Endpoint ---
+app.get("/", (req, res) => {
+  res.status(200).send("Backend is running!");
+});
+// Example middleware to verify the token
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1]; // Get the token from the 'Authorization' header
+
+  if (!token) {
+    return res.status(403).json({ message: "Access denied. No token provided." });
+  }
+
+  console.log('🔐 Signing with JWT_SECRET:', process.env.JWT_SECRET);
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid token." });
+    }
+
+    // Attach the decoded user data to the request object
+    req.user = decoded;
+    next(); // Call next middleware or handler
+  });
+};
+
+// --- NEW Middleware for Super Admin Authorization ---
+const authorizeSuperAdmin = (req, res, next) => {
+    // req.user is set by verifyToken middleware
+    if (req.user && req.user.role === 'Super Admin') {
+        next(); // User is a Super Admin, proceed
+    } else {
+        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
+        return res.status(403).json({ message: "Access Denied: Requires Super Admin role" });
+    }
+};
+
+const authorizeAdmin = (req, res, next) => { // <--- CONSIDER RENAMING THIS FUNCTION
+    // req.user is set by verifyToken middleware
+    if (req.user && (req.user.role === 'Admin' || req.user.role === 'Super Admin')) { // <--- MODIFIED CONDITION
+        next(); // User is an Admin or Super Admin, proceed
+    } else {
+        console.log("Unauthorized access attempt. Role:", req.user ? req.user.role : 'None');
+        // <--- Consider updating the message to reflect the new allowed roles
+        return res.status(403).json({ message: "Access Denied: Requires Admin or Super Admin role" });
     }
 };
 
@@ -4233,3 +4220,7 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // -----------------------------------------------------------------
 // === START THE SERVER ===
 // -----------------------------------------------------------------
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
+});
