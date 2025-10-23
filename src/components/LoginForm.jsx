@@ -102,9 +102,14 @@ const LoginForm = ({ onLoginSuccess, onLoginFailure, termsChecked, setTermsCheck
     }
 
     try {
-      const response = await axios.post("https://login-signup-production-9bdf.up.railway.app/login", formData, {
-        headers: { "Content-Type": "application/json" }
-      });
+  const response = await axios.post(
+    "https://login-signup-production-9bdf.up.railway.app/login",
+    formData,
+    {
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true, // <- allow cookies if backend sets them
+    }
+  );
 
       const { user, token, role } = response.data;
       login(user, token);

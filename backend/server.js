@@ -43,6 +43,41 @@ const lastSent = {}; // { sensorType: timestamp }
 
 // const twilioClient = twilio(accountSid, authToken);
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5000",
+  "https://login-signup-production-e1ef.up.railway.app"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+app.options("*", cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"],
+})); // Handle preflight OPTIONS
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"]
+  }
+});
+
+// --- Debugging Middleware ---
+// This will log every incoming request to the server, which can help diagnose routing issues.
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 const authenticateUser = require('./middleware/authenticateUser');
 
 const authorizeRoles = (allowedRoles) => {
@@ -181,36 +216,6 @@ const authenticateAdminRoute = (req, res, next) => {
         console.log('--- AUTHENTICATION MIDDLEWARE END ---\n');
     }
 };
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5000",
-  "https://login-signup-production-e1ef.up.railway.app"
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
-
-app.options("*", cors()); // Handle preflight OPTIONS
-
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"]
-  }
-});
-
-// --- Debugging Middleware ---
-// This will log every incoming request to the server, which can help diagnose routing issues.
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] Incoming request: ${req.method} ${req.originalUrl}`);
-    next();
-});
 
 // Add session history routes
 app.use("/api/session-history", sessionHistoryRoutes);
