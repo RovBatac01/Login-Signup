@@ -200,6 +200,20 @@ app.use(cors({
 // Explicitly handle preflight OPTIONS for all routes (helps on some hosting providers)
 app.options('*', cors({ origin: allowedOrigins, credentials: true }));
 
+// Diagnostic middleware: log method and path; ensure OPTIONS preflight gets a quick 204
+app.use((req, res, next) => {
+  console.log(`➡️ Incoming request: ${req.method} ${req.originalUrl}`);
+  // If this is a preflight request, respond with allowed methods/headers
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // Note: Access-Control-Allow-Origin is handled by the cors middleware
+    console.log(`↩️ Responding to OPTIONS preflight for ${req.originalUrl}`);
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 // 3. Create the single HTTP server that will handle both Express and Socket.IO
 const server = http.createServer(app);
 
