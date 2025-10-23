@@ -182,7 +182,7 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
-const allowedOrigins = ["https://login-signup-production-e1ef.up.railway.app", "https://login-signup-production-9bdf.up.railway.app"];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5000", "https://login-signup-production-e1ef.up.railway.app"];
 
 // 2. Add all your middleware for parsing and security
 app.use(bodyParser.json());
@@ -193,26 +193,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: allowedOrigins,
     credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
-
-// Explicitly handle preflight OPTIONS for all routes (helps on some hosting providers)
-app.options('*', cors({ origin: allowedOrigins, credentials: true }));
-
-// Diagnostic middleware: log method and path; ensure OPTIONS preflight gets a quick 204
-app.use((req, res, next) => {
-  console.log(`➡️ Incoming request: ${req.method} ${req.originalUrl}`);
-  // If this is a preflight request, respond with allowed methods/headers
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    // Note: Access-Control-Allow-Origin is handled by the cors middleware
-    console.log(`↩️ Responding to OPTIONS preflight for ${req.originalUrl}`);
-    return res.sendStatus(204);
-  }
-  next();
-});
 
 // 3. Create the single HTTP server that will handle both Express and Socket.IO
 const server = http.createServer(app);
@@ -4237,9 +4220,7 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // -----------------------------------------------------------------
 // === START THE SERVER ===
 // -----------------------------------------------------------------
-const PORT = process.env.PORT || 5000;
-// Bind to 0.0.0.0 (recommended for containers/hosting platforms) and print an accurate startup message
-const HOST = process.env.HOST || '0.0.0.0';
-server.listen(PORT, HOST, () => {
-  console.log(`Backend running on ${HOST}:${PORT} (NODE_ENV=${process.env.NODE_ENV || 'development'})`);
+const PORT = process.env.PORT || 10000;
+server.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
 });
