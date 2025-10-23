@@ -4222,7 +4222,7 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // -----------------------------------------------------------------
 // === START THE SERVER ===
 // -----------------------------------------------------------------
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 server.listen(port, "0.0.0.0", () => {
   console.log(`Backend running on 0.0.0.0:${port} (NODE_ENV=${process.env.NODE_ENV})`);
 });
