@@ -193,9 +193,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: allowedOrigins,
     credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+// Explicitly handle preflight OPTIONS for all routes (helps on some hosting providers)
+app.options('*', cors({ origin: allowedOrigins, credentials: true }));
 
 // 3. Create the single HTTP server that will handle both Express and Socket.IO
 const server = http.createServer(app);
