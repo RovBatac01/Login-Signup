@@ -45,7 +45,15 @@ const UserAdminTable = () => {
       try {
         setLoading(true);
         const response = await axios.get("http://localhost:5000/api/users");
-        setAccounts(response.data);
+        
+        // Convert is_verified and email_verified from 0/1 to proper booleans
+        const accountsWithBooleans = response.data.map(account => ({
+          ...account,
+          is_verified: account.is_verified === 1,
+          email_verified: account.email_verified === 1
+        }));
+        
+        setAccounts(accountsWithBooleans);
       } catch (err) {
         setError("Failed to fetch users.");
       } finally {

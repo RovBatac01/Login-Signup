@@ -66,11 +66,8 @@ const SignupForm = () => {
             setMessage("✅ " + response.data.message);
             setShowModal(true);
 
-            await axios.post("http://localhost:5000/send-email", {
-                email: formData.email,
-                subject: "Verify Your Email",
-                message: `Your verification code is: [OTP_PLACEHOLDER]`,
-            });
+            // Email is already sent by the backend /users endpoint via sendVerificationEmail()
+            // No need to call /send-email again here
 
         } catch (error) {
             // Check for specific error messages from the backend

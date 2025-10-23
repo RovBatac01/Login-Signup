@@ -660,7 +660,11 @@ app.get('/api/users', async (req, res) => {
         id,
         username,
         email,
+        phone,
         role,
+        is_verified,
+        email_verified,
+        device_id,
         establishment_id,
         created_at
       FROM users
