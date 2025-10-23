@@ -24,7 +24,7 @@ const authRoutes = require("./models/route");
 const sessionHistoryRoutes = require("./routes/sessionHistory");
 const SessionHistory = require("./models/sessionHistory");
 const app = express();
-const port = 5000;
+const port = 10000;
 const saltRounds = 10;
 const otpGenerator = require('otp-generator');
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -4223,6 +4223,6 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // === START THE SERVER ===
 // -----------------------------------------------------------------
 const PORT = process.env.PORT || 10000;
-server.listen(port, "0.0.0.0", () => {
-  console.log(`Backend running on 0.0.0.0:${port} (NODE_ENV=${process.env.NODE_ENV})`);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend running on 0.0.0.0:${PORT} (NODE_ENV=${process.env.NODE_ENV})`);
 });
