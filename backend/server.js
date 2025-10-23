@@ -4238,6 +4238,8 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // === START THE SERVER ===
 // -----------------------------------------------------------------
 const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+// Bind to 0.0.0.0 (recommended for containers/hosting platforms) and print an accurate startup message
+const HOST = process.env.HOST || '0.0.0.0';
+server.listen(PORT, HOST, () => {
+  console.log(`Backend running on ${HOST}:${PORT} (NODE_ENV=${process.env.NODE_ENV || 'development'})`);
 });
