@@ -12,8 +12,8 @@ import axios from "axios";
 
 // Determine API base URL based on environment
 const API_BASE_URL = import.meta.env.PROD 
-  ? "https://login-signup-production-e1ef.up.railway.app" 
-  : "https://login-signup-production-e1ef.up.railway.app";
+  ? "https://login-signup-production-9bdf.up.railway.app" 
+  : "https://login-signup-production-9bdf.up.railway.app";
 
 const AccountManagement = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);

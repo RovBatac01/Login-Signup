@@ -32,7 +32,7 @@ const Turbidity = () => {
     // Fetch latest turbidity value on mount (fallback)
     const fetchLatestTurbidity = async () => {
       try {
-        const response = await fetch("https://login-signup-production-e1ef.up.railway.app/api/sensors/latest");
+        const response = await fetch("https://login-signup-production-9bdf.up.railway.app/api/sensors/latest");
         if (!response.ok) throw new Error("No data found");
         const latestData = await response.json();
         setTurbidityValue(latestData.turbidity_value);

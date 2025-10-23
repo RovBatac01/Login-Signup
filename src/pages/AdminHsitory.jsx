@@ -84,7 +84,7 @@ const AdminHistory = () => {
 
             try {
                 // Fetch list of sensors for the establishment using the determined ID
-                const response = await fetch(`https://login-signup-production-e1ef.up.railway.app/api/establishment/${id}/sensors`);
+                const response = await fetch(`https://login-signup-production-9bdf.up.railway.app/api/establishment/${id}/sensors`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch establishment sensors: ${response.statusText}`);
                 }
@@ -164,7 +164,7 @@ const AdminHistory = () => {
 
             // Fetch data ONLY for the filtered sensors that are associated with the establishment
             for (const sensor of sensorDefinitions) { // Use the filtered sensorDefinitions here
-                const endpoint = `https://login-signup-production-e1ef.up.railway.app/data${sensor.apiPath}/${backendFilter}?establishmentId=${establishmentId}`;
+                const endpoint = `https://login-signup-production-9bdf.up.railway.app/data${sensor.apiPath}/${backendFilter}?establishmentId=${establishmentId}`;
                 console.log(`Fetching data for ${sensor.name} from: ${endpoint}`);
                 const response = await fetch(endpoint);
                 if (!response.ok) {
@@ -260,7 +260,7 @@ const AdminHistory = () => {
 
             // Fetch data ONLY for the filtered sensors that are associated with the establishment
             for (const sensor of sensorDefinitions) {
-                const endpoint = `https://login-signup-production-e1ef.up.railway.app/data${sensor.apiPath}/${backendFilter}?establishmentId=${establishmentId}`;
+                const endpoint = `https://login-signup-production-9bdf.up.railway.app/data${sensor.apiPath}/${backendFilter}?establishmentId=${establishmentId}`;
                 console.log(`Fetching data for ${sensor.name} from: ${endpoint}`);
                 
                 const response = await fetch(endpoint);

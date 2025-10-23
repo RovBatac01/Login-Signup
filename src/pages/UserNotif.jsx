@@ -128,7 +128,7 @@ const UserNotificationsPage = () => {
     const { theme } = useContext(ThemeContext);
     const [userId, setUserId] = useState(null);
 
-    const API_BASE_URL = "https://login-signup-production-e1ef.up.railway.app";
+    const API_BASE_URL = "https://login-signup-production-9bdf.up.railway.app";
 
     // Ref for the latest notifications state, crucial for polling
     const notificationsRef = useRef(notifications);

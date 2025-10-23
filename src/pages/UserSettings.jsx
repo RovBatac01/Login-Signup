@@ -23,7 +23,7 @@ import '../styles/Pages Css/Settings.css';
 import '../styles/Pages Css/Settings-improved.css';
 
 // Define your backend API base URL
-const API_BASE_URL = 'https://login-signup-production-e1ef.up.railway.app/api';
+const API_BASE_URL = 'https://login-signup-production-9bdf.up.railway.app/api';
 
 const UserSettingsPage = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);

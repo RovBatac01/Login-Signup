@@ -16,7 +16,7 @@ import '../styles/Pages Css/Settings-improved.css';
 
 // Define your backend API base URL
 // Ensure this matches the port your Node.js backend is running on (default: 5000)
-const API_BASE_URL = 'https://login-signup-production-e1ef.up.railway.app/api';
+const API_BASE_URL = 'https://login-signup-production-9bdf.up.railway.app/api';
 
 const SettingsPage = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);

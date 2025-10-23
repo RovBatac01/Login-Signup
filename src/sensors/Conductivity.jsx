@@ -19,20 +19,20 @@ const ConductivityMonitor = ({ theme, filter }) => { // Accept 'filter' prop
     // Determine the API endpoint based on the filter
     switch (currentFilter) {
       case "realtime":
-        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec-compensated/realtime"; // Backend endpoint for compensated EC
+        endpoint = "https://login-signup-production-9bdf.up.railway.app/data/ec-compensated/realtime"; // Backend endpoint for compensated EC
         isRealtime = true;
         break;
       case "24h":
-        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec-compensated/24h"; // Backend endpoint for compensated EC
+        endpoint = "https://login-signup-production-9bdf.up.railway.app/data/ec-compensated/24h"; // Backend endpoint for compensated EC
         break;
       case "7d-avg": // Corresponds to '7d-avg' on backend
-        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec-compensated/7d-avg"; // Backend endpoint for compensated EC
+        endpoint = "https://login-signup-production-9bdf.up.railway.app/data/ec-compensated/7d-avg"; // Backend endpoint for compensated EC
         break;
       case "30d-avg": // Corresponds to '30d-avg' on backend
-        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec-compensated/30d-avg"; // Backend endpoint for compensated EC
+        endpoint = "https://login-signup-production-9bdf.up.railway.app/data/ec-compensated/30d-avg"; // Backend endpoint for compensated EC
         break;
       default:
-        endpoint = "https://login-signup-production-e1ef.up.railway.app/data/ec-compensated/24h"; // Fallback
+        endpoint = "https://login-signup-production-9bdf.up.railway.app/data/ec-compensated/24h"; // Fallback
         break;
     }
 
@@ -64,7 +64,7 @@ const ConductivityMonitor = ({ theme, filter }) => { // Accept 'filter' prop
     } else {
       // Handle real-time data: Connect/reconnect socket and fetch initial real-time data
       if (!socket) { // Only create a new socket if one doesn't exist
-        const newSocket = io("https://login-signup-production-e1ef.up.railway.app");
+        const newSocket = io("https://login-signup-production-9bdf.up.railway.app");
         setSocket(newSocket);
 
         // Listen for specific compensated EC updates (assuming backend emits 'updateECCompensatedData')

@@ -43,7 +43,7 @@ const Dashboard = () => {
     try {
       // IMPORTANT: Ensure your backend's /api/establishments endpoint
       // now fetches and includes ALL associated sensors for each establishment.
-      const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/establishments');
+      const response = await fetch('https://login-signup-production-9bdf.up.railway.app/api/establishments');
       console.log('Frontend - HTTP Response Status:', response.status);
       if (!response.ok) {
         const errorText = await response.text();
@@ -71,7 +71,7 @@ const Dashboard = () => {
       }
 
       // MODIFIED: Change the endpoint to fetch all sensors
-      const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/sensors', { // Assuming /api/sensors gives all
+      const response = await fetch('https://login-signup-production-9bdf.up.railway.app/api/sensors', { // Assuming /api/sensors gives all
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -92,7 +92,7 @@ const Dashboard = () => {
 
   const addEstablishmentToDatabase = async (name, sensors, deviceId) => {
     try {
-      const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/establishments', {
+      const response = await fetch('https://login-signup-production-9bdf.up.railway.app/api/establishments', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -121,7 +121,7 @@ const Dashboard = () => {
     }
 
     try {
-      const response = await fetch(`https://login-signup-production-e1ef.up.railway.app/api/establishments/${establishmentId}`, {
+      const response = await fetch(`https://login-signup-production-9bdf.up.railway.app/api/establishments/${establishmentId}`, {
         method: "DELETE",
       });
 

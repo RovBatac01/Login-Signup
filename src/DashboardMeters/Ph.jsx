@@ -24,7 +24,7 @@ const Ph = () => {
     // Fetch latest pH value on mount (fallback)
     const fetchLatestPh = async () => {
       try {
-        const response = await fetch("https://login-signup-production-e1ef.up.railway.app/api/sensors/latest");
+        const response = await fetch("https://login-signup-production-9bdf.up.railway.app/api/sensors/latest");
         if (!response.ok) throw new Error("No data found");
         const latestData = await response.json();
         setPhValue(latestData.ph_value);

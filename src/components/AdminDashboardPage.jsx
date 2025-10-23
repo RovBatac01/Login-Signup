@@ -102,7 +102,7 @@ const AdminDashboardPage = () => {
     const fetchTotalUsersByDevice = async () => {
       setDashboardSummaryData(prevData => ({ ...prevData, userError: false }));
       try {
-        const response = await fetch(`https://login-signup-production-e1ef.up.railway.app/api/total-users-by-device/${deviceId}`, {
+        const response = await fetch(`https://login-signup-production-9bdf.up.railway.app/api/total-users-by-device/${deviceId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -136,7 +136,7 @@ const AdminDashboardPage = () => {
     const fetchOtherData = async () => {
       // Fetch total establishments (keeping the same as it might be global)
       try {
-        const estResponse = await fetch('https://login-signup-production-e1ef.up.railway.app/api/total-establishments', {
+        const estResponse = await fetch('https://login-signup-production-9bdf.up.railway.app/api/total-establishments', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -164,7 +164,7 @@ const AdminDashboardPage = () => {
 
       // Fetch total sensors by device ID
       try {
-        const sensorResponse = await fetch(`https://login-signup-production-e1ef.up.railway.app/api/total-sensors-by-device/${deviceId}`, {
+        const sensorResponse = await fetch(`https://login-signup-production-9bdf.up.railway.app/api/total-sensors-by-device/${deviceId}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

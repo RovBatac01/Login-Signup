@@ -77,7 +77,7 @@ const AquaSense = () => {
 
     try {
       // Replace with your actual backend API URL
-      const response = await fetch("https://login-signup-production-e1ef.up.railway.app/api/contact", {
+      const response = await fetch("https://login-signup-production-9bdf.up.railway.app/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

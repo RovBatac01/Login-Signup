@@ -29,7 +29,7 @@ const ForgotPassword = () => {
     setStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/forgot-password', {
+      const response = await fetch('https://login-signup-production-9bdf.up.railway.app/api/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const ForgotPassword = () => {
     setStatus({ type: '', message: '' });
 
     try {
-      const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/validate-otp', {
+      const response = await fetch('https://login-signup-production-9bdf.up.railway.app/api/validate-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
     try {
       const token = resetToken || localStorage.getItem("resetToken");
 
-      const response = await fetch('https://login-signup-production-e1ef.up.railway.app/api/reset-password-notloggedin', {
+      const response = await fetch('https://login-signup-production-9bdf.up.railway.app/api/reset-password-notloggedin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

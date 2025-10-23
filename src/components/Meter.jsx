@@ -6,7 +6,7 @@ import "../styles/meter.css";
 import { ThemeContext } from "../context/ThemeContext"; // Import ThemeContext
 
 // ✅ Connect to WebSocket
-const socket = io("https://login-signup-production-e1ef.up.railway.app");
+const socket = io("https://login-signup-production-9bdf.up.railway.app");
 
 const GaugeMeter = () => {
   const { theme } = useContext(ThemeContext); // Use ThemeContext for theme
@@ -14,7 +14,7 @@ const GaugeMeter = () => {
 
   useEffect(() => {
     // ✅ Fetch initial data from the backend
-    axios.get("https://login-signup-production-e1ef.up.railway.app/data").then((response) => {
+    axios.get("https://login-signup-production-9bdf.up.railway.app/data").then((response) => {
       if (response.data.length > 0) {
         console.log("📡 Initial Data:", response.data[0].turbidity_value);
         setValue(response.data[0].turbidity_value);
