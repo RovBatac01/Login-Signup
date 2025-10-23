@@ -182,7 +182,7 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
-const allowedOrigins = ["https://login-signup-production-e1ef.up.railway.app" ];
+const allowedOrigins = ["https://login-signup-production-e1ef.up.railway.app", "https://login-signup-production-9bdf.up.railway.app"];
 
 // 2. Add all your middleware for parsing and security
 app.use(bodyParser.json());
