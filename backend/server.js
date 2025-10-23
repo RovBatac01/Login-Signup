@@ -182,30 +182,27 @@ const authenticateAdminRoute = (req, res, next) => {
     }
 };
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5000", "https://login-signup-production-e1ef.up.railway.app"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5000",
+  "https://login-signup-production-e1ef.up.railway.app"
+];
 
-// 2. Add all your middleware for parsing and security
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Your CORS configuration must be defined after express app is initialized.
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true, // This is essential for handling credentials securely
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-// 3. Create the single HTTP server that will handle both Express and Socket.IO
-const server = http.createServer(app);
+app.options("*", cors()); // Handle preflight OPTIONS
 
-// 4. Initialize your Socket.IO server and attach it to the HTTP server
+const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ["GET", "POST"]
-    }
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"]
+  }
 });
 
 // --- Debugging Middleware ---
@@ -4220,7 +4217,7 @@ app.get("/data/temperature/30d-avg", (req, res) => getHistoricalData('temperatur
 // -----------------------------------------------------------------
 // === START THE SERVER ===
 // -----------------------------------------------------------------
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
 });
