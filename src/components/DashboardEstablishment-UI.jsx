@@ -47,7 +47,7 @@ export const sensorComponentMap = {
 };
 
 // Component for displaying establishment sensors
-const EstablishmentSensors = ({ establishment, onDelete, onShowModal }) => {
+const EstablishmentSensors = ({ establishment, onDelete, onShowModal, viewOnly = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { theme } = useContext(ThemeContext);
 
@@ -81,13 +81,15 @@ const EstablishmentSensors = ({ establishment, onDelete, onShowModal }) => {
           >
             <i className="fas fa-info-circle"></i> Details
           </button>
-          <button
-            onClick={() => onDelete(establishment.id, establishment.name)}
-            className="estab-delete-icon-button"
-            title={`Delete ${establishmentName}`}
-          >
-            <i className="fas fa-trash-alt"></i>
-          </button>
+          {!viewOnly && onDelete && (
+            <button
+              onClick={() => onDelete(establishment.id, establishment.name)}
+              className="estab-delete-icon-button"
+              title={`Delete ${establishmentName}`}
+            >
+              <i className="fas fa-trash-alt"></i>
+            </button>
+          )}
         </div>
         
         {isOpen && (

@@ -7,11 +7,13 @@ import {
   FaPowerOff,
   FaSun,
   FaMoon,
+  FaBuilding,
 } from "react-icons/fa";
 import { ThemeContext } from "../context/ThemeContext"; // Import ThemeContext
 import "../styles/Components Css/Sidebar.css";
 import "../styles/theme.css";
 import { FaBell, FaGears } from "react-icons/fa6";
+import axios from "axios";
 
 const Sidebar = () => {
   console.log("Sidebar component has rendered!");
@@ -21,6 +23,38 @@ const Sidebar = () => {
   const userRole = localStorage.getItem("userRole"); // Get user role from local storage
   const [token, setToken] = useState(localStorage.getItem("authToken"));
   const [username, setUsername] = useState("");
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        let endpoint = "";
+        if (userRole === "User") {
+          endpoint = "http://localhost:5000/api/user/notifications/unread-count";
+        } else if (userRole === "Admin" || userRole === "Super Admin") {
+          endpoint = "http://localhost:5000/api/admin/notifications/unread-count";
+        }
+
+        if (endpoint) {
+          const response = await axios.get(endpoint, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUnreadCount(response.data.unreadCount || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching unread notification count:", error);
+      }
+    };
+
+    fetchUnreadCount();
+    // Poll every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [userRole]);
 
   useEffect(() => {
     console.log("Sidebar: Token in useEffect:", token);
@@ -186,6 +220,19 @@ const Sidebar = () => {
           </div>
         )}
 
+        {/* Establishment Management (Only for Super Admin and Admin) */}
+        {(userRole === "Super Admin" || userRole === "Admin") && (
+          <div
+            className={`menu-item ${
+              location.pathname === "/establishment-management" ? "active" : ""
+            }`}
+            onClick={() => navigate("/establishment-management")}
+          >
+            <FaBuilding className="icon" />
+            <span>Establishments</span>
+          </div>
+        )}
+
         {/* History (Visible to all roles, but path is dynamic) */}
         <div
           className={`menu-item ${
@@ -203,9 +250,27 @@ const Sidebar = () => {
             location.pathname === currentNotificationsPath ? "active" : ""
           }`}
           onClick={() => navigate(currentNotificationsPath)}
+          style={{ position: 'relative' }}
         >
           <FaBell className="icon" />
           <span>Notifications</span>
+          {unreadCount > 0 && (
+            <span style={{
+              position: 'absolute',
+              top: '8px',
+              right: '12px',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              borderRadius: '10px',
+              padding: '2px 6px',
+              fontSize: '0.75rem',
+              fontWeight: 'bold',
+              minWidth: '18px',
+              textAlign: 'center'
+            }}>
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
         </div>
 
         {/* Settings (Dynamic based on role) */}

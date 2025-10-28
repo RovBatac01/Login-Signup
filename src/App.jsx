@@ -8,6 +8,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import LandingImproved from "./pages/LandingImproved"; 
 import Dashboard from "./pages/Dashboard";
 import AccountManagement from "./pages/AccountManagement";
+import EstablishmentManagement from "./pages/EstablishmentManagement";
 import History from "./pages/History";
 import AdminDB from "./pages/adminDB";
 import UserDB from "./pages/userDB";
@@ -113,6 +114,7 @@ const ThemedApp = () => {
                     <Route path="/dashboard" element={<ProtectedRoute element={<Dashboard />} allowedRoles={["Super Admin"]} />} />
                     <Route path="/adminDB" element={<ProtectedRoute element={<AdminDB />} allowedRoles={["Admin"]} />} />
                     <Route path="/accountmanagement" element={<ProtectedRoute element={<AccountManagement />} allowedRoles={["Super Admin"]} />} />
+                    <Route path="/establishment-management" element={<ProtectedRoute element={<EstablishmentManagement />} allowedRoles={["Super Admin", "Admin"]} />} />
                     
                     {/* History Routes - Corrected for Role-Based Navigation */}
                     <Route path="/history" element={<ProtectedRoute element={<History />} allowedRoles={["Super Admin"]} />} /> {/* Only Super Admin to /history */}

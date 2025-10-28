@@ -3031,6 +3031,54 @@ app.post('/api/user/notifications/delete-all', authenticateUser, async (req, res
     }
 });
 
+/**
+ * API Endpoint: GET /api/admin/notifications/unread-count
+ * Get count of unread notifications for Admin/Super Admin
+ */
+app.get('/api/admin/notifications/unread-count', authenticateAdminRoute, async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const connection = await pool.getConnection();
+        try {
+            const [countResult] = await connection.execute(
+                `SELECT COUNT(*) as unreadCount FROM notif WHERE user_id = ? AND is_read = 0`,
+                [userId]
+            );
+            res.status(200).json({ success: true, unreadCount: countResult[0].unreadCount });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error fetching unread count for admin:', error);
+        res.status(500).json({ success: false, message: 'Server error while fetching unread count.' });
+    }
+});
+
+/**
+ * API Endpoint: GET /api/user/notifications/unread-count
+ * Get count of unread notifications for User
+ */
+app.get('/api/user/notifications/unread-count', authenticateUser, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const connection = await pool.getConnection();
+        try {
+            const [countResult] = await connection.execute(
+                `SELECT COUNT(*) as unreadCount FROM notif WHERE user_id = ? AND is_read = 0`,
+                [userId]
+            );
+            res.status(200).json({ success: true, unreadCount: countResult[0].unreadCount });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error fetching unread count for user:', error);
+        res.status(500).json({ success: false, message: 'Server error while fetching unread count.' });
+    }
+});
+
 // API endpoint to handle contact form submissions
 app.post('/api/contact', async (req, res) => {
     const { name, email, message } = req.body;
@@ -3927,7 +3975,7 @@ app.post("/api/sensor-data", async (req, res) => {
     const notifications = {
       turbidity: { sensorType: "turbidity", threshold: 30, condition: "lessThan", unit: "%" },
       turbidity2: { sensorType: "turbidity2", threshold: 30, condition: "lessThan", unit: "%" },
-      ph: { sensorType: "ph", threshold: [0.5, 8.5], condition: "outsideRange", unit: "pH" },
+      ph: { sensorType: "ph", threshold: [6.5, 9.0], condition: "outsideRange", unit: "pH" },
       tds: { sensorType: "tds", threshold: 30, condition: "lessThan", unit: "%" },
       salinity: { sensorType: "salinity", threshold: 30, condition: "lessThan", unit: "%" },
       ec: { sensorType: "ec", threshold: 30, condition: "lessThan", unit: "%" },
