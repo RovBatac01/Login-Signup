@@ -23,25 +23,8 @@
   flex-direction: column;
   justify-content: start;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 20px;
-}
-
-.account-contents::-webkit-scrollbar {
-  width: 8px;
-}
-
-.account-contents::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.account-contents::-webkit-scrollbar-thumb {
-  background: rgba(100, 100, 100, 0.4);
-  border-radius: 4px;
-}
-
-.account-contents::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 100, 100, 0.7);
 }
 
 /* Account Dashboard Stats */
@@ -50,11 +33,12 @@
 }
 
 .account-stats-row {
-  margin: 0 0 30px;
+  margin: 0 0 20px;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .account-stat-card {
@@ -81,6 +65,31 @@
 .account-stat-card.dark {
   background: #2f2f31;
   color: #f8f9fa;
+}
+
+/* Scrollable table section */
+.scrollable-table-section {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 5px;
+}
+
+.scrollable-table-section::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollable-table-section::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.scrollable-table-section::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.4);
+  border-radius: 4px;
+}
+
+.scrollable-table-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.7);
 }
 
 .stat-icon-container {

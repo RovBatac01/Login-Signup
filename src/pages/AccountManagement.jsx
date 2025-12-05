@@ -130,9 +130,12 @@ const AccountManagement = () => {
             </Card>
           </div>
           
-          {/* Account management table */}
-          <div className="account-management-section">
-            <AccountTable />
+          {/* Scrollable table section */}
+          <div className="scrollable-table-section">
+            {/* Account management table */}
+            <div className="account-management-section">
+              <AccountTable />
+            </div>
           </div>
         </div>
       </div>
