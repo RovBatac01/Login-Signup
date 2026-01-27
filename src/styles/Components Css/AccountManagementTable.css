@@ -1,0 +1,924 @@
+:root {
+  /* Title */
+  --acctbl-title-font-size: 22px;
+  --acctbl-title-font-weight: 600;
+  --acctbl-title-margin-bottom: 15px;
+  --acctbl-title-color-light: #000;
+  --acctbl-title-color-dark: #f8f9fa;
+
+  /* Borders */
+  --acctbl-border-light: #ddd;
+  --acctbl-border-dark: #1e1f21;
+  --acctbl-border-dark-new: #1e1f21;
+
+  /* Controls (Search & Filter) */
+  --acctbl-controls-gap: 10px;
+  --acctbl-controls-margin-bottom: 15px;
+  --acctbl-controls-height: 40px;
+  --acctbl-controls-bg-light: transparent;
+  --acctbl-controls-bg-dark: transparent;
+
+  /* Inputs */
+  --acctbl-input-padding: 8px;
+  --acctbl-input-radius: 5px;
+  --acctbl-input-padding-new: 8px 12px;
+  --acctbl-input-radius-new: 8px;
+
+  /* Table */
+  --acctbl-table-border: 1px solid;
+  --acctbl-table-padding: 10px;
+  --acctbl-table-text-align: center;
+  --acctbl-table-bg-light: #ffffff;
+  --acctbl-th-bg-light: #f1f1f1;
+  --acctbl-td-bg-light: #ffffff;
+  --acctbl-table-bg-dark-new: #2f2f31;
+  --acctbl-th-bg-dark-new: #2f2f31;
+  --acctbl-td-bg-dark-new: #2f2f31;
+
+  /* Buttons */
+  --acctbl-btn-padding: 8px 12px;
+  --acctbl-btn-radius: 5px;
+  --acctbl-btn-cursor: pointer;
+  --acctbl-btn-padding-new: 8px 16px;
+  --acctbl-btn-radius-new: 8px;
+  --acctbl-btn-font-size-new: 0.9rem;
+  --acctbl-btn-transition-new: all 0.2s ease-in-out;
+
+  --acctbl-button-hover-dark: #1230AE;
+  --acctbl-button-bg-dark: #2f2f31;
+  --acctbl-edit-btn-dark: #2f2f31;
+  --acctbl-edit-btn-hover-dark: #388e3c;
+  --acctbl-delete-btn-dark: #2f2f31;
+  --acctbl-delete-btn-hover-dark: #e53935;
+  --acctbl-button-hover-light: #218838;
+  --acctbl-edit-btn-light: #28a745;
+  --acctbl-delete-btn-light: #dc3545;
+
+  /* Container & Shadow */
+  --acctbl-container-radius: 10px;
+  --acctbl-shadow-dark: 0 4px 8px rgba(0, 0, 0, 0.2);
+  --acctbl-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  /* Modals */
+  --modal-bg-light: #ffffff;
+  --modal-bg-dark: #2f2f31;
+  --modal-header-border-light: #dee2e6;
+  --modal-header-border-dark: #4a4a60;
+  --modal-close-color-light: #000;
+  --modal-close-color-dark: #f8f9fa;
+  --modal-create-btn-bg: #1B56FD;
+  --modal-create-btn-hover: #1230AE;
+  --modal-cancel-btn-bg: #dc3545;
+  --modal-cancel-btn-hover: #c82333;
+}
+
+/* --- Responsiveness for Root Variables --- */
+
+/* Role badges styles */
+.role-badge {
+  transition: all 0.2s ease;
+}
+
+.role-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.role-badge.admin:hover {
+  background: rgba(27, 86, 253, 0.2) !important;
+}
+
+.role-badge.user:hover {
+  background: rgba(40, 167, 69, 0.2) !important;
+}
+
+.role-badge.superadmin,
+.role-badge.super-admin,
+.role-badge.super_admin {
+  background: rgba(25, 118, 210, 0.2) !important;
+  color: #4dabf5 !important;
+}
+
+.role-badge.superadmin:hover,
+.role-badge.super-admin:hover,
+.role-badge.super_admin:hover {
+  background: rgba(25, 118, 210, 0.3) !important;
+}
+
+/* Adding responsive styles */
+@media (max-width: 768px) {
+  .acctbl-controls {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .acctbl-data-table th,
+  .acctbl-data-table td {
+    font-size: 0.9rem;
+    padding: 12px 8px;
+  }
+  
+  .acctbl-title-main {
+    font-size: 1.7rem;
+  }
+  
+  .acctbl-table-scroll-wrapper {
+    max-height: 500px;
+  }
+  
+  .acctbl-edit-btn,
+  .acctbl-delete-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .acctbl-container {
+    padding: 15px;
+  }
+  
+  .acctbl-controls {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .acctbl-title-main {
+    font-size: 1.4rem;
+    margin-left: 0;
+    text-align: center;
+  }
+  
+  .acctbl-title-main::after {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+  }
+  
+  .acctbl-data-table th,
+  .acctbl-data-table td {
+    font-size: 0.8rem;
+    padding: 10px 6px;
+  }
+  
+  .acctbl-table-scroll-wrapper {
+    max-height: 400px;
+  }
+  
+  .acctbl-edit-btn,
+  .acctbl-delete-btn {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    margin: 0 2px;
+  }
+  
+  .acctbl-add-admin-modal .modal-content,
+  .acctbl-edit-user-modal .modal-content {
+    margin: 5px;
+  }
+  
+  .acctbl-add-admin-modal .modal-footer,
+  .acctbl-edit-user-modal .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .acctbl-save-changes-btn,
+  .acctbl-cancel-edit-btn {
+    width: 100%;
+  }
+}
+
+/* ------------------------------------------- */
+/* GLOBAL & CONTAINER                            */
+/* ------------------------------------------- */
+.acctbl-container {
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: var(--acctbl-container-radius);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  height: fit-content;
+  margin-top: 0;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+.acctbl-container.light {
+  background-color: #FFFDF6;
+  color: #000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.acctbl-container.dark {
+  background: linear-gradient(145deg, #2f2f31, #292a2d);
+  color: var(--acctbl-title-color-dark);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.acctbl-container::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(27, 86, 253, 0.1) 0%, rgba(27, 86, 253, 0) 70%);
+  z-index: 0;
+}
+
+/* --- Responsiveness for Container --- */
+@media (max-width: 768px) {
+  .acctbl-container {
+    padding: 0; /* Remove padding on smaller screens */
+    margin-top: 20px; /* Adjust margin */
+  }
+}
+
+@media (max-width: 480px) {
+  .acctbl-container {
+    padding: 0; /* No padding on mobile */
+    margin-top: 15px; /* Further adjust margin */
+  }
+}
+
+/* ------------------------------------------- */
+/* HEADER                                        */
+/* ------------------------------------------- */
+.acctbl-header {
+  width: 100%;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  font-family: 'montserrat', sans-serif;
+}
+
+.acctbl-title-main {
+  font-size: 2rem;
+  font-weight: 700;
+  color: inherit;
+  margin-left: 10px;
+  position: relative;
+  display: inline-block;
+}
+
+.acctbl-title-main::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(to right, #1B56FD, #1230AE);
+  border-radius: 2px;
+}
+
+/* --- Responsiveness for Header Title --- */
+@media (max-width: 768px) {
+  .acctbl-title-main {
+    font-size: 1.7rem; /* Adjust font size on smaller screens */
+    margin-left: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .acctbl-title-main {
+    font-size: 1.4rem; /* Further adjust font size on mobile */
+    text-align: center; /* Center the title on very small screens */
+    margin-left: 0;
+  }
+}
+
+.acctbl-title {
+  text-align: center;
+  font-size: var(--acctbl-title-font-size);
+  font-weight: var(--acctbl-title-font-weight);
+  margin-bottom: var(--acctbl-title-margin-bottom);
+  color: var(--acctbl-title-color-light);
+}
+
+.acctbl-container.dark .acctbl-title {
+  color: var(--acctbl-title-color-dark);
+}
+
+/* ------------------------------------------- */
+/* CONTROLS (SEARCH & FILTER)                    */
+/* ------------------------------------------- */
+.acctbl-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--acctbl-controls-gap);
+  margin-bottom: 25px;
+  background: var(--acctbl-controls-bg-light);
+  border-radius: 12px;
+  align-items: center;
+  padding: 15px 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  font-family: 'montserrat', sans-serif;
+  position: relative;
+  z-index: 1;
+}
+
+.acctbl-container.dark .acctbl-controls {
+  background: rgba(42, 42, 42, 0.5);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(70, 70, 70, 0.5);
+}
+
+.acctbl-search-input,
+.acctbl-filter-select {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--acctbl-table-bg-light);
+  color: var(--acctbl-title-color-light);
+  border: 1px solid var(--acctbl-border-light);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.acctbl-container.dark .acctbl-search-input,
+.acctbl-container.dark .acctbl-filter-select {
+  background: #2f2f31;
+  color: #f8f9fa;
+  border: 1px solid #3a3a40;
+}
+
+.acctbl-search-input:focus,
+.acctbl-filter-select:focus {
+  border-color: #1B56FD;
+  box-shadow: 0 0 0 3px rgba(27, 86, 253, 0.25);
+  transform: translateY(-2px);
+}
+
+.acctbl-add-btn {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(to right, #1B56FD, #1230AE);
+  color: white;
+  box-shadow: 0 4px 10px rgba(27, 86, 253, 0.25);
+}
+
+.acctbl-add-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(27, 86, 253, 0.35);
+  background: linear-gradient(to right, #1648d4, #0f2991);
+}
+
+/* ------------------------------------------- */
+/* TABLE                                         */
+/* ------------------------------------------- */
+.acctbl-table-scroll-wrapper {
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(200, 200, 200, 0.1);
+  width: 100%;
+}
+
+.acctbl-container.dark .acctbl-table-scroll-wrapper {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(60, 60, 60, 0.5);
+  background-color: #2f2f31;
+}
+
+.acctbl-table-scroll-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.acctbl-table-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(240, 240, 240, 0.1);
+  border-radius: 5px;
+}
+
+.acctbl-table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(180, 180, 180, 0.5);
+  border-radius: 5px;
+}
+
+.acctbl-table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.8);
+}
+
+.acctbl-container.dark .acctbl-table-scroll-wrapper::-webkit-scrollbar-track {
+  background: rgba(40, 40, 40, 0.3);
+}
+
+.acctbl-container.dark .acctbl-table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(90, 90, 90, 0.5);
+}
+
+.acctbl-container.dark .acctbl-table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 110, 110, 0.8);
+}
+
+.acctbl-data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  background: var(--acctbl-table-bg-light);
+  color: var(--acctbl-title-color-light);
+  height: fit-content;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.acctbl-container.dark .acctbl-data-table {
+  background: #2f2f31 !important;
+  color: var(--acctbl-title-color-dark) !important;
+}
+
+/* Override Bootstrap table styles in dark mode */
+.acctbl-container.dark .table {
+  --bs-table-bg: #2f2f31 !important;
+  --bs-table-color: #f8f9fa !important;
+  color: #f8f9fa !important;
+  background-color: #2f2f31 !important;
+  border-color: #3a3a3d !important;
+}
+
+.acctbl-container.dark table,
+.acctbl-container.dark .table-responsive,
+.acctbl-container.dark .table-bordered,
+.acctbl-container.dark .table-striped,
+.acctbl-container.dark .table-hover {
+  background-color: #2f2f31 !important;
+  color: #f8f9fa !important;
+}
+
+/* Force Bootstrap table elements to use dark background */
+.acctbl-container.dark .table>thead,
+.acctbl-container.dark .table>tbody,
+.acctbl-container.dark .table>tfoot,
+.acctbl-container.dark .table>tr,
+.acctbl-container.dark .table>tbody>tr,
+.acctbl-container.dark .table>tbody>tr>td,
+.acctbl-container.dark .table>tbody>tr>th,
+.acctbl-container.dark .table>tfoot>tr>td,
+.acctbl-container.dark .table>tfoot>tr>th,
+.acctbl-container.dark .table>thead>tr>td,
+.acctbl-container.dark .table>thead>tr>th {
+  background-color: #2f2f31 !important;
+  color: #f8f9fa !important;
+  border-color: #3a3a3d !important;
+}
+
+/* Hover effect for table rows in dark mode */
+.acctbl-container.dark .acctbl-data-table tbody tr:hover td,
+.acctbl-container.dark .table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.acctbl-data-table thead {
+  position: sticky;
+  top: 0;
+  background-color: inherit;
+  z-index: 1;
+  font-family: 'montserrat', sans-serif;
+}
+
+.light .acctbl-data-table thead {
+  background-color: #f7f7f7;
+  color: var(--acctbl-title-color-light);
+}
+
+.dark .acctbl-data-table thead,
+.acctbl-container.dark .acctbl-data-table thead,
+.dark .table thead,
+.acctbl-container.dark .table thead {
+  background-color: #2f2f31 !important;
+  color: var(--acctbl-title-color-dark);
+}
+
+.acctbl-container.dark .table>:not(caption)>*>* {
+  background-color: #2f2f31 !important;
+  border-bottom-color: #3a3a3d !important;
+  color: #f8f9fa;
+}
+
+.acctbl-data-table th {
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 2px solid #ddd;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
+
+.acctbl-container.dark .acctbl-data-table th {
+  border-bottom: 2px solid #3a3a3d;
+}
+
+.acctbl-data-table td {
+  padding: 16px 12px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  transition: all 0.2s ease;
+}
+
+.acctbl-container.dark .acctbl-data-table td {
+  border-bottom: 1px solid #3a3a3d;
+  color: #f8f9fa;
+}
+
+.acctbl-data-table tbody tr {
+  font-family: 'poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.acctbl-data-table tbody tr:hover td {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.acctbl-container.dark .acctbl-data-table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.acctbl-data-table tbody tr:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.acctbl-container.dark .acctbl-data-table tbody tr:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.acctbl-actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.acctbl-no-data {
+  text-align: center;
+  padding: 40px 0;
+  font-style: italic;
+  color: #888;
+}
+
+.acctbl-container.dark .acctbl-no-data {
+  color: #aaa;
+}
+
+/* ------------------------------------------- */
+/* BUTTONS (Table Row Actions)                     */
+/* ------------------------------------------- */
+.acctbl-edit-btn,
+.acctbl-delete-btn {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 4px;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.acctbl-edit-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.acctbl-edit-btn:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+}
+
+.acctbl-delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.acctbl-delete-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+}
+
+.acctbl-container.dark .acctbl-edit-btn {
+  background: #2f2f31;
+  color: white;
+  border: 1px solid #3a3a40;
+}
+
+.acctbl-container.dark .acctbl-edit-btn:hover {
+  background: #388e3c;
+  border-color: transparent;
+}
+
+.acctbl-container.dark .acctbl-delete-btn {
+  background: #2f2f31;
+  color: white;
+  border: 1px solid #3a3a40;
+}
+
+.acctbl-container.dark .acctbl-delete-btn:hover {
+  background: #e53935;
+  border-color: transparent;
+}
+
+/* ------------------------------------------- */
+/* SPINNER & ALERT                               */
+/* ------------------------------------------- */
+.acctbl-spinner {
+  color: #1B56FD;
+  margin: 30px auto;
+  display: block;
+  width: 3rem;
+  height: 3rem;
+}
+
+.acctbl-container.dark .acctbl-spinner {
+  color: #4e7df9;
+}
+
+.acctbl-error-alert {
+  margin: 20px 0;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  box-shadow: 0 4px 10px rgba(220, 53, 69, 0.1);
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.acctbl-error-alert::before {
+  content: "⚠️";
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.acctbl-container.dark .acctbl-error-alert {
+  background-color: rgba(94, 43, 48, 0.8);
+  color: #f7a7ab;
+  border: 1px solid #7c3f46;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* ------------------------------------------- */
+/* MODALS                                        */
+/* ------------------------------------------- */
+
+/* Base modal styles */
+.acctbl-add-admin-modal .modal-content,
+.acctbl-edit-user-modal .modal-content {
+  border-radius: 15px;
+  background-color: var(--modal-bg-light);
+  color: var(--acctbl-title-color-light);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+body.dark .acctbl-add-admin-modal .modal-content,
+body.dark .acctbl-edit-user-modal .modal-content {
+  background-color: #2c2c30;
+  color: var(--acctbl-title-color-dark);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.acctbl-add-admin-modal .modal-header,
+.acctbl-edit-user-modal .modal-header {
+  border-bottom: 1px solid #eaeaea;
+  padding: 20px 25px;
+  font-family: 'montserrat', sans-serif;
+  position: relative;
+}
+
+.acctbl-add-admin-modal .modal-header::after,
+.acctbl-edit-user-modal .modal-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, #1B56FD, transparent);
+}
+
+body.dark .acctbl-add-admin-modal .modal-header,
+body.dark .acctbl-edit-user-modal .modal-header {
+  border-bottom: 1px solid #3d3d42;
+}
+
+.acctbl-add-admin-modal .modal-title,
+.acctbl-edit-user-modal .modal-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: inherit;
+  position: relative;
+  display: inline-block;
+}
+
+.acctbl-add-admin-modal .modal-header .btn-close,
+.acctbl-edit-user-modal .modal-header .btn-close {
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  border: 0;
+  background: none;
+  font-size: 1.5rem;
+  padding: 0;
+  margin: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.acctbl-add-admin-modal .modal-header .btn-close:hover,
+.acctbl-edit-user-modal .modal-header .btn-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.dark .acctbl-add-admin-modal .modal-header .btn-close:hover,
+body.dark .acctbl-edit-user-modal .modal-header .btn-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.acctbl-add-admin-modal .modal-body,
+.acctbl-edit-user-modal .modal-body {
+  padding: 25px;
+}
+
+.acctbl-add-admin-modal .mb-3.acctbl-form-group,
+.acctbl-edit-user-modal .mb-3.acctbl-form-group {
+  margin-bottom: 20px;
+}
+
+.acctbl-add-admin-modal .acctbl-form-label,
+.acctbl-edit-user-modal .acctbl-form-label {
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: block;
+  color: inherit;
+  font-family: 'montserrat', sans-serif;
+  font-size: 0.95rem;
+}
+
+.acctbl-add-admin-modal .acctbl-form-control,
+.acctbl-edit-user-modal .acctbl-form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  color: var(--acctbl-title-color-light);
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.acctbl-add-admin-modal .acctbl-form-control:focus,
+.acctbl-edit-user-modal .acctbl-form-control:focus {
+  border-color: #1B56FD;
+  box-shadow: 0 0 0 3px rgba(27, 86, 253, 0.15);
+  transform: translateY(-2px);
+}
+
+body.dark .acctbl-add-admin-modal .acctbl-form-control,
+body.dark .acctbl-edit-user-modal .acctbl-form-control {
+  background-color: #33333a;
+  color: var(--acctbl-title-color-dark);
+  border: 1px solid #444;
+}
+
+.acctbl-edit-error-alert {
+  margin: 20px 0 10px;
+  padding: 15px;
+  border-radius: 10px;
+  font-weight: 500;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  position: relative;
+  padding-left: 45px;
+}
+
+.acctbl-edit-error-alert::before {
+  content: "⚠️";
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+
+.acctbl-container.dark .acctbl-edit-error-alert {
+  background-color: rgba(94, 43, 48, 0.8);
+  color: #f7a7ab;
+  border: 1px solid #7c3f46;
+}
+
+.acctbl-add-admin-modal .acctbl-modal-footer,
+.acctbl-edit-user-modal .acctbl-modal-footer {
+  border-top: 1px solid #eaeaea;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  position: relative;
+}
+
+.acctbl-add-admin-modal .acctbl-modal-footer::before,
+.acctbl-edit-user-modal .acctbl-modal-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #1B56FD);
+}
+
+body.dark .acctbl-add-admin-modal .acctbl-modal-footer,
+body.dark .acctbl-edit-user-modal .acctbl-modal-footer {
+  border-top: 1px solid #3d3d42;
+}
+
+/* Buttons within Modal Footer */
+.acctbl-add-admin-modal .acctbl-save-changes-btn,
+.acctbl-edit-user-modal .acctbl-save-changes-btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  background: linear-gradient(to right, #1B56FD, #1230AE);
+  color: white;
+  box-shadow: 0 4px 10px rgba(27, 86, 253, 0.25);
+}
+
+.acctbl-add-admin-modal .acctbl-save-changes-btn:hover,
+.acctbl-edit-user-modal .acctbl-save-changes-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(27, 86, 253, 0.35);
+}
+
+.acctbl-add-admin-modal .acctbl-cancel-edit-btn,
+.acctbl-edit-user-modal .acctbl-cancel-edit-btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ddd;
+}
+
+.acctbl-add-admin-modal .acctbl-cancel-edit-btn:hover,
+.acctbl-edit-user-modal .acctbl-cancel-edit-btn:hover {
+  background-color: #e9ecef;
+  transform: translateY(-2px);
+}
+
+body.dark .acctbl-add-admin-modal .acctbl-cancel-edit-btn,
+body.dark .acctbl-edit-user-modal .acctbl-cancel-edit-btn {
+  background-color: #3a3a3e;
+  color: #f8f9fa;
+  border: 1px solid #4a4a4e;
+}
+
+body.dark .acctbl-add-admin-modal .acctbl-cancel-edit-btn:hover,
+body.dark .acctbl-edit-user-modal .acctbl-cancel-edit-btn:hover {
+  background-color: #444448;
+}

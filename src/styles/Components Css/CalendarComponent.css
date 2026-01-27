@@ -1,0 +1,888 @@
+body.light {
+    /* Calendar general */
+    --calendar-bg: #f8f9fa;
+    --calendar-text: #333; /* Corrected to match usage below */
+    --calendar-text-secondary: #6c757d; /* Added for secondary text */
+    --calendar-border: #e0e0e0; /* Corrected to match usage below */
+    --calendar-shadow: rgba(0, 0, 0, 0.1); /* Corrected to match usage below */
+    --calendar-selected-bg-shadow: rgba(59, 130, 246, 0.3); /* For the original blue shade */
+
+
+    /* Calendar Header */
+    --calendar-header-bg: #e9ecef;
+    --calendar-nav-btn-color: #007bff;
+    --calendar-nav-hover: #cfe2ff; /* Corrected to match usage below */
+
+    /* Calendar Days */
+    --calendar-day-bg: #fff;
+    --calendar-hover-bg: #f0f0f0; /* Corrected to match usage below */
+    --calendar-today-bg: #e2f0ff; /* Light blue for today's background */
+    --calendar-today-text: #0056b3; /* Darker blue for today's text */
+    --calendar-selected-bg: #007bff; /* Corrected to match usage below */
+    --calendar-selected-text: #fff; /* Corrected to match usage below */
+    --calendar-event-indicator-bg: #ffc107; /* Yellowish */
+
+    /* Calendar Display/List Background */
+    --calendar-display-bg: #ffffff; /* Corrected to match usage below */
+
+    /* Modal specific light theme */
+    --modal-bg: #fff;
+    --modal-text-color: #333;
+    --modal-header-border: #eee;
+    --modal-input-border: #ddd;
+    --modal-input-bg: #fff;
+    --modal-label-color: #555;
+    --modal-date-display-bg: #f9f9f9;
+    --modal-date-display-color: #666;
+    --modal-cancel-btn-bg: #e0e0e0;
+    --modal-cancel-btn-color: #333;
+    --modal-cancel-btn-hover-bg: #d0d0d0;
+    --modal-save-btn-bg: #007bff;
+    --modal-save-btn-color: white;
+    --modal-save-btn-hover-bg: #0056b3;
+    --modal-save-btn-disabled-bg: #a0c9ff;
+    --modal-close-btn-color: #888;
+}
+
+/* Define variables for dark mode */
+body.dark {
+    /* Calendar general */
+    --calendar-bg: #2a2a2a;
+    --calendar-text: #e0e0e0;
+    --calendar-text-secondary: #a0a0a0;
+    --calendar-border: #444;
+    --calendar-shadow: rgba(0, 0, 0, 0.4);
+    --calendar-selected-bg-shadow: rgba(138, 180, 248, 0.3); /* Dark mode appropriate shadow */
+
+    /* Calendar Header */
+    --calendar-header-bg: #3c3c3c;
+    --calendar-nav-btn-color: #8ab4f8; /* Light blue for dark theme */
+    --calendar-nav-hover: #4a4a4a;
+
+    /* Calendar Days */
+    --calendar-day-bg: #3a3a3a;
+    --calendar-hover-bg: #4a4a4a;
+    --calendar-today-bg: #5a7da3; /* Darker blue for today's background */
+    --calendar-today-text: #f0f0f0; /* Lighter text for today */
+    --calendar-selected-bg: #8ab4f8;
+    --calendar-selected-text: #1a1a1a;
+    --calendar-event-indicator-bg: #f5cb5c; /* Yellowish for dark theme */
+
+    /* Calendar Display/List Background */
+    --calendar-display-bg: #3a3a3a;
+
+    /* Modal specific dark theme */
+    --modal-bg: #333;
+    --modal-text-color: #f0f0f0;
+    --modal-header-border: #444;
+    --modal-input-border: #555;
+    --modal-input-bg: #444;
+    --modal-label-color: #bbb;
+    --modal-date-display-bg: #4a4a4a;
+    --modal-date-display-color: #ccc;
+    --modal-cancel-btn-bg: #555;
+    --modal-cancel-btn-color: #f0f0f0;
+    --modal-cancel-btn-hover-bg: #666;
+    --modal-save-btn-bg: #8ab4f8;
+    --modal-save-btn-color: #1a1a1a;
+    --modal-save-btn-hover-bg: #6c97e0;
+    --modal-save-btn-disabled-bg: #5a7da3;
+    --modal-close-btn-color: #bbb;
+}
+
+/* Base styles that apply to both themes, using variables */
+body {
+    transition: background-color 0.3s ease;
+}
+
+body.light {
+    background-color: #f0f2f5; /* Light background for the page outside calendar */
+}
+
+body.dark {
+    background-color: #1a1a1a; /* Dark background for the page outside calendar */
+}
+
+.calendar-container {
+    max-width: 400px;
+    width: 95%; /* Use a percentage for better flexibility */
+    background: var(--calendar-bg);
+    border: 1px solid var(--calendar-border);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px var(--calendar-shadow);
+    padding: 24px;
+    margin: 20px auto; /* Add vertical margin for spacing */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    color: var(--calendar-text);
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Include padding in the element's total width and height */
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    background-color: var(--calendar-header-bg);
+    border-bottom: 1px solid var(--calendar-border);
+    padding: 15px 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--calendar-nav-btn-color);
+}
+
+.nav-button:hover {
+    background-color: var(--calendar-nav-hover);
+    color: var(--calendar-text);
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    color: inherit;
+}
+
+.month-year {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--calendar-text);
+    margin: 0;
+    text-align: center; /* Center the month and year */
+}
+
+/* Theme Toggle Button */
+.theme-toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--calendar-nav-btn-color);
+    margin-left: 10px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-toggle-button:hover {
+    background-color: var(--calendar-nav-hover);
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+    background-color: var(--calendar-header-bg);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--calendar-border);
+}
+
+.weekday {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.weekday span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--calendar-text-secondary);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 24px;
+    padding: 10px;
+}
+
+.calendar-day, .calendar-empty-day {
+    height: 40px;
+    width: 100%; /* Make width flexible to fit grid cell */
+    max-width: 40px; /* Set a max-width to prevent stretching on larger screens */
+    aspect-ratio: 1 / 1; /* Keep the day cells square */
+    border: 1px solid var(--calendar-border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--calendar-day-bg);
+    color: var(--calendar-text);
+    position: relative;
+    overflow: visible;
+    box-sizing: border-box; /* Include padding/border in size */
+}
+
+.calendar-day:hover {
+    background-color: var(--calendar-hover-bg);
+    transform: scale(1.05);
+}
+
+.calendar-day.today {
+    background-color: var(--calendar-today-bg);
+    color: var(--calendar-today-text);
+    font-weight: 600;
+    border: 2px solid var(--calendar-today-bg);
+}
+
+.calendar-day.selected {
+    background-color: var(--calendar-selected-bg);
+    color: var(--calendar-selected-text);
+    font-weight: 600;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--calendar-selected-bg-shadow);
+    border: 1px solid var(--calendar-selected-bg);
+}
+
+.calendar-day.selected:hover {
+    background-color: var(--calendar-selected-bg);
+    filter: brightness(1.1);
+}
+
+.calendar-day.today.selected {
+    background-color: var(--calendar-selected-bg);
+    color: var(--calendar-selected-text);
+    border: 2px solid var(--calendar-selected-bg);
+}
+
+.calendar-empty-day {
+    height: 40px;
+    background-color: transparent;
+    border: none;
+    cursor: default; /* Change cursor for empty days */
+}
+
+.selected-date-display {
+    display: flex;
+    flex-direction: column; /* Stack elements on smaller screens */
+    align-items: stretch; /* Stretch items to fill available width */
+    gap: 8px; /* Reduce gap for smaller screens */
+    text-align: center;
+    padding: 12px;
+    background-color: var(--calendar-display-bg);
+    border-radius: 8px;
+    border: 1px solid var(--calendar-border);
+    margin-top: 10px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.selected-label {
+    font-size: 14px;
+    color: var(--calendar-text-secondary);
+    margin: 0;
+}
+
+.selected-value {
+    font-weight: 500;
+    color: var(--calendar-text);
+    margin: 0;
+}
+
+/* Responsive design */
+
+/* Small devices (e.g., mobile phones, up to 480px) */
+@media (max-width: 480px) {
+    body {
+        padding: 10px; /* Add some padding to the body on small screens */
+    }
+
+    .calendar-container {
+        max-width: 100%;
+        margin: 10px auto; /* Adjust margin for small screens */
+        border-radius: 12px;
+        padding: 15px; /* Slightly reduce padding */
+    }
+
+    .calendar-header {
+        margin-bottom: 15px;
+        padding: 10px 15px; /* Adjust header padding */
+    }
+
+    .month-year {
+        font-size: 18px;
+        flex-grow: 1; /* Allow month-year to take more space */
+        text-align: center;
+    }
+
+    .nav-button {
+        padding: 6px;
+    }
+
+    .nav-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .theme-toggle-button {
+        margin-left: 5px; /* Reduce margin */
+        padding: 6px;
+    }
+
+    .weekday span {
+        font-size: 12px; /* Smaller weekday text */
+    }
+
+    .calendar-day, .calendar-empty-day {
+        height: auto; /* Let height be determined by aspect-ratio */
+        max-width: 100%; /* Ensure they don't exceed grid cell */
+        font-size: 13px;
+        padding: 5px 0; /* Add vertical padding for content */
+    }
+
+    .event-indicator {
+        bottom: 1px; /* Adjust position for smaller days */
+        width: 5px;
+        height: 5px;
+    }
+
+    .selected-date-display {
+        flex-direction: column; /* Stack label and value vertically */
+        align-items: center; /* Center items when stacked */
+        padding: 10px;
+        gap: 4px; /* Smaller gap */
+    }
+
+    .add-event-btn {
+        padding: 8px 12px; /* Smaller padding for button */
+        font-size: 13px;
+        gap: 4px;
+    }
+
+    .plus-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Event List */
+    .event-list-header {
+        padding: 10px 12px;
+    }
+
+    .event-list-header h3 {
+        font-size: 15px;
+    }
+
+    .close-btn .close-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .event-item {
+        padding: 10px 12px;
+        flex-direction: column; /* Stack event content and delete button */
+        align-items: flex-start; /* Align content to start */
+        gap: 5px; /* Space between stacked elements */
+    }
+
+    .event-content {
+        width: 100%;
+        margin-bottom: 5px; /* Space before delete button if stacked */
+    }
+
+    .event-title {
+        font-size: 14px;
+    }
+
+    .event-time {
+        font-size: 11px;
+    }
+
+    .event-description {
+        font-size: 12px;
+    }
+
+    .delete-event-btn {
+        align-self: flex-end; /* Align delete button to the end when stacked */
+        padding: 2px; /* Smaller padding */
+    }
+}
+
+/* Medium devices (e.g., tablets, between 481px and 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .calendar-container {
+        max-width: 500px; /* Allow calendar to be a bit wider */
+        padding: 20px;
+    }
+
+    .month-year {
+        font-size: 22px;
+    }
+
+    .calendar-day, .calendar-empty-day {
+        height: 45px;
+        width: 45px; /* Slightly larger day cells */
+        font-size: 15px;
+    }
+
+    .weekday span {
+        font-size: 14px;
+    }
+
+    .selected-date-display {
+        flex-direction: row; /* Keep elements side-by-side */
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .selected-label {
+        margin-bottom: 0;
+    }
+}
+
+/* Large devices (desktops, 769px and up) - base styles already cover this */
+@media (min-width: 769px) {
+    .calendar-container {
+        max-width: 400px; /* Revert to original max-width for larger screens */
+        padding: 24px;
+    }
+
+    .calendar-day, .calendar-empty-day {
+        height: 40px;
+        width: 40px;
+    }
+
+    .selected-date-display {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+}
+
+
+/* Special styles for integration with your dashboard */
+/* .dashboard-calendar {
+    background: var(--calendar-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px var(--calendar-shadow);
+}
+
+.dashboard-calendar .calendar-container {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+} */
+
+/* Animation for smooth theme transitions */
+/* This rule is crucial for smooth transitions for ALL elements within the calendar */
+.calendar-container * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus states for accessibility */
+.nav-button:focus,
+.calendar-day:focus,
+.theme-toggle-button:focus,
+.add-event-btn:focus,
+.close-btn:focus,
+.delete-event-btn:focus,
+.my-app-calendar-event-modal-close-btn:focus,
+.my-app-calendar-event-cancel-btn:focus,
+.my-app-calendar-event-save-btn:focus {
+    outline: 2px solid var(--calendar-selected-bg);
+    outline-offset: 2px;
+}
+
+/* Loading state (optional) */
+.calendar-container.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Event-related styles */
+.calendar-day.has-events .day-number {
+    font-weight: 600;
+}
+
+.event-indicator {
+    position: absolute;
+    bottom: 2px;
+    width: 6px;
+    height: 6px;
+    background-color: var(--calendar-event-indicator-bg);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.calendar-day.selected .event-indicator {
+    background-color: var(--calendar-selected-text); /* Indicator should contrast with selected day */
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Add event button */
+.add-event-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: var(--calendar-selected-bg);
+    color: var(--calendar-selected-text);
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-event-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.plus-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Event List */
+.event-list {
+    margin-top: 20px;
+    background-color: var(--calendar-display-bg);
+    border: 1px solid var(--calendar-border);
+    border-radius: 8px;
+    overflow: hidden;
+    color: var(--calendar-text);
+}
+
+.event-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background-color: var(--calendar-header-bg);
+    border-bottom: 1px solid var(--calendar-border);
+}
+
+.event-list-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--calendar-text);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: var(--calendar-text-secondary);
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    background-color: var(--calendar-hover-bg);
+    color: var(--calendar-text);
+}
+
+.close-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.events {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.no-events {
+    padding: 20px;
+    text-align: center;
+    color: var(--calendar-text-secondary);
+    font-style: italic;
+    margin: 0;
+}
+
+.event-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--calendar-border);
+    transition: background-color 0.2s ease;
+    background-color: var(--calendar-day-bg);
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-item:hover {
+    background-color: var(--calendar-hover-bg);
+}
+
+.event-content {
+    flex: 1;
+}
+
+.event-title {
+    font-weight: 600;
+    color: var(--calendar-text);
+    margin-bottom: 4px;
+}
+
+.event-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--calendar-text-secondary);
+    margin-bottom: 4px;
+}
+
+.time-icon {
+    width: 12px;
+    height: 12px;
+    color: var(--calendar-text-secondary);
+}
+
+.event-description {
+    font-size: 13px;
+    color: var(--calendar-text-secondary);
+    line-height: 1.4;
+}
+
+.delete-event-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: #ef4444;
+    transition: all 0.2s ease;
+}
+
+.delete-event-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.delete-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* --- Modal Styles (using unique class names and theme variables) --- */
+.my-app-calendar-event-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.my-app-calendar-event-modal {
+    background-color: var(--modal-bg);
+    color: var(--modal-text-color);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    position: relative;
+    z-index: 1001;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-sizing: border-box; /* Crucial for responsive padding */
+}
+
+.my-app-calendar-event-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--modal-header-border);
+    padding-bottom: 10px;
+}
+
+.my-app-calendar-event-modal-header h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: var(--modal-text-color);
+}
+
+.my-app-calendar-event-modal-close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--modal-close-btn-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.my-app-calendar-event-modal-close-btn:hover {
+    color: #f00;
+}
+
+.my-app-calendar-event-modal-close-btn .close-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.my-app-calendar-event-modal-body {
+    margin-bottom: 20px;
+}
+
+.my-app-calendar-event-form-group {
+    margin-bottom: 15px;
+}
+
+.my-app-calendar-event-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--modal-label-color);
+}
+
+.my-app-calendar-event-form-input,
+.my-app-calendar-event-form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--modal-input-border);
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+    background-color: var(--modal-input-bg);
+    color: var(--modal-text-color);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.my-app-calendar-event-form-input::placeholder,
+.my-app-calendar-event-form-textarea::placeholder {
+    color: var(--modal-label-color);
+    opacity: 0.7;
+}
+
+.my-app-calendar-event-form-textarea {
+    resize: vertical;
+}
+
+.my-app-calendar-event-date-display {
+    padding: 10px;
+    border: 1px solid var(--modal-input-border);
+    border-radius: 4px;
+    background-color: var(--modal-date-display-bg);
+    color: var(--modal-date-display-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.my-app-calendar-event-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--modal-header-border);
+    padding-top: 15px;
+}
+
+.my-app-calendar-event-cancel-btn,
+.my-app-calendar-event-save-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.my-app-calendar-event-cancel-btn {
+    background-color: var(--modal-cancel-btn-bg);
+    color: var(--modal-cancel-btn-color);
+}
+
+.my-app-calendar-event-cancel-btn:hover {
+    background-color: var(--modal-cancel-btn-hover-bg);
+}
+
+.my-app-calendar-event-save-btn {
+    background-color: var(--modal-save-btn-bg);
+    color: var(--modal-save-btn-color);
+}
+
+.my-app-calendar-event-save-btn:hover {
+    background-color: var(--modal-save-btn-hover-bg);
+}
+
+.my-app-calendar-event-save-btn:disabled {
+    background-color: var(--modal-save-btn-disabled-bg);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Modal responsiveness */
+@media (max-width: 550px) {
+    .my-app-calendar-event-modal {
+        width: 95%; /* Wider modal on small screens */
+        padding: 20px; /* Reduce padding */
+    }
+
+    .my-app-calendar-event-modal-header h3 {
+        font-size: 1.3em; /* Smaller header font */
+    }
+
+    .my-app-calendar-event-modal-close-btn .close-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .my-app-calendar-event-form-group label {
+        font-size: 0.9em;
+    }
+
+    .my-app-calendar-event-form-input,
+    .my-app-calendar-event-form-textarea,
+    .my-app-calendar-event-date-display {
+        padding: 8px; /* Smaller padding for inputs/displays */
+        font-size: 0.9em;
+    }
+
+    .my-app-calendar-event-modal-footer {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 8px; /* Smaller gap */
+        padding-top: 10px;
+    }
+
+    .my-app-calendar-event-cancel-btn,
+    .my-app-calendar-event-save-btn {
+        width: 100%; /* Make buttons full width */
+        padding: 10px;
+        font-size: 0.9em;
+    }
+}

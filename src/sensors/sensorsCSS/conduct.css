@@ -1,0 +1,27 @@
+/* Default Dark Mode */
+.conductivity-monitor-container {
+    background-color: #2f2f31; /* Dark background */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Light Mode */
+  .conductivity-monitor-container.light {
+    background-color: white;
+    color: black;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Chart Styling */
+  .conductivity-monitor-container .recharts-cartesian-grid {
+    stroke: rgba(255, 255, 255, 0.2); /* Light grid in dark mode */
+  }
+  
+  .conductivity-monitor-container.light .recharts-cartesian-grid {
+    stroke: rgba(0, 0, 0, 0.2); /* Dark grid in light mode */
+  }
+  

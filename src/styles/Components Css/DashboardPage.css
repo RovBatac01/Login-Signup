@@ -1,0 +1,179 @@
+:root[data-theme='light'] {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --card-bg: #FFFDF6;
+  --card-text: #222;
+  --input-bg: #F6F5F5;
+  --input-text: #4a5568;
+  --input-border: #e0e0e0;
+  --icon-color-light: #6b7280; /* Neutral icon color for light theme */
+}
+
+:root[data-theme='dark'] {
+  --bg-color: #121212;
+  --text-color: #ffffff;
+  --card-bg: #2f2f31;
+  --card-text: #e2e8f0;
+  --input-bg: #2a2a2a;
+  --input-text: #e2e8f0;
+  --input-border: #444;
+  --icon-color-dark: #9ca3af; 
+}
+
+.dashboard-page {
+  background-color: transparent;
+  color: var(--text-color);
+  padding: 20px;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.dashboard-page-title {
+  font-size: 2.2rem; 
+  font-weight: 700;
+  margin-bottom: 25px; 
+  color: var(--text-color);
+  text-align: left;
+  font-family: 'Montserrat';
+}
+
+.dashboard-search-input-wrapper {
+  margin-bottom: 30px; 
+  display: flex;
+  align-items: center;
+  position: relative; 
+  max-width: 450px; 
+  width: 100%;
+  font-family: 'Poppins';
+}
+
+.dashboard-search-input {
+  width: 100%;
+  border: 1px solid var(--input-border);
+  border-radius: 8px; 
+  padding: 12px 12px 12px 40px;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); 
+  outline: none;
+  transition: all 0.2s ease-in-out;
+  font-family: 'Poppins';
+}
+
+.dashboard-search-input:focus {
+  border-color: #4299e1; /* Blue border on focus */
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+}
+
+.dashboard-search-icon {
+  position: absolute;
+  left: 12px; /* Position the icon inside */
+  color: var(--icon-color-light); /* Default icon color */
+  width: 20px;
+  height: 20px;
+}
+
+/* Dark theme specific icon color */
+:root[data-theme='dark'] .dashboard-search-icon {
+  color: var(--icon-color-dark);
+}
+
+
+.dashboard-summary-container {
+  display: flex; /* Change from grid to flex */
+  flex-wrap: wrap;
+  gap: 25px; /* Increased gap between cards */
+  width: 100%;
+  justify-content: center;
+}
+
+.dashboard-summary-card {
+  flex: 1 1 280px; /* Flex grow, shrink, and base width */
+  background-color: var(--card-bg);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Stronger, softer shadow */
+  border-radius: 12px; /* More rounded corners */
+  border: 1px solid var(--input-border); /* Use input border for consistency */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* Ensures content stays within rounded corners */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Hover effect */
+}
+
+.dashboard-summary-card:hover {
+  transform: translateY(-5px); /* Lift card on hover */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+.dashboard-summary-header {
+  padding: 18px 20px 10px; /* Adjusted padding */
+  display: flex;
+  align-items: center; /* Align icon and title */
+  gap: 10px; /* Space between icon and title */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Subtle separator */
+  font-family: 'Montserrat';
+}
+
+.dashboard-summary-title {
+  font-size: 1.15rem; /* Slightly larger title */
+  font-weight: 600;
+  color: var(--card-text);
+  margin: 0; /* Reset margin */
+}
+
+.dashboard-summary-icon {
+  width: 28px; /* Larger icon size */
+  height: 28px;
+  min-width: 28px; /* Ensure icon doesn't shrink */
+}
+
+.dashboard-summary-icon.blue {
+  color: #3182ce;
+}
+
+.dashboard-summary-icon.green {
+  color: #38a169;
+}
+
+.dashboard-summary-icon.purple {
+  color: #805ad5;
+}
+
+.dashboard-summary-content {
+  padding: 10px 20px 18px; /* Adjusted padding */
+}
+
+.dashboard-summary-value-blue,
+.dashboard-summary-value-green,
+.dashboard-summary-value-purple {
+  font-size: 2rem; /* Larger value for impact */
+  font-weight: 800; /* Bolder font weight */
+  margin: 0; /* Remove default paragraph margin */
+}
+
+.dashboard-summary-value-blue {
+  color: #3182ce; /* Consistent blue */
+}
+
+.dashboard-summary-value-green {
+  color: #38a169; /* Consistent green */
+}
+
+.dashboard-summary-value-purple {
+  color: #805ad5; /* Consistent purple */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .dashboard-summary-container {
+    grid-template-columns: 1fr; /* Stack cards on smaller screens */
+  }
+
+  .dashboard-search-input-wrapper {
+    max-width: 100%; /* Full width on smaller screens */
+  }
+}

@@ -1,23 +1,254 @@
-.form-control.transparent-input {
-  background-color: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  color: #fff;
-  border-radius: 8px;
-  padding: 10px 15px;
+/* Matched .form-control.transparent-input to .input-field */
+/* .light{
+    --mb4-border:1px solid rgba(255, 255, 255, 0.018);
+    --mb4-bg:#ffffff;
 }
 
-.form-control.transparent-input:focus {
-  background-color: transparent;
-  border-color: #fff;
-  color: #fff;
-  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+.dark{
+    --mb4-border:1px solid rgba(255, 255, 255, 0.018);
+    --mb4-bg:rgba(255, 255, 255, 0.1); 
+} */
+.mb-4 .light{
+    border: 1px solid rgba(255, 255, 255, 0.018);
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: 'poppins';
 }
 
-.form-control.transparent-input::placeholder {
-  color: rgb(255, 255, 255);
+.mb-4 .dark{
+    border: 1px solid rgba(255, 255, 255, 0.018);
+    background-color: rgba(255, 255, 255, 0.1); ;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-family: 'poppins';
 }
 
-.form-control.transparent-input:disabled,
-.form-control.transparent-input[readonly] {
-  background-color: transparent;
+.input-field {
+    background-color: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.input-field:focus {
+    background-color: transparent;
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+}
+
+.input-field::placeholder {
+    color: rgb(255, 255, 255);
+}
+
+.input-field:disabled,
+.input-field[readonly] {
+    background-color: transparent;
+}
+
+/* Unique styles for the Signup Verification Modal */
+.signup-verification-modal .modal-content {
+    border-radius: 10px;
+    background-color: var(--modal-bg-light); /* This variable is not defined in this pure translation, keep for context */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+/* Dark theme specific styles for the modal content (matched to .signup-verification-modal.dark) */
+.signup-verification-modal.dark .modal-content {
+    background-color: var(--modal-bg-dark); /* This variable is not defined in this pure translation, keep for context */
+    color: #e0e0e0;
+}
+
+.signup-verification-modal .modal-header {
+    border-bottom: 1px solid var(--modal-header-border-light); /* This variable is not defined in this pure translation, keep for context */
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Dark theme specific header border (matched to .signup-verification-modal.dark) */
+.signup-verification-modal.dark .modal-header {
+    border-color: var(--modal-header-border-dark); /* This variable is not defined in this pure translation, keep for context */
+}
+
+.signup-verification-modal .modal-title {
+    font-size: 1.25rem;
+    color: #000;
+    font-family: 'montserrat';
+}
+
+/* Dark theme specific title color (matched to .signup-verification-modal.dark) */
+.signup-verification-modal.dark .modal-title {
+    color: #ffffff;
+}
+
+.signup-verification-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.signup-verification-modal .modal-body p {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #343a40;
+    font-family: 'poppins';
+}
+
+/* Dark theme specific body text color (matched to .signup-verification-modal.dark) */
+.signup-verification-modal.dark .modal-body p {
+    color: #ffffff;
+}
+
+/* Matched .form-control inside modal to .input-field in modal for consistency if .input-field is used on modal inputs */
+/* If you apply 'input-field' to your modal's Form.Control, this specific selector might not be strictly needed,
+   as .input-field itself would apply. However, if you want *different* styles for modal inputs vs.
+   main form inputs, keep this more specific selector. */
+.signup-verification-modal .input-field { /* Changed from .form-control to .input-field */
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+    background-color: #ffffff;
+    color: #212529;
+    font-family: 'poppins';
+
+}
+
+/* Dark theme specific form control (matched to .signup-verification-modal.dark and .input-field) */
+.signup-verification-modal.dark .input-field { /* Changed from .form-control to .input-field */
+    background-color: #424242;
+    border-color: #616161;
+    color: #ffffff;
+}
+
+.signup-verification-modal .input-field::placeholder { /* Changed from .form-control to .input-field */
+    color: #6c757d;
+}
+
+.signup-verification-modal .modal-footer {
+    border-top: 1px solid var(--modal-header-border-light); /* This variable is not defined in this pure translation, keep for context */
+    padding: 1rem 1.5rem;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* Dark theme specific footer border (matched to .signup-verification-modal.dark) */
+.signup-verification-modal.dark .modal-footer {
+    border-color: var(--modal-header-border-dark); /* This variable is not defined in this pure translation, keep for context */
+}
+
+.signup-verification-modal .modal-footer .btn {
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    /* box-shadow: var(--acctbl-shadow-dark); Removed as --acctbl-shadow-dark was not defined */
+}
+
+.signup-verification-modal .modal-footer .btn-primary {
+    background-color: var(--modal-create-btn-bg); /* This variable is not defined in this pure translation, keep for context */
+    border-color: var(--modal-create-btn-bg); /* This variable is not defined in this pure translation, keep for context */
+    color: white;
+}
+
+.signup-verification-modal .modal-footer .btn-primary:hover {
+    background-color: var(--modal-create-btn-hover); /* This variable is not defined in this pure translation, keep for context */
+    border-color: var(--modal-create-btn-hover); /* This variable is not defined in this pure translation, keep for context */
+}
+
+.signup-verification-modal .modal-footer .btn-secondary {
+    background-color: var(--modal-cancel-btn-bg); /* This variable is not defined in this pure translation, keep for context */
+    border-color: var(--modal-cancel-btn-bg); /* This variable is not defined in this pure translation, keep for context */
+    color: white;
+}
+
+.signup-verification-modal .modal-footer .btn-secondary:hover {
+    background-color: var(--modal-cancel-btn-hover); /* This variable is not defined in this pure translation, keep for context */
+    border-color: var(--modal-cancel-btn-hover); /* This variable is not defined in this pure translation, keep for context */
+}
+
+/* Close button styling */
+.signup-verification-modal .btn-close {
+    color: var(--modal-close-color-light); /* This variable is not defined in this pure translation, keep for context */
+    opacity: 0.5;
+}
+
+.signup-verification-modal .btn-close:hover {
+    opacity: 0.75;
+}
+
+/* Dark theme specific close button (matched to .signup-verification-modal.dark) */
+.signup-verification-modal.dark .btn-close {
+    color: var(--modal-close-color-dark); /* This variable is not defined in this pure translation, keep for context */
+}
+
+.gradient-btn-signup{
+    background: linear-gradient(45deg, #1B56FD, #1230AE); 
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px; 
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease-in-out;
+    font-family: 'poppins' !important;
+}
+
+/* --- Base styles for the alert message --- */
+.alert-signup {
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    text-align: center;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Smooth transition for theme change */
+}
+
+/* --- Error message specific styles --- */
+.alert-signup.error {
+    background-color: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
+}
+
+/* --- Success message specific styles --- */
+.alert-signup.success {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
+}
+
+/* --- Light Mode (Default) --- */
+/* These variables will be used unless a dark mode is active */
+:root {
+    --error-bg: #fdd; /* Light red background */
+    --error-text: #c00; /* Darker red text */
+    --error-border: #f00; /* Red border */
+
+    --success-bg: #dff; /* Light green background */
+    --success-text: #080; /* Darker green text */
+    --success-border: #0c0; /* Green border */
+
+    /* Add other global theme variables here if you have them, e.g.: */
+    /* --background-color-light: #ffffff; */
+    /* --text-color-light: #333333; */
+}
+
+/* --- Dark Mode --- */
+/* Apply these styles when the 'dark-mode' class is present on the body or a parent element */
+body.dark-mode, .dark-mode { /* Adjust the selector based on where your theme class is applied */
+    --error-bg: #5c2020; /* Darker red background */
+    --error-text: #ff9999; /* Lighter red text */
+    --error-border: #e00000; /* Red border */
+
+    --success-bg: #205c20; /* Darker green background */
+    --success-text: #99ff99; /* Lighter green text */
+    --success-border: #00e000; /* Green border */
+
+    /* Add other global dark theme variables here if you have them, e.g.: */
+    /* --background-color-dark: #333333; */
+    /* --text-color-dark: #f0f0f0; */
 }

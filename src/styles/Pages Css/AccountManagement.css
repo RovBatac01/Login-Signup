@@ -1,0 +1,278 @@
+.account {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-color);
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.account-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  justify-content: start;
+  align-items: flex-start;
+}
+
+.account-contents {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.account-contents::-webkit-scrollbar {
+  width: 8px;
+}
+
+.account-contents::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.account-contents::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.4);
+  border-radius: 4px;
+}
+
+.account-contents::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.7);
+}
+
+/* Account Dashboard Stats */
+.account-dashboard {
+  width: 100%;
+}
+
+.account-stats-row {
+  margin: 0 0 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+
+.account-stat-card {
+  border-radius: 10px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  height: 100%;
+  overflow: hidden;
+  flex: 1;
+  min-width: 200px;
+}
+
+.account-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.account-stat-card.light {
+  background-color: white;
+  color: #333;
+}
+
+.account-stat-card.dark {
+  background: #2f2f31;
+  color: #f8f9fa;
+}
+
+.stat-icon-container {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  background-color: #E8F1FF;
+}
+
+.user-icon {
+  background-color: #E8F1FF;
+  color: #3B82F6;
+}
+
+.admin-icon {
+  background-color: #E8F1FF;
+  color: #3B82F6;
+}
+
+.super-admin-icon {
+  background-color: #FEF9C3;
+  color: #EAB308;
+}
+
+.recent-icon {
+  background-color: #DCFCE7;
+  color: #22C55E;
+}
+
+.dark .user-icon {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60A5FA;
+}
+
+.dark .admin-icon {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60A5FA;
+}
+
+.dark .super-admin-icon {
+  background-color: rgba(234, 179, 8, 0.2);
+  color: #FACC15;
+}
+
+.dark .recent-icon {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #4ADE80;
+}
+
+.stat-count {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+  color: #111827;
+}
+
+.dark .stat-count {
+  color: #F9FAFB;
+}
+
+.stat-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 8px 0;
+  color: #4B5563;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dark .stat-title {
+  color: #9CA3AF;
+}
+
+.stat-info {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+.dark .stat-info {
+  color: #D1D5DB;
+}
+
+/* Section Title - Deprecated, using page-title instead */
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #111827;
+  margin: 0 0 25px 0;
+  padding-bottom: 10px;
+  width: 100%;
+  text-transform: uppercase;
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: #3B82F6;
+}
+
+.dark .section-title {
+  color: #F9FAFB;
+}
+
+.account-management-section {
+  margin-top: 15px;
+  width: 100%;
+}
+
+/* --- Responsiveness --- */
+
+/* For screens smaller than 992px */
+@media (max-width: 992px) {
+  .account-stats-row {
+    gap: 15px;
+  }
+  
+  .account-stat-card {
+    min-width: 180px;
+  }
+}
+
+/* For screens smaller than 768px (e.g., tablets and mobile) */
+@media (max-width: 768px) {
+  .account-container {
+    flex-direction: column; /* Stack items vertically on small screens */
+  }
+
+  .account-contents {
+    height: auto;
+    overflow-y: auto;
+    padding: 15px;
+  }
+  
+  .account-stats-row {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .account-stat-card {
+    width: 100%;
+  }
+  
+  .stat-count {
+    font-size: 2rem;
+  }
+  
+  .stat-title {
+    margin: 6px 0;
+  }
+}
+
+/* For screens smaller than 480px (e.g., mobile phones) */
+@media (max-width: 480px) {
+  .account-contents {
+    padding: 10px;
+  }
+  
+  .account-stats-row {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .stat-count {
+    font-size: 1.75rem;
+  }
+  
+  .stat-title {
+    font-size: 0.9rem;
+    margin: 4px 0;
+  }
+  
+  .stat-info {
+    font-size: 0.8rem;
+  }
+  
+  .section-title {
+    font-size: 1.25rem;
+    margin: 0 0 15px 0;
+  }
+}

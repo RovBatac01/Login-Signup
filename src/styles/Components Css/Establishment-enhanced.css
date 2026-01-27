@@ -1,0 +1,416 @@
+/* Enhanced Establishment UI and Modal Styles */
+
+:root[data-theme='light'] {
+  --background-main: #FFFDF6;
+  --background-modal: #ffffff;
+  --text-primary: #111;
+  --text-secondary: #333;
+  --button-bg: #4caf50;
+  --button-hover: #45a049;
+  --modal-close-bg: #f44336;
+  --modal-close-hover: #d32f2f;
+  --badge-bg: rgba(76, 175, 80, 0.2);
+  --badge-color: #1b5e20;
+  --badge-device-bg: rgba(33, 150, 243, 0.2);
+  --badge-device-color: #0d47a1;
+  --card-border: #eaeaea;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --missing-component-bg: #ffebee;
+  --missing-component-color: #d32f2f;
+  --meta-bg: rgba(248, 249, 250, 0.7);
+  --meta-border: #e0e0e0;
+  --meta-text: #000000;
+}
+
+:root[data-theme='dark'] {
+  --background-main: #2f2f31;
+  --background-modal: #1e1f21;
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --button-bg: #2e7031;
+  --button-hover: #5a6268;
+  --modal-close-bg: #2f2f31;
+  --modal-close-hover: #dc3545;
+  --badge-bg: rgba(76, 175, 80, 0.25);
+  --badge-color: #81c784;
+  --badge-device-bg: rgba(33, 150, 243, 0.25);
+  --badge-device-color: #64b5f6;
+  --card-border: #363636;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --missing-component-bg: rgba(211, 47, 47, 0.2);
+  --missing-component-color: #ef5350;
+  --meta-bg: rgba(45, 45, 48, 0.7);
+  --meta-border: #3a3a3c;
+  --meta-text: #e0e0e0;
+}
+
+/* Base container styles */
+.estab-sensors-wrapper {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  width: 100%;
+}
+
+.estab-sensors-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem; /* Reduced padding from 1.2rem to 0.8rem horizontal and 1rem vertical */
+  background-color: var(--background-main);
+  border-radius: 0.75rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.8rem; /* Reduced margin from 1.2rem to 0.8rem */
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  border: 1px solid #e0e0e0;
+}
+
+/* Info section */
+.estab-info {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.estab-name {
+  font-size: 1.25rem; /* Reduced font size from 1.4rem */
+  font-weight: 700;
+  margin-bottom: 0.4rem; /* Reduced margin from 0.75rem to 0.4rem */
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.05);
+  letter-spacing: 0.02em;
+}
+
+.estab-meta {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  background-color: var(--meta-bg);
+  color: var(--meta-text) !important; 
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--meta-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Meta container text */
+.estab-meta span,
+.estab-modal-meta span {
+  color: var(--meta-text);
+  font-weight: 500;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  letter-spacing: 0.01em;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.sensor-count-badge {
+  background-color: var(--badge-bg);
+  color: var(--badge-color);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.device-id-badge {
+  background-color: var(--badge-device-bg);
+  color: var(--badge-device-color);
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.badge i {
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Action buttons */
+.estab-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.estab-details-button {
+  background-color: var(--button-bg);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+  letter-spacing: 0.02em;
+}
+
+.estab-details-button:hover {
+  background-color: var(--button-hover);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.estab-delete-icon-button {
+  background: rgba(220, 53, 69, 0.08);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.estab-delete-icon-button:hover {
+  color: #c82333;
+  background-color: rgba(220, 53, 69, 0.15);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* Modal styles */
+.estab-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow-y: auto;
+  backdrop-filter: blur(3px);
+}
+
+.estab-modal-content {
+  background-color: var(--background-modal);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+
+.estab-modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.estab-modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.estab-modal-content::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+}
+
+/* Modal header */
+.estab-modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+  position: relative;
+}
+
+.estab-modal-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.estab-modal-meta {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  background-color: var(--meta-bg);
+  color: var(--meta-text) !important;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--meta-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.estab-modal-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.estab-modal-close-button:hover {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--modal-close-hover);
+}
+
+/* Sensor list */
+.estab-sensor-list {
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Sensor card */
+.estab-sensor-card {
+  background-color: var(--background-main);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+}
+
+.estab-sensor-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.estab-sensor-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text-primary);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.estab-sensor-body {
+  padding: 1rem;
+}
+
+/* Missing component styles */
+.missing-component {
+  border: 1px dashed var(--card-border);
+}
+
+.missing-sensor-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--missing-component-color);
+  background-color: var(--missing-component-bg);
+  border-radius: 0.5rem;
+}
+
+.missing-sensor-placeholder i {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.missing-sensor-placeholder p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* No sensors message */
+.no-sensors-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+.no-sensors-icon {
+  font-size: 3rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.no-sensors-message {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Modal footer */
+.estab-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--card-border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.estab-modal-close-button-bottom {
+  background-color: var(--modal-close-bg);
+  color: white;
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+}
+
+.estab-modal-close-button-bottom:hover {
+  background-color: var(--modal-close-hover);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .estab-sensors-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .estab-info {
+    margin-bottom: 1rem;
+    margin-right: 0;
+  }
+  
+  .estab-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .estab-modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .estab-sensor-list {
+    grid-template-columns: 1fr;
+  }
+}

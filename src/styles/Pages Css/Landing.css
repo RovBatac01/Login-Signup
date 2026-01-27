@@ -1,0 +1,634 @@
+/* Define base CSS variables in :root for default (or dark) theme */
+:root {
+  /* Colors for Dark Theme (your current default) */
+  --color-primary-brand: #4a8af4; /* AQUASENSE brand color */
+  --color-text-primary: #ffffff; /* Main text color */
+  --color-text-secondary: #b0b0b0; /* Secondary text, descriptions */
+  --color-background-main: #1e1f21; /* Main container background */
+  --color-background-navbar: linear-gradient(to right, #1e1f21, #2f2f31); /* Navbar background */
+  --color-background-section: #1e1f21; /* Section backgrounds */
+  --color-background-card: linear-gradient(to bottom, #2f2f31, #1e1f21); /* Card backgrounds */
+  --color-background-form: rgba(255, 255, 255, 0.05); /* Form background */
+  --color-border-main: #004aad; /* Navbar border */
+  --color-border-input: rgba(255, 255, 255, 0.3); /* Input border */
+  --color-highlight: #4a8af4; /* Highlight text and active nav links */
+  --color-button-border: white; /* Button border color */
+  --color-button-hover: #377cd2; /* Button hover background */
+  --color-footer-copyright: #777; /* Footer copyright text */
+
+  /* General styles (not theme-dependent directly, but can use variables) */
+  --transition-speed: 0.3s ease-in-out;
+  --border-radius-base: 5px;
+  --border-radius-lg: 10px;
+}
+
+/* Light Theme Overrides */
+/* When body or aquasense-main-container has the 'light' class */
+body.light, .aquasense-main-container.light {
+  --color-primary-brand: #007bff; /* A standard blue for light theme */
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-background-main: #f0f2f5; /* Light gray background */
+  --color-background-navbar: linear-gradient(to right, #ffffff, #f8f9fa); /* Lighter navbar */
+  --color-background-section: #ffffff; /* White section backgrounds */
+  --color-background-card: #ffffff; /* White card backgrounds */
+  --color-background-form: #f8f9fa; /* Light form background */
+  --color-border-main: #e0e0e0; /* Lighter border */
+  --color-border-input: #cccccc; /* Lighter input border */
+  --color-highlight: #007bff; /* Use primary blue for highlight */
+  --color-button-border: #007bff; /* Blue border for buttons */
+  --color-button-hover: #0056b3; /* Darker blue on hover */
+  --color-footer-copyright: #888; /* Slightly darker gray */
+}
+
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Main Container */
+.aquasense-main-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background-color: var(--color-background-main); /* Use variable */
+  flex: 1;
+  transition: background-color var(--transition-speed); /* Transition only background */
+  animation: fadeIn 0.5s ease-in-out;
+  padding-top: 50px;
+  color: var(--color-text-primary); /* Apply main text color */
+}
+
+/* Navbar */
+.aquasense-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  background: var(--color-background-navbar); /* Use variable */
+  border-bottom: 2px solid var(--color-border-main); /* Use variable */
+  transition: background var(--transition-speed), border-bottom var(--transition-speed);
+  animation: slideInLeft 0.5s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  font-family: 'montserrat';
+}
+
+.aquasense-brand {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-primary-brand); /* Use variable */
+  transition: color var(--transition-speed), transform var(--transition-speed);
+}
+
+.aquasense-brand:hover {
+  transform: scale(1.05);
+}
+
+.aquasense-navigation {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.aquasense-navigation a {
+  text-decoration: none;
+  color: var(--color-text-primary); /* Use variable */
+  font-size: 16px;
+  transition: color var(--transition-speed), transform var(--transition-speed);
+}
+
+.aquasense-navigation a:hover {
+  color: var(--color-primary-brand); /* Use variable */
+  transform: scale(1.1);
+}
+
+/* Hero Section */
+.aquasense-hero-section {
+  text-align: left;
+  padding: 80px 40px;
+  background: var(--color-background-navbar); /* Reusing navbar background for consistency */
+  color: var(--color-text-primary); /* Use variable */
+  transition: color var(--transition-speed), background var(--transition-speed);
+  animation: fadeIn 1s ease-in-out;
+}
+
+.hero-welcome-text {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--color-primary-brand); /* Use variable */
+  animation: fadeIn 1s ease-in-out;
+  font-family: 'poppins';
+}
+
+.hero-main-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: color var(--transition-speed); /* Transition only color */
+  animation: slideInLeft 1s ease-in-out;
+  font-family: 'montserrat';
+}
+
+.hero-description {
+  font-size: 16px;
+  color: var(--color-text-secondary); /* Use variable */
+  margin-top: 10px;
+  max-width: 600px;
+  transition: color var(--transition-speed);
+  animation: fadeIn 1.5s ease-in-out;
+  font-family: 'poppins';
+  text-align: justify;
+}
+
+.hero-btn-contact {
+  width: 150px;
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: transparent;
+  color: var(--color-text-primary); /* Use variable */
+  border: 1px solid var(--color-button-border); /* Use variable */
+  border-radius: var(--border-radius-base);
+  transition: all var(--transition-speed);
+  animation: fadeIn 2s ease-in-out;
+  font-family: 'poppins';
+}
+
+.hero-btn-contact:hover {
+  background-color: var(--color-primary-brand); /* Use variable */
+  border-color: var(--color-primary-brand); /* Use variable */
+  transform: scale(1.05);
+}
+
+/* About Section */
+.aquasense-about-section {
+  padding: 80px 50px;
+  background: var(--color-background-section); /* Use variable */
+  color: var(--color-text-primary); /* Use variable */
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+.about-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Left - Image */
+.about-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeInLeft 1s ease-in-out;
+}
+
+.about-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-lg);
+  transition: transform var(--transition-speed);
+}
+
+.about-image img:hover {
+  transform: scale(1.05);
+}
+
+/* Right - Content */
+.about-content {
+  flex: 1;
+  padding-left: 20px;
+  animation: fadeInRight 1s ease-in-out;
+}
+
+.about-subtitle {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--color-primary-brand); /* Use variable */
+  letter-spacing: 1px;
+  font-family: 'poppins';
+}
+
+.about-heading {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 10px;
+  font-family: 'montserrat';
+  color: var(--color-text-primary);
+}
+
+.about-description {
+  font-size: 16px;
+  color: var(--color-text-secondary); /* Use variable */
+  margin-top: 10px;
+  max-width: 600px;
+  font-family: 'poppins';
+  text-align: justify;
+}
+
+.about-btn-learn-more {
+  width: 150px;
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: transparent;
+  color: var(--color-text-primary); /* Use variable */
+  border: 1px solid var(--color-button-border); /* Use variable */
+  border-radius: var(--border-radius-base);
+  transition: all var(--transition-speed);
+  font-family: 'poppins';
+}
+
+.about-btn-learn-more:hover {
+  background-color: var(--color-primary-brand); /* Use variable */
+  border-color: var(--color-primary-brand); /* Use variable */
+  transform: scale(1.05);
+}
+
+/* Services Section */
+.aquasense-services-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 40px;
+  background: var(--color-background-section); /* Use variable */
+  color: var(--color-text-primary); /* Use variable */
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+.services-info {
+  flex: 1;
+  animation: fadeInLeft 1s ease-in-out;
+  font-family: 'poppins';
+}
+
+.services-header {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--color-primary-brand); /* Use variable */
+  letter-spacing: 1px;
+  font-family: 'poppins';
+}
+
+.services-main-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 10px;
+  font-family: 'poppins';
+  color: var(--color-text-primary);
+}
+
+.highlight-text {
+  color: var(--color-highlight); /* Use variable */
+}
+
+.services-description {
+  font-size: 16px;
+  color: var(--color-text-secondary); /* Use variable */
+  margin-top: 10px;
+  max-width: 500px;
+  font-family: 'poppins';
+    text-align: justify;
+}
+
+.services-btn-view-all {
+  width: 150px;
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: transparent;
+  color: var(--color-text-primary); /* Use variable */
+  border: 1px solid var(--color-button-border); /* Use variable */
+  border-radius: var(--border-radius-base);
+  transition: all var(--transition-speed);
+  font-family: 'poppins';
+}
+
+.services-btn-view-all:hover {
+  background-color: var(--color-primary-brand); /* Use variable */
+  border-color: var(--color-primary-brand); /* Use variable */
+  transform: scale(1.05);
+}
+
+/* Services Grid */
+.services-list {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  animation: fadeInRight 1s ease-in-out;
+}
+
+.service-card {
+  background: var(--color-background-card); /* Use variable */
+  padding: 40px;
+  text-align: center;
+  border-radius: var(--border-radius-lg);
+  transition: transform var(--transition-speed), box-shadow var(--transition-speed), background var(--transition-speed);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(74, 138, 244, 0.2); /* Still specific to the blue highlight for now */
+  animation: popIn 0.3s ease-in-out;
+}
+
+.service-title {
+  color: var(--color-primary-brand); /* Use variable */
+  font-size: 18px;
+  margin-top: 10px;
+  font-family: 'poppins';
+}
+
+.service-description {
+  font-size: 14px;
+  color: var(--color-text-secondary); /* Use variable */
+  margin-top: 5px;
+  font-family: 'poppins';
+text-align: start;
+}
+
+/* Contact Section */
+.aquasense-contact-section {
+  padding: 80px 50px;
+  background: var(--color-background-section); /* Use variable */
+  color: var(--color-text-primary); /* Use variable */
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+.contact-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 50px;
+}
+
+/* Left Side - Contact Info */
+.contact-info {
+  flex: 1;
+  max-width: 500px;
+  animation: fadeInLeft 1s ease-in-out;
+  font-family: 'poppins';
+}
+
+.contact-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+/* Highlight text uses primary brand color for consistency */
+/* .highlight-text is already defined */
+
+.contact-divider {
+  width: 50px;
+  border: 2px solid var(--color-text-primary); /* Use primary text color for divider */
+  margin: 10px 0;
+  transition: border-color var(--transition-speed);
+}
+
+.contact-description {
+  font-size: 16px;
+  color: var(--color-text-secondary); /* Use variable */
+  margin-top: 10px;
+}
+
+.contact-details {
+  margin-top: 20px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  color: var(--color-text-primary);
+}
+
+.contact-item h4 {
+  color: var(--color-text-primary);
+}
+
+.contact-item p {
+  color: var(--color-text-secondary);
+}
+
+
+.contact-icon {
+  width: 24px;
+  height: 24px;
+  /* Adjust filter for light/dark theme if icons are not SVGs or colored */
+  /* Example:
+  .aquasense-main-container.light .contact-icon { filter: invert(0.8); }
+  */
+}
+
+/* Right Side - Contact Form */
+.contact-form {
+  flex: 1;
+  max-width: 400px;
+  background: var(--color-background-form); /* Use variable */
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  animation: fadeInRight 1s ease-in-out;
+  font-family: 'poppins';
+  transition: background var(--transition-speed);
+}
+
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: var(--color-text-primary);
+}
+
+.contact-form input,
+.contact-form textarea {
+  background: transparent;
+  border: 1px solid var(--color-border-input); /* Use variable */
+  padding: 10px;
+  color: var(--color-text-primary); /* Use variable */
+  margin-bottom: 15px;
+  border-radius: var(--border-radius-base);
+  transition: border-color var(--transition-speed), color var(--transition-speed);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--color-primary-brand); /* Use variable */
+  animation: shake 0.5s ease-in-out;
+  font-family: 'poppins';
+}
+
+.contact-form textarea {
+  height: 100px;
+}
+
+.contact-form button {
+  background-color: var(--color-primary-brand); /* Use variable */
+  border: none;
+  padding: 12px;
+  color: var(--color-text-primary); /* Keep text color for button */
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.contact-form button:hover {
+  background-color: var(--color-button-hover); /* Use variable */
+}
+
+.btn-submit {
+  width: 150px;
+  margin-top: 20px;
+  padding: 12px 24px;
+  background-color: transparent;
+  color: var(--color-text-primary); /* Use variable */
+  border: 1px solid var(--color-button-border); /* Use variable */
+  border-radius: var(--border-radius-base);
+  transition: all var(--transition-speed);
+  font-family: 'poppins';
+}
+
+.btn-submit:hover {
+  background-color: var(--color-primary-brand); /* Use variable */
+  border-color: var(--color-primary-brand); /* Use variable */
+  transform: scale(1.05);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--color-background-navbar); /* Reusing navbar background */
+  color: var(--color-text-secondary); /* Use variable for general text */
+  animation: fadeIn 1.5s ease-in-out;
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+.footer-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--color-primary-brand); /* Use variable */
+  margin-bottom: 10px;
+  font-family: 'montserrat';
+}
+
+.footer-text {
+  font-size: 14px;
+  color: var(--color-text-secondary); /* Use variable */
+  margin-bottom: 15px;
+  font-family: 'poppins';
+}
+
+.footer-socials {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.footer-socials img {
+  width: 20px;
+  height: 20px;
+  /* You might need to adjust filter based on icon source for light/dark themes */
+  filter: brightness(0.8); /* This works for dark mode if icons are light */
+  transition: var(--transition-speed);
+}
+
+.footer-socials img:hover {
+  filter: brightness(1);
+}
+
+.footer-copyright {
+  font-size: 12px;
+  color: var(--color-footer-copyright); /* Use variable */
+  font-family: 'poppins';
+}
+
+/* Keyframes for Animations (remain unchanged) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.aquasense-navigation a.active {
+  color: var(--color-highlight); /* Use variable for active link highlight */
+  font-weight: bold;
+}

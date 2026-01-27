@@ -1,24 +1,270 @@
-.form-control.transparent-input {
-  background-color: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  color: #fff;
-  border-radius: 8px;
-  padding: 10px 15px;
+/* Base styles for input fields - adaptable to both themes */
+.light{
+--danger-color:black;
 }
 
-.form-control.transparent-input:focus {
-  background-color: transparent;
-  border-color: #fff;
-  color: #fff;
-  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+.dark{
+--danger-color:white;
+}
+.input-field {
+    border-radius: 8px; /* Consistent rounded corners */
+    padding: 10px 15px;
+    font-size: 1rem;
+    width: 100%; /* Ensure inputs take full width */
+    transition: all 0.3s ease-in-out; /* Smooth transitions for theme changes and focus */
+    min-height: 45px; /* Ensure a consistent height for input fields, helps with icon alignment */
 }
 
-.form-control.transparent-input::placeholder {
-  color: rgb(255, 255, 255);
+/* Light Theme Input Field Styles (matching the provided image) */
+.input-field.light {
+    background-color: #ffffff;
+    border: 1px solid #ced4da; /* Light grey border */
+    color: #495057; /* Dark text for light theme */
 }
 
-.form-control.transparent-input:disabled,
-.form-control.transparent-input[readonly] {
-  background-color: transparent;
+.input-field.light:focus {
+    background-color: #ffffff;
+    border-color: #80bdff; /* Bootstrap primary blue on focus */
+    color: #495057;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Blue focus shadow */
 }
 
+/* Placeholder text styling for light theme */
+.input-field.light::placeholder {
+    color: #6c757d; /* Muted grey placeholder */
+}
+
+/* Dark Theme Input Field Styles (Contrast to light theme, matching image's dark input) */
+.input-field.dark {
+    background-color: #363636; /* Solid dark background as seen in image */
+    border: 1px solid #555555; /* Slightly darker border for contrast */
+    color: #f8f9fa; /* Light text for dark theme */
+}
+
+.input-field.dark:focus {
+    background-color: #444444; /* Slightly lighter dark on focus */
+    color: #f8f9fa;
+}
+
+/* Placeholder text styling for dark theme */
+.input-field.dark::placeholder {
+    color: #aaaaaa; /* Lighter grey for placeholders in dark theme */
+    opacity: 1; /* Ensure placeholder is not transparent */
+}
+
+/* Disabled or readonly fields - applies to both themes */
+.input-field:disabled,
+.input-field[readonly] {
+    opacity: 0.7; /* Slightly faded */
+    cursor: not-allowed;
+}
+
+
+/* --- Form Button --- */
+/* The image shows a pink-to-purple gradient. Let's create that. */
+.gradient-button-login {
+    /* Updated gradient to match the image */
+    background: linear-gradient(45deg, #1B56FD, #1230AE);
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease-in-out;
+    font-family: 'poppins' !important;
+}
+
+.gradient-btn:hover { /* Note: your jsx uses gradient-button-login, ensure consistency if you use this class name */
+    opacity: 0.9; /* Slight dim on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow on hover */
+}
+
+.gradient-btn:active { /* Note: your jsx uses gradient-button-login, ensure consistency if you use this class name */
+    opacity: 0.8; /* Further dim on click */
+    transform: translateY(1px);
+}
+
+
+.form-check-label {
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+
+.form-check-input {
+    /* Add any custom styling for the checkbox itself here if needed */
+}
+
+.text-center {
+    text-align: center;
+}
+
+.danger{
+    color: var(--danger-color);
+    margin-top: 0.75rem;
+    text-align: center;
+    font-family: 'poppins';
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem !important;
+    font-family: 'poppins';
+}
+.mt-3 {
+    margin-top: 1.5rem !important;
+    font-family: 'poppins';
+}
+.my-3 {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* New: For the checkbox text */
+.form-check-label.light {
+    color: #333333;
+}
+
+.form-check-label.dark {
+    color: #f8f9fa;
+}
+
+
+/* --- Password Input Specific Styles (Modified) --- */
+
+/* Renamed to `password-input-container` for better semantic clarity */
+.password-input-container {
+    position: relative;
+    /* Ensure no extra padding or margin from parent `mb-3` interferes here */
+}
+
+/* Adjust padding for the input field when an icon is present */
+/* The input field itself should be targeted by the `password-with-icon` class */
+.password-input-container .input-field.password-with-icon {
+    padding-right: 45px; /* Make space for the icon */
+    /* border-radius and other base styles inherited from .input-field */
+}
+
+/* Positioning and styling for the eye icon */
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px; /* Adjust as needed to position the icon from the right edge */
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.1rem; /* Slightly larger icon */
+    z-index: 2; /* Ensure icon is above the input */
+    display: flex; /* Helps with centering */
+    align-items: center; /* Vertically align icon */
+    justify-content: center; /* Horizontally align icon */
+    height: 100%; /* Take full height of parent for better click target */
+}
+
+/* Default (light theme) icon color */
+.password-toggle-icon.light {
+    color: #6c757d; /* Muted grey for light theme */
+}
+
+.password-toggle-icon.light:hover {
+    color: #007bff; /* Bootstrap primary blue on hover for light theme */
+}
+
+/* Dark theme icon color */
+.password-toggle-icon.dark {
+    color: #aaaaaa; /* Lighter grey to match dark background */
+}
+
+.password-toggle-icon.dark:hover {
+    color: #f8f9fa; /* White on hover for dark theme, for prominence */
+}
+
+/* Custom styles for the Terms and Conditions Modal */
+
+.terms-modal .modal-content {
+  border-radius: 15px; /* Rounded corners for the modal */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+  background: linear-gradient(135deg, #f0f4f8, #e0e7ee); /* Light gradient background */
+  color: #333; /* Darker text for readability */
+}
+
+.terms-modal .modal-header {
+  border-bottom: 1px solid #dcdfe4; /* Subtle border below header */
+  padding: 20px 25px; /* More padding */
+  background-color: #ffffff; /* White header background */
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  font-family: 'montserrat';
+}
+
+.terms-modal .modal-title {
+  color: #2c3e50; /* Darker title color */
+  font-weight: 700; /* Bolder title */
+  font-size: 1.5rem; /* Larger font size */
+  
+}
+
+.terms-modal .btn-close {
+  font-size: 1rem;
+  color: #555; /* Darker close button */
+  opacity: 0.7; /* Slightly less opaque */
+}
+
+.terms-modal .modal-body {
+  padding: 25px; /* Ample padding inside body */
+  line-height: 1.7; /* Increased line height for better readability */
+  font-size: 0.95rem; /* Slightly larger base font */
+}
+
+.terms-modal h4 {
+  color: #1a5276; /* Distinct color for subheadings */
+  margin-bottom: 15px;
+  font-weight: 600;
+  border-bottom: 2px solid #aebfd1; /* Underline for emphasis */
+  padding-bottom: 5px;
+  font-family: 'montserrat';
+}
+
+
+.terms-modal ul {
+  list-style-type: disc; /* Standard disc bullets */
+  margin-left: 20px; /* Indent lists */
+  margin-bottom: 15px;
+  font-family: 'poppins';
+  text-align: justify;
+}
+
+.terms-modal ul li {
+  margin-bottom: 8px; /* Spacing between list items */
+  
+}
+
+.terms-modal strong {
+  color: #004085; /* Stronger color for bold text */
+}
+
+.terms-modal .modal-footer {
+  border-top: 1px solid #dcdfe4; /* Subtle border above footer */
+  padding: 15px 25px; /* Padding for the footer */
+  background-color: #ffffff;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.terms-modal .btn-secondary {
+  background-color: #6c757d; /* Standard secondary button color */
+  border-color: #6c757d;
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  font-family: 'poppins';
+}
+
+.terms-modal .btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+  transform: translateY(-2px); /* Slight lift on hover */
+}
+
+.terms-modal p{
+    font-family: 'poppins';
+    text-align: justify;
+}

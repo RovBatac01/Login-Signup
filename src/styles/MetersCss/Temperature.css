@@ -1,0 +1,151 @@
+:root {
+  --dark-mode-bg: #2f2f31;
+  --dark-mode-bg-rgba: #1e1f21;
+  --light-mode-bg: #f9f9f9;
+  --toggle-slider-light: white;
+
+  --toggle-text-light: black;
+
+  --widget-text-light: #333;
+
+  --toggle-label-light:white;
+  --slider-bg-light: #1230AE;
+}
+
+[data-theme="dark"] {
+  --custom-toggle-bg-dark: #444444; 
+  --toggle-label-dark:white;
+  --slider-bg-dark: white;
+    --widget-text-dark: #f9f9f9;
+      --toggle-text-dark: #f9f9f9;
+        --toggle-slider-dark: #1230AE;
+}
+
+.widget-container {
+  width: 100%;
+  max-width: 300px;
+  padding: 1rem;
+  background-color: var(--dark-mode-bg); 
+  border-radius: 20px;
+  text-align: center;
+  height: 350px;
+}
+
+.widget-container.light {
+  background-color: var(--light-mode-bg);
+}
+
+.toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-family: 'poppins';
+}
+
+.custom-toggle {
+  position: relative;
+  width: 200px;
+  height: 42px;
+  background-color: var(--custom-toggle-bg-light);
+  border-radius: 9999px;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  margin-top: 3px;
+}
+
+.custom-toggle.dark {
+  background-color: var(--custom-toggle-bg-dark);
+}
+
+.toggle-label {
+  flex: 1;
+  text-align: center;
+  z-index: 2;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* .custom-toggle.disconnected .disconnected-label {
+  color: black;
+}
+
+.custom-toggle.disconnected .disconnected-label .light{
+  color: black;
+}
+
+.custom-toggle.disconnected .connected-label {
+  color: black;
+}
+
+.custom-toggle.disconnected .connected-label .light{
+  color: black;
+} */
+
+
+.slider {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  z-index: 2;
+  transition: transform 0.3s ease;
+  background-color: var(--slider-bg-light);
+}
+
+.slider.dark {
+  background-color: var(--slider-bg-dark);
+}
+
+.custom-toggle.connected .slider {
+  transform: translateX(0);
+}
+
+.custom-toggle.disconnected .slider {
+  transform: translateX(100%);
+}
+
+
+
+/* Meter Styling */
+.meter-container {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 1rem auto;
+    font-family: 'poppins';
+}
+
+.temperature-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: bold;
+  color: var(--toggle-text-dark);
+}
+
+.temperature-text .light{
+    color: var(--toggle-text-light);
+}
+
+.temperature-text .label {
+  font-size: 0.9rem;
+}
+
+.temperature-text .value {
+  font-size: 2.5rem;
+}
+
+.temperature-text .unit {
+  font-size: 1rem;
+}
+
+.water-quality-text {
+  font-size: 0.95rem;
+    font-family: 'poppins';
+}
